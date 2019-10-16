@@ -1,0 +1,134 @@
+% !TeX root = ./proposal.tex
+
+\vfil
+
+
+\begin{center}
+      {\Large Computer Science Tripos -- Part II -- Project Proposal} \\
+      \vspace{0.4in}
+      {\huge \bf A probabilistic programming language in OCaml } \\
+      \vspace{0.4in}
+      {\large A. Roy, Christ's College} \\
+      \vspace{0.1in}
+      {\large \today} \\
+
+\end{center}
+\vspace{0.4in}
+
+\vfil
+
+\textbf{Project Originator:} Dr. L. Wang
+\vspace{0.1in}
+
+\textbf{Project Supervisor:} Dr R. Mortier
+\vspace{0.1in}
+
+\textbf{Director of Studies:} Dr R. Mortier
+\vspace{0.1in}
+
+\textbf{Project Overseers:} Dr~J.~A.~Crowcroft  \& Dr~T.~Sauerwald
+
+\vfil
+
+% Main document
+
+\section*{Introduction}
+
+A probabilistic programming language (PPL) is a framework in which one can create statistical models and have inference run on them automatically. A PPL can take the form of its own language (i.e. a DSL), or be embedded within an existing language (such as OCaml). The ability to write probabilistic programs within OCaml would allow us to leverage the benefits of OCaml, such as expressiveness, a strong type system, and memory safety. The use of a numerical computation library, Owl, will allow us to perform inference performantly.
+
+
+\section*{Starting Point}
+
+% TODO: insert references for other languages
+There do exist PPLs for OCaml, such as IBAL \cite{kiselyov2009embedded}, as well as PPLs for other languages, such as WebPPL (JS), Church, Infer.Net to name a few. My PPL can draw on some of the ideas introduced by these languages, particularly in implementing efficient inference engines.
+
+I will be using an existing OCaml numerical computation library (Owl). This library does not contain methods for probabilistic programming in general, although it does contain modules which will help in the implementation of an inference engine such as efficient random number generation and lazy evaluation.
+
+I have experience with the core SML language, which will aid in learning basic OCaml due to similarities in the languages, however I will still have to learn the modules system.
+
+\section*{Substance and Structure of the Project}
+
+There are 2 main components to the system, namely the modelling API and the inference engine.
+
+\subsection*{Modeling API}
+The modeling API is used to represent a statistical model. For example, in mathematical notation, a random variable representing a coin flip may be represented as $X \sim N(0,1)$, but in a PPL we need to represent this as code. An example would be
+\begin{verbatim}
+      Variable<double> x = Variable.GaussianFromMeanAndVariance(0, 1)
+\end{verbatim}
+in the Infer.Net (F\#) language. In OCaml, there will be many different options for representing distributions, and a choice will need to be made about whether to create a separate domain specific language (DSL) or whether to embed the language in OCaml as a library.
+
+% TODO finish this
+\subsection*{Inference Engine}
+There are many different options for a possible inference engine
+
+\section*{Evaluation}
+
+The PPL developed here will be compared to existing PPLs for OCaml (in particular, IBAL), comparing performance for programs describing the same models. I will also want to quantify exactly what kind of problems need to be supported by my PPL and make sure these kind of programs can be run. I will also want to support a minimum number of standard distributions, e.g. bernoulli, normal, geometric, etc. or enable users to define custom distributions.
+
+\subsection*{Success Criteria}
+
+\begin{itemize}
+      \item \textbf{Available distributions}: I will aim to make sure my PPL has at minimum the bernoulli and normal distributions available as basic building blocks to build more complex probabilistic programs.
+      % TODO: TODO_ clarify this one below - what does this mean, do I actually need this as a goal or is it already there since I'm doing a library not a DSL?
+      \item \textbf{Language Features}: I will aim to support some subset of Ocaml language features, such as 'if' statements, 'for' loops, operators and functions.
+      \item \textbf{Performance}: This is a quantitative measure, comparing programs written in my PPL to equivalent programs in other PPLs.
+      \item \textbf{Expressiveness}: This is a more qualitative measure, comparing equivalent programs with the same goals across various PPLs.
+\end{itemize}
+
+\section*{Extensions}
+
+There are several extensions which could be considered, time permitting:
+
+\begin{enumerate}
+      \item There could be more options for the inference engine, i.e. implementing more than one inference algorithm. Different algorithms are suited to different inference tasks, so this would be a worthwhile extension
+      \item I could add more distributions, as well as the ability to create custom distributions
+      \item Include the ability to visualise results using the plotting module in owl.
+      \item Include the ability to visualise the model in which inference is being performed (e.g. the factor graph)
+\end{enumerate}
+
+
+\section*{Schedule}
+Planned starting date is {28/10/19}, the Monday after handing in project proposal. Work is broken up into roughly 2 week sections.
+
+\subsection*{Michaelmas Term}
+\begin{itemize}
+      \item {\bf Weeks 3-4 (28/10/19 -- 10/11/19)} \\ Set up IDE and local environment - installing Owl and practicing using it. Read papers on past PPLs and implementations, both ocaml or otherwise. Set up project repository and directory structure.
+      \item \textbf{Weeks 5-6 (11/10/19 -- 24/11/19)} \\ Design a basic modelling API and write module/function signatures. Decide how to implement this (e.g. DSL vs library). Research inference algorithms and make sure they will fit into the modelling API designed.
+      \item \textbf{Weeks 7-8 (25/10/19 -- 08/12/19)} \\ Begin to implement the modelling API, and allow running a model 'forward', i.e. generating samples.
+\end{itemize}
+\subsection*{Christmas Holidays}
+\begin{itemize}
+      \item \textbf{Weeks 1-2 (09/12/19 -- 22/12/19)}\\ Begin to implement a basic inference algorithm (such as MCMC) allowing programs to be run 'backwards' to infer parameters.
+      \item \textbf{Weeks 3-4 (23/12/19 -- 05/01/20)} [\textit{Christmas Break}]
+      \item \textbf{Weeks 5-6 (06/01/20 -- 19/01/19)}\\ Consider extensions if finished early. Begin writing up progress report.
+\end{itemize}
+\subsection*{Lent Term}
+\begin{itemize}
+      \item \textbf{Weeks 1-2 (20/01/19 -- 02/02/20)}\\ Finish progress report as well as any extensions, time permitting.
+            \\ \textit{Milestone: Progress report deadline (31/01/19)}
+      \item \textbf{Weeks 3-4 (03/02/20 -- 16/02/20)}\\ Prepare for the presentation, begin planning the dissertation, particularly the structure and the content I need to write for each section. Begin writing, starting with the first sections (e.g. introduction).
+            \\ \textit{Milestone: Progress report presentations (06/02/20)}
+      \item \textbf{Weeks 5-6 (17/02/20 -- 01/02/20)}\\ Finish writing up the bulk of the implementation section.
+      \item \textbf{Weeks 7-8 (02/03/20 -- 15/03/20)}\\ Complete first draft of dissertation and complete any unfinished tasks.
+\end{itemize}
+\subsection*{Easter Holidays}
+\begin{itemize}
+      \item \textbf{Weeks 1-6 (16/03/20 -- 26/04/20)}\\ Improve dissertation based on supervisor feedback
+\end{itemize}
+\subsection*{Easter Term}
+\begin{itemize}
+      \item \textbf{Weeks 1-2 (27/04/20 -- 07/04/20)}\\ Finalise disseration after proof reading and hand in.
+            \\ \textit{Milestone: Electronic Submission deadline (08/04/20)}
+\end{itemize}
+
+
+\section*{Resources Required}
+
+\paragraph*{Hardware}
+I intend to use my personal laptop for the main development and subsequent write up (HP Pavilion 15, 8GB RAM, i5-8265U CPU, running Ubuntu and Windows dual booted).
+
+\paragraph*{Software}
+The required software includes the ocaml compiler, with a build system (dune) and a package manager (opam). I will also use the IDE VSCode with an OCaml extension, as well as git for version control and latex for the write up.
+
+\paragraph*{Backups}
+For backups, I will use GitHub to host my git repository remotely, pushing frequently. I will also backup weekly to a USB stick in case of failures. The software I require is available on MCS machines, so I'll be able to continue work in the event of a hardware failure.

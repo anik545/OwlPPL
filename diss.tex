@@ -1,0 +1,483 @@
+% The master copy of this demo dissertation is held on my filespace
+% on the cl file serve (/homes/mr/teaching/demodissert/)
+
+% Last updated by MR on 2 August 2001
+
+\documentclass[12pt,twoside,notitlepage]{report}
+
+\usepackage{a4}
+\usepackage{verbatim}
+
+\input{epsf}                            % to allow postscript inclusions
+% On thor and CUS read top of file:
+%     /opt/TeX/lib/texmf/tex/dvips/epsf.sty
+% On CL machines read:
+%     /usr/lib/tex/macros/dvips/epsf.tex
+
+
+
+
+\raggedbottom                           % try to avoid widows and orphans
+\sloppy
+\clubpenalty1000%
+\widowpenalty1000%
+
+\addtolength{\oddsidemargin}{6mm}       % adjust margins
+\addtolength{\evensidemargin}{-8mm}
+
+\renewcommand{\baselinestretch}{1.1}    % adjust line spacing to make
+                                        % more readable
+
+\begin{document}
+
+\bibliographystyle{plain}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title
+
+
+\pagestyle{empty}
+
+\hfill{\LARGE \bf Anik Roy}
+
+\vspace*{60mm}
+\begin{center}
+\Huge
+{\bf A probabilistic programming language in Ocaml} \\
+\vspace*{5mm}
+Diploma in Computer Science \\
+\vspace*{5mm}
+Christ's College \\
+\vspace*{5mm}
+\today  % today's date
+\end{center}
+
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Proforma, table of contents and list of figures
+
+\setcounter{page}{1}
+\pagenumbering{roman}
+\pagestyle{plain}
+
+\chapter*{Proforma}
+
+{\large
+\begin{tabular}{ll}
+Name:               & \bf Anik Roy                       \\
+College:            & \bf Christ's College                     \\
+Project Title:      & \bf A probabilistic programming language in Ocaml \\
+Examination:        & \bf Diploma in Computer Science, July 2020        \\
+Word Count:         & \bf --\footnotemark[1]
+(well less than the 12000 limit) \\
+Project Originator: & Dr R.~Mortier                    \\
+Supervisor:         & Dr R.~Mortier                    \\ 
+\end{tabular}
+}
+\footnotetext[1]{This word count was computed
+by {\tt detex diss.tex | tr -cd '0-9A-Za-z $\tt\backslash$n' | wc -w}
+}
+\stepcounter{footnote}
+
+
+\section*{Original Aims of the Project}
+
+
+\section*{Work Completed}
+
+
+\section*{Special Difficulties}
+
+ 
+\newpage
+\section*{Declaration}
+
+I, Anik Roy of Christ's College, being a candidate for Part II of the Computer
+Science Tripos [or the Diploma in Computer Science], hereby declare
+that this dissertation and the work described in it are my own work,
+unaided except as may be specified below, and that the dissertation
+does not contain material that has already been used to any substantial
+extent for a comparable purpose.
+
+\bigskip
+\leftline{Signed [signature]}
+
+\medskip
+\leftline{Date [date]}
+
+\cleardoublepage
+
+\tableofcontents
+
+\listoffigures
+
+\newpage
+\section*{Acknowledgements}
+
+This document owes much to an earlier version written by Simon Moore
+\cite{Moore95}.  His help, encouragement and advice was greatly 
+appreciated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% now for the chapters
+
+\cleardoublepage        % just to make sure before the page numbering
+                        % is changed
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+\pagestyle{headings}
+
+\chapter{Introduction}
+
+\section{Overview of the files}
+
+This document consists of the following files:
+
+\begin{itemize}
+\item {\tt Makefile} --- The Makefile for the dissertation and Project Proposal
+\item {\tt diss.tex} --- The dissertation
+\item {\tt propbody.tex} --- Appendix~C  -- the project proposal 
+\item {\tt proposal.tex}  --- A \LaTeX\ main file for the proposal 
+\item{\tt figs} -- A directory containing diagrams and pictures
+\item{\tt refs.bib} --- The bibliography database
+\end{itemize}
+
+\section{Building the document}
+
+This document was produced using \LaTeXe which is based upon
+\LaTeX\cite{Lamport86}.  To build the document you first need to
+generate {\tt diss.aux} which, amongst other things, contains the
+references used.  This if done by executing the command:
+
+{\tt latex diss}
+
+\noindent
+Then the bibliography can be generated from {\tt refs.bib} using:
+
+{\tt bibtex diss}
+
+\noindent
+Finally, to ensure all the page numbering is correct run {\tt latex}
+on {\tt diss.tex} until the {\tt .aux} files do not change.  This
+usually takes 2 more runs.
+
+\subsection{The makefile}
+
+To simplify the calls to {\tt latex} and {\tt bibtex}, 
+a makefile has been provided, see Appendix~\ref{makefile}. 
+It provides the following facilities:
+
+\begin{itemize}
+
+\item{\tt make} \\
+ Display help information.
+
+\item{\tt make prop} \\
+ Run {\tt latex proposal; xdvi proposal.dvi}.
+
+\item{\tt make diss.ps} \\
+ Make the file {\tt diss.ps}.
+
+\item{\tt make gv} \\
+ View the dissertation using ghostview after performing 
+{\tt make diss.ps}, if necessary.
+
+\item{\tt make gs} \\
+ View the dissertation using ghostscript after performing 
+{\tt make diss.ps}, if necessary.
+
+\item{\tt make count} \\
+Display an estimate of the word count.
+
+\item{\tt make all} \\
+Construct {\tt proposal.dvi} and {\tt diss.ps}.
+
+\item{\tt make pub} \\ Make a {\tt .tar} version of the {\tt demodiss}
+directory and place it in my {\tt public\_html} directory.
+
+\item{\tt make clean} \\ Delete all files except the source files of
+the dissertation. All these deleted files can be reconstructed by
+typing {\tt make all}.
+
+\item{\tt make pr} \\
+Print the dissertation on your default printer.
+
+\end{itemize}
+
+
+\section{Counting words}
+
+An approximate word count of the body of the dissertation may be
+obtained using:
+
+{\tt wc diss.tex}
+
+\noindent
+Alternatively, try something like:
+
+\verb/detex diss.tex | tr -cd '0-9A-Z a-z\n' | wc -w/
+
+
+
+
+\cleardoublepage
+
+
+
+\chapter{Preparation}
+
+This chapter is empty!
+
+
+\cleardoublepage
+\chapter{Implementation}
+
+\section{Verbatim text}
+
+Verbatim text can be included using \verb|\begin{verbatim}| and
+\verb|\end{verbatim}|. I normally use a slightly smaller font and
+often squeeze the lines a little closer together, as in:
+
+{\renewcommand{\baselinestretch}{0.8}\small\begin{verbatim}
+GET "libhdr"
+ 
+GLOBAL { count:200; all  }
+ 
+LET try(ld, row, rd) BE TEST row=all
+                        THEN count := count + 1
+                        ELSE { LET poss = all & ~(ld | row | rd)
+                               UNTIL poss=0 DO
+                               { LET p = poss & -poss
+                                 poss := poss - p
+                                 try(ld+p << 1, row+p, rd+p >> 1)
+                               }
+                             }
+LET start() = VALOF
+{ all := 1
+  FOR i = 1 TO 12 DO
+  { count := 0
+    try(0, 0, 0)
+    writef("Number of solutions to %i2-queens is %i5*n", i, count)
+    all := 2*all + 1
+  }
+  RESULTIS 0
+}
+\end{verbatim}
+}
+
+\section{Tables}
+
+\begin{samepage}
+Here is a simple example\footnote{A footnote} of a table.
+
+\begin{center}
+\begin{tabular}{l|c|r}
+Left      & Centred & Right \\
+Justified &         & Justified \\[3mm]
+%\hline\\%[-2mm]
+First     & A       & XXX \\
+Second    & AA      & XX  \\
+Last      & AAA     & X   \\
+\end{tabular}
+\end{center}
+
+\noindent
+There is another example table in the proforma.
+\end{samepage}
+
+\section{Simple diagrams}
+
+Simple diagrams can be written directly in \LaTeX.  For example, see
+figure~\ref{latexpic1} on page~\pageref{latexpic1} and see
+figure~\ref{latexpic2} on page~\pageref{latexpic2}.
+
+\begin{figure}
+\setlength{\unitlength}{1mm}
+\begin{center}
+\begin{picture}(125,100)
+\put(0,80){\framebox(50,10){AAA}}
+\put(0,60){\framebox(50,10){BBB}}
+\put(0,40){\framebox(50,10){CCC}}
+\put(0,20){\framebox(50,10){DDD}}
+\put(0,00){\framebox(50,10){EEE}}
+
+\put(75,80){\framebox(50,10){XXX}}
+\put(75,60){\framebox(50,10){YYY}}
+\put(75,40){\framebox(50,10){ZZZ}}
+
+\put(25,80){\vector(0,-1){10}}
+\put(25,60){\vector(0,-1){10}}
+\put(25,50){\vector(0,1){10}}
+\put(25,40){\vector(0,-1){10}}
+\put(25,20){\vector(0,-1){10}}
+
+\put(100,80){\vector(0,-1){10}}
+\put(100,70){\vector(0,1){10}}
+\put(100,60){\vector(0,-1){10}}
+\put(100,50){\vector(0,1){10}}
+
+\put(50,65){\vector(1,0){25}}
+\put(75,65){\vector(-1,0){25}}
+\end{picture}
+\end{center}
+\caption{\label{latexpic1}A picture composed of boxes and vectors.}
+\end{figure}
+
+\begin{figure}
+\setlength{\unitlength}{1mm}
+\begin{center}
+
+\begin{picture}(100,70)
+\put(47,65){\circle{10}}
+\put(45,64){abc}
+
+\put(37,45){\circle{10}}
+\put(37,51){\line(1,1){7}}
+\put(35,44){def}
+
+\put(57,25){\circle{10}}
+\put(57,31){\line(-1,3){9}}
+\put(57,31){\line(-3,2){15}}
+\put(55,24){ghi}
+
+\put(32,0){\framebox(10,10){A}}
+\put(52,0){\framebox(10,10){B}}
+\put(37,12){\line(0,1){26}}
+\put(37,12){\line(2,1){15}}
+\put(57,12){\line(0,2){6}}
+\end{picture}
+
+\end{center}
+\caption{\label{latexpic2}A diagram composed of circles, lines and boxes.}
+\end{figure}
+
+
+
+\section{Adding more complicated graphics}
+
+The use of \LaTeX\ format can be tedious and it is often better to use
+encapsulated postscript to represent complicated graphics.
+Figure~\ref{epsfig} and ~\ref{xfig} on page \pageref{xfig} are
+examples. The second figure was drawn using {\tt xfig} and exported in
+{\tt.eps} format. This is my recommended way of drawing all diagrams.
+
+
+\begin{figure}[tbh]
+\centerline{\epsfbox{figs/cuarms.eps}}
+\caption{\label{epsfig}Example figure using encapsulated postscript}
+\end{figure}
+
+\begin{figure}[tbh]
+\vspace{4in}
+\caption{\label{pastedfig}Example figure where a picture can be pasted in}
+\end{figure}
+
+
+\begin{figure}[tbh]
+  
+\centerline{\epsfbox{figs/diagram.eps}}
+\caption{\label{xfig}Example diagram drawn using {\tt xfig}}
+\end{figure}
+
+
+
+
+\cleardoublepage
+\chapter{Evaluation}
+
+\section{Printing and binding}
+
+If you have access to a laser printer that can print on two sides, you
+can use it to print two copies of your dissertation and then get them
+bound by the Computer Laboratory Bookshop. Otherwise, print your
+dissertation single sided and get the Bookshop to copy and bind it double
+sided.
+
+
+Better printing quality can sometimes be obtained by giving the
+Bookshop an MSDOS 1.44~Mbyte 3.5" floppy disc containing the
+Postscript form of your dissertation. If the file is too large a
+compressed version with {\tt zip} but not {\tt gnuzip} nor {\tt
+compress} is acceptable. However they prefer the uncompressed form if
+possible. From my experience I do not recommend this method.
+
+\subsection{Things to note}
+
+\begin{itemize}
+\item Ensure that there are the correct number of blank pages inserted
+so that each double sided page has a front and a back.  So, for
+example, the title page must be followed by an absolutely blank page
+(not even a page number).
+
+\item Submitted postscript introduces more potential problems.
+Therefore you must either allow two iterations of the binding process
+(once in a digital form, falling back to a second, paper, submission if
+necessary) or submit both paper and electronic versions.
+
+\item There may be unexpected problems with fonts.
+
+\end{itemize}
+
+\section{Further information}
+
+See the Computer Lab's world wide web pages at URL:
+
+{\tt http://www.cl.cam.ac.uk/TeXdoc/TeXdocs.html}
+
+
+\cleardoublepage
+\chapter{Conclusion}
+
+I hope that this rough guide to writing a dissertation is \LaTeX\ has
+been helpful and saved you time.
+
+
+
+
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% the bibliography
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{refs}
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% the appendices
+\appendix
+
+\chapter{Latex source}
+
+\section{diss.tex}
+{\scriptsize\verbatiminput{diss.tex}}
+
+\section{proposal.tex}
+{\scriptsize\verbatiminput{proposal.tex}}
+
+\section{propbody.tex}
+{\scriptsize\verbatiminput{propbody.tex}}
+
+
+
+\cleardoublepage
+
+\chapter{Makefile}
+
+\section{\label{makefile}Makefile}
+{\scriptsize\verbatiminput{makefile.txt}}
+
+\section{refs.bib}
+{\scriptsize\verbatiminput{refs.bib}}
+
+
+\cleardoublepage
+
+\chapter{Project Proposal}
+
+\input{propbody}
+
+\end{document}
