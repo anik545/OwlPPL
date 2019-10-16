@@ -1,0 +1,34 @@
+phase 1
+
+
+Subject: Phase 1 - Anik Roy: A probabilistic programming language in Ocaml
+
+Phase 1 Project Selection Status Report
+
+Name: Anik Roy
+
+College: Christ's
+
+User Identifier: ar899
+
+Director of Studies:  Dr. Richard Mortier
+
+Please complete 1, 2 and 3 below.
+
+1. Please write 100 words on your current project ideas.
+
+Owl is an Ocaml scientific computing library - my project would involve writing a probabilistic programming language (PPL) on top of owl, utilising components that already exist in the library. The motivation would be to write statistical models in ocaml which could have inference performed for them automatically.  The main challenges include designing an API for modelling and implementing an inference engine. The project could be evaluated by comparing code written in owl to perform inference for a model on a dataset (e.g. stop-and-search dataset used in 1B Foundations of Data Science) to code written in my PPL.
+
+2. Please list names of potential project supervisors.
+Dr. Richard Mortier
+
+3. Is there any chance that your project will involve any
+computing resources other than the Computing Service's MCS and
+software that is already installed there, for example: your own
+machine, machines in College, special peripherals, imported
+software packages, special hardware, network access, substantial
+extra disc space on the MCS.
+
+If so indicate below what, and what it is needed for.
+
+Own laptop (dual boot Windows + Ubuntu) with necessary software installed for the implementation and subsequent write up
