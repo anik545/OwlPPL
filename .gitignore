@@ -2,6 +2,7 @@
 .vscode/
 owl/
 hansei/
+misc/
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
