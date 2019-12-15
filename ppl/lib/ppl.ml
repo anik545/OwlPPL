@@ -39,7 +39,7 @@ let sample_from: type a.a sampleable -> a = function
   | Categorical xs ->
     let r = Owl_base_stats.uniform_rvs ~a:0.0 ~b:1. in
     let rec loop (p_left:(a * prob) list) (remaining:prob) = match p_left with
-        (v,p)::xs -> if Float.(<=) p remaining then v else loop xs (remaining -. p)
+        (v,p)::xs -> if Float.(<=) p remaining || (Stdlib.(=) xs []) then v else loop xs (remaining -. p)
       | [] -> raise Undefined
     in
     loop xs r
@@ -47,7 +47,7 @@ let sample_from: type a.a sampleable -> a = function
 
 let rec sample: 'a. 'a dist -> 'a = function
     Return x -> x
-  | Bind (d,f) -> let y  = f (sample d) in sample y
+  | Bind (d,f) -> let y = f (sample d) in sample y
   | Primitive d -> sample_from d
   | Conditional (_,_) -> raise Undefined
 
@@ -86,25 +86,33 @@ let flatten xss =
 let (let*) = (>>=)
 let return = return
 
-let mh d = 
+let mh n d = 
   let proposal = prior d in
-  let rec iterate (x,s) = 
+  let rec iterate ?(n=n) (x,s) = 
+    if n = 0 then return [] else
     let* (y,r) = proposal in
     let* accept = bernoulli @@ Float.min 1. (r /. s) in
     let next = if accept then (y,r) else (x,s) in
-    let* rest = iterate next in
+    let* rest = iterate ~n:(n-1) next in
     return (next::rest)
-    in
+  in
     fmap (List.map ~f:fst) (proposal >>= iterate)
     
-let mh' n d = fmap (fun x -> List.nth_exn x n) (mh d)
-    
-    (* let importance' n d = 0 *)
-    
-    
-let pdf (s:'a sampleable) (a:'a) :float = 
+let mh' n d = fmap (fun x -> List.nth_exn x (n-1)) (mh n d)
+
+let pdf (s:'a sampleable) (x:'a) :float = 
   match s with
-    | Normal(mu,sigma) -> Owl_stats_dist.gaussian_pdf ~mu:mu ~sigma:sigma a
+    | Normal(mu,sigma) -> Owl_stats_dist.gaussian_pdf ~mu:mu ~sigma:sigma x
     | Uniform _ -> raise NotImplemented
     | Categorical _ -> raise NotImplemented
-    | Beta (_, _) -> raise NotImplemented
+    | Beta (a, b) -> Owl_stats_dist.beta_pdf ~a:a ~b:b x
+
+
+
+let sample_mean ?(n=100000) d = 
+  let rec loop n d sofar = 
+    if n = 0 
+    then sofar
+    else loop (n-1) d ((sample d) +. sofar)
+  in
+    (loop n d 0.) /. float_of_int n

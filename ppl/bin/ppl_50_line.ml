@@ -73,18 +73,18 @@ let uniform1: uniform = (0. , 1.)
    let f = fit uniform1 x [0.1;0.5;0.2;0.2;0.3;0.4;0.2;0.5;0.2;0.12;0.44;0.22;0.32]
    let m = mean_var (Array.of_list (empirical f)) *)
 
-let (>>=) dist fn = probBind fn dist 
+let (>>=) dist fn = probBind fn dist
 let ($) dist fn = probMap fn dist
 
-let obs = [0.8;0.3;0.93;0.56;0.23;0.90;0.78;0.23]
+let obs = [20.;10.3;10.9;5.5;0.9;0.7;0.]
+
+let (let*) = (>>=) 
 
 let param_dist = 
-  (particles_uniform uniform1)
-  >>= (fun a -> 
-      (particles_uniform uniform1)
-      >>= (fun b -> 
-          (fitQ (a,b) (particles_uniform (a,b)) obs)
-          $ (fun _ -> (a,b))))
+  let* a = particles_uniform (0., 20.) in
+  let* b = particles_uniform (0., 1.) in
+  (fitQ (a,b) (particles_uniform (a,b)) obs) 
+  $ (fun _ -> (a,b))
 
 let emp = empirical param_dist
 
@@ -95,6 +95,12 @@ let () = Out_channel.output_string stdout @@ string_of_float (fst mean_var_a)
 let () = Printf.printf " "
 let () = Out_channel.output_string stdout @@ string_of_float (snd mean_var_a)
 let () = Printf.printf "\n"
+
+let () = Out_channel.output_string stdout @@ string_of_float (fst mean_var_b)
+let () = Printf.printf " "
+let () = Out_channel.output_string stdout @@ string_of_float (snd mean_var_b)
+let () = Printf.printf "\n"
+
 (* let () = 
 let open Printf in
   let () = printf "%f %f " (fst mean_var_a) (snd mean_var_a) *)

@@ -23,13 +23,22 @@ type param  = float * float
 
 
 let linreg = 
-  let linear: param dist = normal 0. 1. >>= (fun a -> normal 0. 1. >>= fun b -> return (a,b)) in 
-  let point (x,y) d = condition (fun (a,b) -> pdf (Normal ((a *. x +. b),1.)) y) d in
+  let linear = 
+    let* a = normal 0. 1. in
+    let* b = normal 0. 1. in 
+    return (a,b)
+  in
+  
+  let point (x,y) d = condition (fun (a,b) -> pdf (Normal (a *. x +. b, 1.)) y) d in
+
   let points ps d = List.fold ~f:(flip point) ~init:d ps in
 
-  let obs = [(0.,0.);(1.,1.);(2.,2.)] in
+  let obs = [(0.,0.);(1.,1.);(2.,2.);(3.,3.)] in
   let posterior = points obs linear in
   posterior
 
 let x = linreg
-let s = sample (mh x)
+let param_dist = (mh' 67 x)
+let s = sample param_dist
+
+let () = Printf.printf "%f %f\n" (fst s) (snd s)
