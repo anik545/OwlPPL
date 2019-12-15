@@ -1,0 +1,3 @@
+(executables
+ (names main ppl_50_line)
+ (libraries ppl core owl))

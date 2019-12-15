@@ -1,4 +1,0 @@
-# dune exec --profile release ./ppl_test.exe
-# OCAMLPARAM: unset
-$ /usr/bin/nproc > /tmp/dune65d2b0.output 2> /dev/null
-$ /home/anik/.opam/4.08.0/bin/ocamlc.opt -config > /tmp/dunece8dd9.output

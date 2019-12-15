@@ -1,8 +1,0 @@
-lib: [
-  "_build/install/default/lib/ppl/META"
-  "_build/install/default/lib/ppl/dune-package"
-  "_build/install/default/lib/ppl/opam"
-]
-bin: [
-  "_build/install/default/bin/ppl"
-]

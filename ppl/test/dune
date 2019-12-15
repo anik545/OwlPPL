@@ -1,0 +1,3 @@
+(test
+ (name ppl)
+ (libraries core owl))

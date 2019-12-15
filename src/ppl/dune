@@ -1,4 +1,0 @@
-(executable
- (name ppl_test)
- (libraries core owl-base)
-)
