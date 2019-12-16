@@ -26,7 +26,22 @@ let beta a b = Primitive (Beta (a,b))
 (* MONAD/FUNCTOR FUNCTIONS *)
 let return x = Return x
 let (>>=) d f  = Bind (d,f)
+
+let (let*) = (>>=)
+
 let fmap f xs = xs >>= (fun x -> return (f x)) (*liftM*)
+let liftM2 f ma mb =
+  let* a = ma in
+  let* b = mb in
+  return (f a b)
+
+let sequence mlist =
+  let mcons p q =
+    let* x = p in
+    let* y = q in 
+    return (x::y)
+    
+  in List.fold_right mlist ~f:mcons ~init:(return [])
 
 let condition c d = Conditional (c,d)
 
@@ -83,9 +98,6 @@ let flatten xss =
   in 
   flatten' xss
 
-let (let*) = (>>=)
-let return = return
-
 let mh n d = 
   let proposal = prior d in
   let rec iterate ?(n=n) (x,s) = 
@@ -106,6 +118,8 @@ let pdf (s:'a sampleable) (x:'a) :float =
     | Uniform _ -> raise NotImplemented
     | Categorical _ -> raise NotImplemented
     | Beta (a, b) -> Owl_stats_dist.beta_pdf ~a:a ~b:b x
+
+let flip f a b = f b a
 
 
 

@@ -1,18 +1,6 @@
 open Ppl
 open Core
 
-let liftM2 fn ma mb =
-  ma      >>= fun a ->
-  mb      >>= fun b ->
-  return (fn a b)
-
-let sequence mlist =
-  let mcons p q =
-    p >>= fun x ->
-    q >>= fun y ->
-    return (x::y)
-
-  in List.fold_right mlist ~f:mcons ~init:(return [])
 
 (* A distribution over the total given a number of dice rolls *)
 let rec die = function 
