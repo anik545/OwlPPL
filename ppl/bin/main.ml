@@ -4,19 +4,19 @@ open Core
 let flip f a b = f b a
 
 let coin_tossing () =
-  let weight: prob dist = bernoulli 0.8 >>= (fun isFair -> if isFair then return 0.5 else beta 5. 1.) in 
+  let weight: prob dist = 
+    let* isFair = bernoulli 0.8 in
+    if isFair then return 0.5 else beta 5. 1.
+  in
 
   let toss (b:bool) (d:prob dist): prob dist = condition (fun w -> if b then w else 1. -. w) d in 
 
   let tosses (bs: bool list) (d: prob dist): prob dist = List.fold bs ~init:d ~f:(flip toss) in
 
 
-  let observations = [true; true; false; false; false; false; false] in
+  let observations = [false; false; false; false; false; false; false] in
   let posterior_weight = tosses observations weight in
-
-  let pr = prior posterior_weight in
-  (* let s = fun () -> sample pr in *)
-  pr
+  posterior_weight
 
 type point_t  = float * float
 type param  = float * float
