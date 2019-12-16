@@ -15,7 +15,7 @@ let linreg =
 
   let points ps d = List.fold ~f:(flip point) ~init:d ps in
 
-  let obs = [(0.,0.);(1.,2.);(2.,4.);(2.,6.)] in
+  let obs = [(0.,0.);(1.,2.);(2.,4.);(3.,6.);(4.,8.);(5.,10.);(6.,12.);(7.,14.);(8.,16.);(9.,18.)] in
   let posterior = points obs linear in
   posterior
 

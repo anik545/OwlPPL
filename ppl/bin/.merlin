@@ -28,7 +28,9 @@ B /home/anik/.opam/4.08.1/lib/ocaml
 B /home/anik/.opam/4.08.1/lib/ocaml/threads
 B /home/anik/.opam/4.08.1/lib/owl
 B /home/anik/.opam/4.08.1/lib/owl-base
+B /home/anik/.opam/4.08.1/lib/owl-plplot
 B /home/anik/.opam/4.08.1/lib/parsexp
+B /home/anik/.opam/4.08.1/lib/plplot
 B /home/anik/.opam/4.08.1/lib/ppx_assert/runtime-lib
 B /home/anik/.opam/4.08.1/lib/ppx_bench/runtime-lib
 B /home/anik/.opam/4.08.1/lib/ppx_compare/runtime-lib
@@ -84,7 +86,9 @@ S /home/anik/.opam/4.08.1/lib/ocaml
 S /home/anik/.opam/4.08.1/lib/ocaml/threads
 S /home/anik/.opam/4.08.1/lib/owl
 S /home/anik/.opam/4.08.1/lib/owl-base
+S /home/anik/.opam/4.08.1/lib/owl-plplot
 S /home/anik/.opam/4.08.1/lib/parsexp
+S /home/anik/.opam/4.08.1/lib/plplot
 S /home/anik/.opam/4.08.1/lib/ppx_assert/runtime-lib
 S /home/anik/.opam/4.08.1/lib/ppx_bench/runtime-lib
 S /home/anik/.opam/4.08.1/lib/ppx_compare/runtime-lib
