@@ -1,10 +1,6 @@
 open Ppl
 open Core
 
-(* operators on probability distributions *)
-let ( +~ ) = liftM2 ( + )
-let ( -~ ) = liftM2 ( - )
-let ( *~ ) = liftM2 ( * )
 
 (* A distribution over the total given a number of dice rolls *)
 let rec die = function 

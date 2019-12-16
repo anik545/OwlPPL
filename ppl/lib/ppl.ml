@@ -8,7 +8,9 @@ type _ sampleable =
     Normal: float * float -> float sampleable 
   | Uniform: 'a list -> 'a sampleable 
   | Categorical: ('a * prob) list -> 'a sampleable
-  | Beta: (float * float) -> float sampleable
+  | Beta: float * float -> float sampleable
+  | Binomial: int * float -> int sampleable
+  | C_Uniform: float * float -> float sampleable
 
 type _ dist = 
     Return: 'a -> 'a dist
@@ -19,9 +21,12 @@ type _ dist =
 (* Creating distributions *)
 let uniform xs = Primitive (Uniform xs)
 let categorical xs = Primitive (Categorical xs)
-let normal mu sigma = Primitive (Normal (mu, sigma))
 let bernoulli p = categorical [(true, p); (false, 1. -. p)]
+let binomial n p = Binomial (n,p)
+
+let normal mu sigma = Primitive (Normal (mu, sigma))
 let beta a b = Primitive (Beta (a,b))
+let c_uniform a b = Primitive (C_Uniform(a,b))
 
 (* MONAD/FUNCTOR FUNCTIONS *)
 let return x = Return x
@@ -45,6 +50,11 @@ let sequence mlist =
 
   in List.fold_right mlist ~f:mcons ~init:(return [])
 
+(* operators on probability distributions *)
+let ( +~ ) = liftM2 ( + )
+let ( -~ ) = liftM2 ( - )
+let ( *~ ) = liftM2 ( * )
+
 let condition c d = Conditional (c,d)
 
 (* SAMPLING *)
@@ -60,7 +70,25 @@ let sample_from: type a.a sampleable -> a = function
       | [] -> raise Undefined
     in
     loop xs r
-  | Beta (a, b) -> Owl_stats_dist.beta_rvs ~a:a ~b:b
+  | Beta (a, b) -> Owl_stats_dist.beta_rvs ~a ~b
+  | Binomial (n, p) -> Owl_stats_dist.binomial_rvs ~n ~p
+  | C_Uniform (a,b) -> Owl_stats_dist.uniform_rvs ~a ~b
+
+let pdf: type a.a sampleable -> a -> float = function
+  (* cont *)
+  | Normal(mu,sigma) -> Owl_stats_dist.gaussian_pdf ~mu ~sigma
+  | Beta (a, b) -> Owl_stats_dist.beta_pdf ~a ~b
+  | C_Uniform (a, b) -> Owl_stats_dist.uniform_pdf ~a ~b 
+
+  (* discrete *)
+  | Uniform us -> fun _ -> 1. /. (float_of_int (List.length us))
+  | Categorical cs -> fun x -> 
+      let rec lookup l = function 
+        | (a,p)::xs -> if Stdlib.(=) a x then p else lookup l xs
+        | [] -> 0. (* not found *)
+      in
+        lookup x cs
+  | Binomial (n,p) -> Owl_stats_dist.binomial_pdf ~n ~p
 
 let rec sample: 'a. 'a dist -> 'a = function
     Return x -> x
@@ -115,21 +143,6 @@ let mh n d =
     fmap (List.map ~f:fst) (proposal >>= iterate)
     
 let mh' n d = fmap (fun x -> List.nth_exn x (n-1)) (mh n d)
-
-let pdf (s:'a sampleable) (x:'a) :float = 
-  match s with
-    (* cont *)
-    | Normal(mu,sigma) -> Owl_stats_dist.gaussian_pdf ~mu:mu ~sigma:sigma x
-    | Beta (a, b) -> Owl_stats_dist.beta_pdf ~a:a ~b:b x
-
-    (* discrete *)
-    | Uniform us -> 1. /. (float_of_int (List.length us))
-    | Categorical cs -> 
-        let rec lookup l = function 
-          | (a,p)::xs -> if Stdlib.(=) a x then p else lookup l xs
-          | [] -> 0. (* not found *)
-        in
-          lookup x cs
 
 let flip f a b = f b a
 
