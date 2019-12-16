@@ -53,7 +53,7 @@ B /home/anik/.opam/4.08.1/lib/time_now
 B /home/anik/.opam/4.08.1/lib/typerep
 B /home/anik/.opam/4.08.1/lib/variantslib
 B /home/anik/.opam/4.08.1/lib/zip
-B ../_build/default/bin/.main.eobjs/byte
+B ../_build/default/bin/.ppl_50_line.eobjs/byte
 B ../_build/default/lib/.ppl.objs/byte
 S /home/anik/.opam/4.08.1/lib/base
 S /home/anik/.opam/4.08.1/lib/base/base_internalhash_types

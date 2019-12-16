@@ -29,18 +29,20 @@ let (>>=) d f  = Bind (d,f)
 
 let (let*) = (>>=)
 
-let fmap f xs = xs >>= (fun x -> return (f x)) (*liftM*)
+let fmap f xs =
+  let* x = xs in
+  return (f x)
+let liftM = fmap
 let liftM2 f ma mb =
   let* a = ma in
   let* b = mb in
   return (f a b)
-
 let sequence mlist =
   let mcons p q =
     let* x = p in
-    let* y = q in 
+    let* y = q in
     return (x::y)
-    
+
   in List.fold_right mlist ~f:mcons ~init:(return [])
 
 let condition c d = Conditional (c,d)
@@ -73,16 +75,18 @@ let rec prior': 'a.'a dist -> 'a dist = function
   | d -> d
 
 let rec prior: 'a.'a dist -> ('a*prob) dist = function
-    Conditional (c,d) -> prior d >>= (fun (x,s) -> return (x, s *. (c x)))
-  | Bind (d,f) -> prior d >>= (fun (x,s) -> f x >>= (fun y -> return (y,s)))
-  | d -> d >>= (fun x-> return (x,1.))
+    Conditional (c,d) ->
+      let* (x,s) = prior d in
+      return (x, s *. (c x))
+  | Bind (d,f) ->
+      let* (x,s) = prior d in
+      let* y = f x in
+      return (y, s)
+  | d ->
+      let* x = d in
+      return (x,1.)
 
 type 'a samples = ('a * prob) list
-
-
-let rec sequence (xs:('a dist) list) : ('a list) dist = match xs with
-    [] -> return []
-  | m::ms -> m >>= (fun x -> sequence ms >>= (fun xs -> return (x::xs)))
 
 let resample (xs: 'a samples): ('a samples) dist =
   let n = List.length xs in
@@ -114,10 +118,18 @@ let mh' n d = fmap (fun x -> List.nth_exn x (n-1)) (mh n d)
 
 let pdf (s:'a sampleable) (x:'a) :float = 
   match s with
+    (* cont *)
     | Normal(mu,sigma) -> Owl_stats_dist.gaussian_pdf ~mu:mu ~sigma:sigma x
-    | Uniform _ -> raise NotImplemented
-    | Categorical _ -> raise NotImplemented
     | Beta (a, b) -> Owl_stats_dist.beta_pdf ~a:a ~b:b x
+
+    (* discrete *)
+    | Uniform us -> 1. /. (float_of_int (List.length us))
+    | Categorical cs -> 
+        let rec lookup l = function 
+          | (a,p)::xs -> if Stdlib.(=) a x then p else lookup l xs
+          | [] -> 0. (* not found *)
+        in
+          lookup x cs
 
 let flip f a b = f b a
 
