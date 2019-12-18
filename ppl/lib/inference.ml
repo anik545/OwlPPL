@@ -100,13 +100,16 @@ let pimh' k n d = mh' k (smc' n d)
 (* https://arxiv.org/pdf/1407.2864.pdf *)
 (* TODO: make lazy?? *)
 let resamplePC ps n = 
-  let rec iterate n mean ((x,w)::ps) iters =
+  let rec iterate n mean ps iters =
+  match ps with
+  | [] -> raise NotImplemented
+  | (x,w)::ps ->
     let k = float_of_int n in
     let mean' = (k /. (k +. 1.)) *. mean +. (1. /. (k +. 1.)) *. w in
     let r = w /. mean' in
-    let flr = floor r in
+    let flr = Float.round_down r in
     let probLow = flr in
-    let clr = ceil r  in
+    let clr = Float.round_up r  in
     let probHigh = clr in
     let spawn x w =
       if Float.(r < 1.) then
@@ -116,7 +119,6 @@ let resamplePC ps n =
         (return @@ List.init (int_of_float flr) ~f:(fun _ -> x, w /. probLow))
         (return @@ List.init (int_of_float clr) ~f:(fun _ -> x, w /. probHigh))  
     in
-
     let* children = spawn x w in
     if iters = 0 then return children else
     let* rest = iterate (n+1) mean' ps (iters-1) in
@@ -135,7 +137,6 @@ let rec cascade:'a.int -> 'a dist -> 'a samples dist = fun n -> function
       let* ys = mapM f xs in
       return (List.zip_exn ys ws)
 
-  | d -> sequence @@ List.init n ~f:(fun _ -> (fmap (fun x-> (x, 1.)) d))
+  | d -> sequence @@ List.init n ~f:(fun _ -> (fmap (fun x -> (x, 1.)) d))
 
 let cascade' n d = (cascade n d) >>= (fun x -> categorical (List.take x n))
-
