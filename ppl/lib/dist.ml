@@ -24,6 +24,7 @@ type _ dist =
 let uniform xs = Primitive (Uniform xs)
 let categorical xs = Primitive (Categorical xs)
 let bernoulli p = categorical [(true, p); (false, 1. -. p)]
+let choice p x y = Bind ((bernoulli p), (fun c -> if c then x else y))
 let binomial n p = Binomial (n,p)
 
 (* continuous *)
@@ -52,6 +53,13 @@ let sequence mlist =
     return (x::y)
 
   in List.fold_right mlist ~f:mcons ~init:(return [])
+let rec mapM f xs = 
+  match xs with 
+    | [] -> return []
+    | x::xs -> 
+        let* x' = f x in 
+        let* xs' = mapM f xs in 
+        return (x'::xs')
 
 (* operators on probability distributions *)
 let ( +~ ) = liftM2 ( + )
@@ -123,3 +131,14 @@ let hist_dist ?h ?(n=5000) ?(fname="fig.jpg") d =
 
   Plot.histogram ~h:pl ~bin:50 Owl.(Mat.col (Mat.of_array samples n 1) 0);
   pl
+
+
+(*   
+  (* TODO: replace d' with a type e.g. `pdf-able` for dists with exact density *)
+let kl (d: 'a dist) (d': 'a sampleable) = 
+  (* d' has exact pdf, d can only take samples *)
+  let samples = take_k_samples 10000 d in
+  Array.sort ~compare:(Float.compare) samples;
+  let l = Array.length samples in
+  let pdf_ arr =      
+*)

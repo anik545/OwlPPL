@@ -18,7 +18,7 @@ let mn = sample_mean ~n:10000 (post_single_coin) (* 0.833 *)
 
 let () = Printf.printf "%f\n" mn
 
-let () = 
+let () =
   let open Owl_plplot in
 
   let n = 10000 in
@@ -27,14 +27,13 @@ let () =
   Plot.subplot pl 0 0;
   let pl = hist_dist ~h:pl ~n post_single_coin in
 
-  Plot.plot_fun ~h:pl (fun x -> (560. /. 4.26) *. (Owl_stats_dist.beta_pdf ~a:10. ~b:2. x)) 0. 1.;
+  Plot.plot_fun ~h:pl (fun x -> (570. /. 4.26) *. (Owl_stats_dist.beta_pdf ~a:10. ~b:2. x)) 0. 1.;
  
   Plot.subplot pl 1 0;
 
-  
-  Plot.probplot 
+  Plot.probplot
     ~h:pl
-    ~spec:[ RGB (255,0,0); MarkerSize 0.25; Marker "#[0x2299]" ] 
+    ~spec:[ MarkerSize 0.25; ]
     ~dist:(Owl_stats_dist.beta_ppf ~a:10. ~b:2.)
     (Owl.(Mat.col (Mat.of_array (take_k_samples n post_single_coin) n 1) 0 ));
   
