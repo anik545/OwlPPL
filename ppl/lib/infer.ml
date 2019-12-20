@@ -1,29 +1,17 @@
 open Core
-
-module type Infer = sig 
-  type 'a dist
-  type prob = float
-  type 'a samples = ('a * prob) list
-  (* Inference is a procedure which transforms dists*)
-  val infer: ?iterations:int -> 'a dist -> 'a dist
-end
-
-module type Dist = sig
-
-end
-
+open Sigs
 
 module CommonInference = struct 
-  type 'a dist = 'a Dist.dist
+  type 'a dist = 'a Old_dist.dist
   type prob = float
   type 'a samples = ('a * prob) list
 
-  let (let*) = Dist.( let* )
-  let (>>=)  = Dist.(>>=)
+  let (let*) = Old_dist.( let* )
+  let (>>=)  = Old_dist.(>>=)
   (* TODO: clean this up - split dist into proper module + make this a functor *)
   let fmap, return, categorical, sequence, bernoulli, mapM, condition, choice
   = 
-  Dist.(fmap, return, categorical, sequence, bernoulli, mapM, condition, choice)
+  Old_dist.(fmap, return, categorical, sequence, bernoulli, mapM, condition, choice)
   exception NotImplemented
 
   let rec prior': 'a.'a dist -> 'a dist = function
@@ -50,9 +38,10 @@ let resample (xs: 'a samples): ('a samples) dist =
   sequence @@ List.init n ~f:(fun _ -> (fmap (fun x-> (x, 1.)) (old_dist)))
 
 let flatten xss =
-  let rec f xs p = match xs with ((x,q)::t) -> (x,p*.q)::(f t p) | [] -> [] in
-  let rec flatten' =
-    function
+  let rec f xs p = match xs with 
+    | ((x,q)::t) -> (x,p*.q)::(f t p) 
+    | [] -> [] in
+  let rec flatten' xs = match xs with
       (xs, p)::xs' -> (f xs p) @ flatten' xs'
     | [] -> []
   in 
@@ -61,7 +50,7 @@ let flatten xss =
 let normalise xs = 
   let norm = List.sum (module Float) ~f:snd xs in
   List.map ~f:(fun (v,p)->(v,p/.norm)) xs
-  
+
 end
 
 module MH: Infer = struct
@@ -156,4 +145,5 @@ module PC: Infer = struct
   
     | d -> sequence @@ List.init n ~f:(fun _ -> (fmap (fun x -> (x, 1.)) d))
   
-  let infer ?(iterations=5000) d = (cascade iterations d) >>= (fun x -> categorical (List.take x iterations))end
+  let infer ?(iterations=5000) d = (cascade iterations d) >>= (fun x -> categorical (List.take x iterations))
+end

@@ -1,4 +1,4 @@
-open Dist
+open Old_dist
 open Core
 
 (* INFERENCE *)
@@ -25,15 +25,15 @@ let resample (xs: 'a samples): ('a samples) dist =
   let n = List.length xs in
   let old_dist = categorical xs in
   sequence @@ List.init n ~f:(fun _ -> (fmap (fun x-> (x, 1.)) (old_dist)))
-
+ 
 let flatten xss =
-  let rec f xs p = match xs with ((x,q)::t) -> (x,p*.q)::(f t p) | [] -> [] in
-  let rec flatten' =
-    function
-      (xs, p)::xs' -> (f xs p) @ flatten' xs'
+  let mul_likelihood xs p = List.map ~f:(fun (x,q) -> (x, p *.q)) xs in
+  (* let rec flat_map xss = match xss with
+      (xs, p)::xs' -> (mul_likelihood xs p) @ flatten' xs'
     | [] -> []
-  in 
-  flatten' xss
+  in *)
+  List.concat_map xss ~f:(fun (xs,p) -> mul_likelihood xs p)
+  (* flat_map xss *)
 
 (* TODO: importance sampling *)
 
