@@ -1,5 +1,5 @@
 open Core
-open Sigs
+(* open Sigs *)
 
 module CommonInference = struct 
   type 'a dist = 'a Old_dist.dist
@@ -53,7 +53,7 @@ let normalise xs =
 
 end
 
-module MH: Infer = struct
+module MH = struct
   include CommonInference
 
   let mh n d =
@@ -72,7 +72,7 @@ module MH: Infer = struct
   
 end
 
-module SMC: Infer = struct
+module SMC = struct
   include CommonInference
 
   let rec smc: 'a.int -> 'a dist -> 'a samples dist =
@@ -102,7 +102,7 @@ module SMC: Infer = struct
   let infer ?(iterations=1000) d = prior' (smc' iterations d)
 end
 
-module PC: Infer = struct
+module PC = struct
   include CommonInference
 
   let resamplePC ps n = 

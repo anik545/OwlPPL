@@ -157,9 +157,6 @@ end
 
 module type Infer = sig 
   module D:SampleDistMonad
-  type 'a dist
-  type prob = float
-  type 'a samples = ('a * prob) list
   (* Inference is a procedure which transforms dists*)
   val infer: ?iterations:int -> 'a D.dist -> 'a D.dist
 end
@@ -226,7 +223,7 @@ module SampleablePrimitives: PrimitiveSampleable = struct
 end
 
 
-module Dist' = Dist(SampleablePrimitives)
+module Dist' : SampleDistMonad = Dist(SampleablePrimitives)
 
 let x = 
   let open Dist' in 
@@ -256,13 +253,9 @@ module type Model = sig
   val model: t D.dist
 end
 
-module MH (D:SampleDistMonad): Infer = struct
+module MH (D:SampleDistMonad) : Infer with module D = D and type 'a D.dist = 'a D.dist = struct
   module D = D
   open D open Core
-
-  type 'a dist = 'a D.dist
-  type prob = float
-  type 'a samples = ('a * prob) list
 
   let mh n d =
     let proposal = prior d in
@@ -277,7 +270,6 @@ module MH (D:SampleDistMonad): Infer = struct
     liftM (List.map ~f:fst) (proposal >>= iterate)
   
   let infer ?(iterations=1000) d = liftM (fun x -> List.nth_exn x (iterations-1)) (mh iterations d)
-  
 end
 
 module NormalModel(D:SampleDistMonad): Model = struct
@@ -302,13 +294,14 @@ module InferModel
 (M: Model with type 'a D.dist := 'a I.D.dist) 
       = 
 struct
+  include M
   let posterior_dist =  I.infer M.model
-  let sample = I.D.sample posterior_dist
+  let sample_posterior = I.D.sample posterior_dist
 end
 
 module NModel = NormalModel(Dist')
 module MH' = MH(Dist')
-module Test = InferModel(MH')(NModel:Model with type 'a D.dist = 'a MH'.D.dist)
+(* module Test = InferModel(MH')(NModel:Model with type 'a D.dist = 'a MH'.D.dist) *)
 
-let x = Test.posterior_dist
-let s = Test.sample
+(* let x = Test.posterior_dist *)
+(* let s = Test.sample_posterior *)

@@ -1,10 +1,11 @@
 open Old_dist
 open Core
 
+
 (* INFERENCE *)
 let rec prior': 'a.'a dist -> 'a dist = function
     Conditional (_,d) -> prior' d
-  | Bind (d,f) -> Bind ((prior' d),f)
+  | Bind (d,f) -> (prior' d) >>= f
   | d -> d
 
 let rec prior: 'a.'a dist -> ('a*prob) dist = function
@@ -82,7 +83,7 @@ let rec smc: 'a.int -> 'a dist -> 'a samples dist =
 
   | d -> sequence @@ List.init n ~f:(fun _ -> (fmap (fun x-> (x, 1.)) d))
 
-let smc' n d = smc n d >>= categorical 
+let smc' n d = (smc n d) >>= categorical 
 
 let smcStandard n d = prior' (smc n d)
 let smcStandard' n d = prior' (smc' n d)

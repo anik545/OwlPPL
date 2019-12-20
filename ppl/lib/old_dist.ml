@@ -132,13 +132,28 @@ let hist_dist ?h ?(n=5000) ?(fname="fig.jpg") d =
   Plot.histogram ~h:pl ~bin:50 Owl.(Mat.col (Mat.of_array samples n 1) 0);
   pl
 
+type 'a samples = ('a * prob) list
+type 'a no_dup_vals_samples = ('a , prob) Map.Poly.t
 
-(*   
-  (* TODO: replace d' with a type e.g. `pdf-able` for dists with exact density *)
-let kl (d: 'a dist) (d': 'a sampleable) = 
-  (* d' has exact pdf, d can only take samples *)
-  let samples = take_k_samples 10000 d in
-  Array.sort ~compare:(Float.compare) samples;
-  let l = Array.length samples in
-  let pdf_ arr =      
-*)
+let undup xs = 
+  let map = Map.Poly.of_alist_fold xs ~f:(+.) ~init:0. in
+  map
+
+let dist_of_n_samples n (d: 'a dist): 'a list dist = 
+  sequence @@ List.init n ~f:(fun _ -> (d))
+
+let kl_samples (p: 'a samples) (q: 'a sampleable) = 
+  (* d' has exact pdf, d can only take (weighted) samples *)
+  let samples = undup p in
+  let xs = Map.Poly.to_alist samples in
+  let f (x,p_x) = match pdf q x with
+    | 0. -> raise Undefined
+    | q_x -> p_x *. log (p_x /. q_x)
+  in
+    List.sum (module Float) ~f xs
+
+let kl_dist ?(n=1000) (p: ('a * prob) dist) (q: 'a sampleable) = 
+  (* d' has exact pdf, d can only take (weighted) samples *)
+  let sample_dist = dist_of_n_samples n p in
+  let samples = undup (sample sample_dist) in
+  kl_samples (Map.Poly.to_alist samples) q
