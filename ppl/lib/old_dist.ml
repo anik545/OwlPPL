@@ -55,11 +55,11 @@ let sequence mlist =
   in List.fold_right mlist ~f:mcons ~init:(return [])
 let rec mapM f xs = 
   match xs with 
-    | [] -> return []
-    | x::xs -> 
-        let* x' = f x in 
-        let* xs' = mapM f xs in 
-        return (x'::xs')
+  | [] -> return []
+  | x::xs -> 
+    let* x' = f x in 
+    let* xs' = mapM f xs in 
+    return (x'::xs')
 
 (* operators on probability distributions *)
 let ( +~ ) = liftM2 ( + )
@@ -123,7 +123,7 @@ let take_k_samples k d = Array.init k ~f:(fun _ -> sample d)
 let hist_dist ?h ?(n=5000) ?(fname="fig.jpg") d = 
   let open Owl_plplot in 
   let samples = take_k_samples n d in
-  
+
   let pl = match h with 
     | None -> Plot.create ~m:1 ~n:1 fname 
     | Some h -> h 
@@ -150,10 +150,21 @@ let kl_samples (p: 'a samples) (q: 'a sampleable) =
     | 0. -> raise Undefined
     | q_x -> p_x *. log (p_x /. q_x)
   in
-    List.sum (module Float) ~f xs
+  List.sum (module Float) ~f xs
 
 let kl_dist ?(n=1000) (p: ('a * prob) dist) (q: 'a sampleable) = 
   (* d' has exact pdf, d can only take (weighted) samples *)
   let sample_dist = dist_of_n_samples n p in
   let samples = undup (sample sample_dist) in
   kl_samples (Map.Poly.to_alist samples) q
+
+
+(* TODO: create a prob_map module *)
+let weighted_dist ?(n=300) (d: 'a dist) : ('a, float) Core.Map.Poly.t =
+  let rec loop n map =
+    if n = 0 then map else
+      let s = sample d in 
+      let map = Map.Poly.update map s ~f:(fun x -> match x with None -> 1. | Some y -> y +. 1.) in
+      loop (n-1) map
+  in
+  loop n Map.Poly.empty
