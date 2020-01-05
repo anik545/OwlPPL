@@ -10,8 +10,8 @@ let linreg =
     let* b = normal 0. 1. in 
     return (a,b)
   in
-
-  let point d (x,y) = condition (fun (a,b) -> pdf (Normal (a *. x +. b, 1.)) y) d in
+  let open Float in
+  let point d (x,y) = condition (fun (a,b) -> pdf (Normal (a*x+b, 1.)) y) d in
 
   let points ps d = List.fold ~f:(point) ~init:d ps in
 

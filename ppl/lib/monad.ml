@@ -17,8 +17,7 @@ module type EMonad = sig
 end
 
 
-module Make_Extended(M: Monad): EMonad with type 'a t = 'a M.t = struct
-  type 'a t = 'a M.t
+module Make_Extended(M: Monad): EMonad with type 'a t := 'a M.t = struct
 
   let bind = M.bind
   let return = M.return
@@ -53,3 +52,33 @@ module Make_Extended(M: Monad): EMonad with type 'a t = 'a M.t = struct
       return (x'::xs')
 end
 
+
+module Dist = struct
+  type 'a dist = 'a Old_dist.dist
+  module DistMonad: (Monad with type 'a t = 'a dist) = struct
+    type 'a t = 'a dist
+    let return x = Old_dist.Return x
+    let bind d f = Old_dist.Bind (d,f)
+  end
+  include Make_Extended(DistMonad)
+
+  open Old_dist
+  let uniform xs = Primitive (Uniform xs)
+  let categorical xs = Primitive (Categorical xs)
+  let bernoulli p = categorical [(true, p); (false, 1. -. p)]
+  let choice p x y = Bind ((bernoulli p), (fun c -> if c then x else y))
+  let binomial n p = Binomial (n,p)
+
+  (* continuous *)
+  let normal mu sigma = Primitive (Normal (mu, sigma))
+  let beta a b = Primitive (Beta (a,b))
+  let c_uniform a b = Primitive (C_Uniform(a,b))
+
+  let rec sample: 'a. 'a dist -> 'a = function
+      Return x -> x
+    | Bind (d,f) -> let y = f (sample d) in sample y
+    | Primitive d -> sample_primitive d
+    | Conditional (_,_) -> raise Undefined
+
+
+end

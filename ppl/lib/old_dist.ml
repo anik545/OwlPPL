@@ -12,11 +12,18 @@ type _ sampleable =
   | Binomial: int * float -> int sampleable
   | C_Uniform: float * float -> float sampleable
 
+(* TODO: find a way to save the names of variables, so we can infer any of them *)
 type _ dist = 
     Return: 'a -> 'a dist
   | Bind: 'a dist * ('a -> 'b dist) -> 'b dist
   | Primitive: 'a sampleable -> 'a dist
   | Conditional: ('a -> prob) * 'a dist -> 'a dist
+
+(* type _ dist = 
+    Return: 'a -> 'a dist
+   | Bind: 'a dist * ('a -> 'b dist) -> 'b dist
+   | Primitive: 'a sampleable -> 'a dist
+   | Conditional: ('a -> prob) * 'a dist -> 'a dist *)
 
 (* Helpers for creating common distributions *)
 
@@ -37,6 +44,7 @@ let return x = Return x
 let (>>=) d f  = Bind (d,f)
 
 let (let*) = (>>=)
+
 
 let fmap f xs =
   let* x = xs in
@@ -102,6 +110,12 @@ let pdf: type a.a sampleable -> a -> float = function
     lookup x cs
   | Binomial (n,p) -> Owl_stats_dist.binomial_pdf ~n ~p
 
+type 'a primitive = {sample: unit -> 'a; pdf: 'a -> float}
+
+let binomial_primitive n p = {sample = (fun () -> Owl_stats_dist.binomial_rvs ~n ~p);
+                              pdf = Owl_stats_dist.binomial_pdf ~n ~p
+                             }
+
 let observe dst noise value = condition (fun x -> pdf (noise x) value) dst
 
 let rec sample: 'a. 'a dist -> 'a = function
@@ -160,11 +174,11 @@ let kl_dist ?(n=1000) (p: ('a * prob) dist) (q: 'a sampleable) =
 
 
 (* TODO: create a prob_map module *)
-let weighted_dist ?(n=300) (d: 'a dist) : ('a, float) Core.Map.Poly.t =
+let weighted_dist ?(n=300) (d: 'a dist) : ('a, int) Core.Map.Poly.t =
   let rec loop n map =
     if n = 0 then map else
       let s = sample d in 
-      let map = Map.Poly.update map s ~f:(fun x -> match x with None -> 1. | Some y -> y +. 1.) in
+      let map = Map.Poly.update map s ~f:(fun x -> match x with None -> 1 | Some y -> y + 1) in
       loop (n-1) map
   in
   loop n Map.Poly.empty

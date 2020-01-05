@@ -1,6 +1,13 @@
 open Ppl
 open Core
 
+(* TODO: This won't work until we make dist lazy (stack overflow) *)
+let rec geometric' p n = 
+  let* c = (bernoulli p) in 
+  if c then (return n) else (geometric' p (n+1))
+
+let geometric p = geometric' p 0  
+
 (* https://www.cl.cam.ac.uk/teaching/1819/DataSci/notes0.pdf pg33 *)
 let single_coin = 
   let pr = c_uniform 0. 1. in
@@ -28,7 +35,7 @@ let () =
   let pl = hist_dist ~h:pl ~n post_single_coin in
 
   Plot.plot_fun ~h:pl (fun x -> (570. /. 4.26) *. (Owl_stats_dist.beta_pdf ~a:10. ~b:2. x)) 0. 1.;
- 
+
   Plot.subplot pl 1 0;
 
   Plot.probplot
@@ -36,5 +43,5 @@ let () =
     ~spec:[ MarkerSize 0.25; ]
     ~dist:(Owl_stats_dist.beta_ppf ~a:10. ~b:2.)
     (Owl.(Mat.col (Mat.of_array (take_k_samples n post_single_coin) n 1) 0 ));
-  
+
   Plot.output pl;
