@@ -1,7 +1,7 @@
 open Ppl
 open Core
 
-
+let (+~) = liftM2 (+)
 (* A distribution over the total given a number of dice rolls *)
 let rec die = function 
   | 0 -> return 0

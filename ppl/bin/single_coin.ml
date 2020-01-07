@@ -12,7 +12,7 @@ let geometric p = geometric' p 0
 let single_coin = 
   let pr = c_uniform 0. 1. in
 
-  let toss t = condition (fun p -> pdf (Binomial(10,p)) t) in
+  let toss t = condition (fun p -> Primitives.(pdf @@ binomial 10 p) t) in
 
   let obs = 9 in (* we see x=9 heads *)
 

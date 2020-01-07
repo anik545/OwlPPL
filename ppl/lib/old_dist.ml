@@ -110,11 +110,6 @@ let pdf: type a.a sampleable -> a -> float = function
     lookup x cs
   | Binomial (n,p) -> Owl_stats_dist.binomial_pdf ~n ~p
 
-type 'a primitive = {sample: unit -> 'a; pdf: 'a -> float}
-
-let binomial_primitive n p = {sample = (fun () -> Owl_stats_dist.binomial_rvs ~n ~p);
-                              pdf = Owl_stats_dist.binomial_pdf ~n ~p
-                             }
 
 let observe dst noise value = condition (fun x -> pdf (noise x) value) dst
 

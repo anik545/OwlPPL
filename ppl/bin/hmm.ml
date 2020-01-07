@@ -14,7 +14,7 @@ let hmm =
     | _ -> raise Undefined
   in
   (* emmission probabilities for observed state (normal) *)
-  let score y x = pdf (Normal (float_of_int x,1.)) y in
+  let score y x = Primitives.(pdf @@ normal (float_of_int x) 1.) y in
   let expand d y = condition (fun l ->  score y (List.hd_exn l)) @@ 
     let* rest = d in 
     let* x = trans (List.hd_exn rest) 
@@ -34,11 +34,8 @@ let pm m = Map.Poly.iteri m ~f:(fun ~key:x ~data:y -> Printf.printf "%d -> %d\n"
 let l = List.(map ~f:(fun n -> weighted_dist ~n:100 (nth_of_dist n posterior)) (range ~stop:`inclusive 0 16))
 
 let () = List.iter l ~f:(fun m -> pm m;Printf.printf "\n")
-
 (* 
-posterior (100 samples):
-array([[10, 35, 54],
-       [ 5, 66, 28],
+posterior (100 samples):'a t
        [ 5, 66, 27],
        [10, 74, 15],
        [28, 60, 10],

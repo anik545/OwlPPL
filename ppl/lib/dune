@@ -1,4 +1,6 @@
 (library
  (name ppl)
  (public_name ppl)
- (libraries core owl owl-plplot))
+ (libraries core owl owl-plplot)
+ (preprocess (pps ppx_deriving.show ppx_jane))
+)

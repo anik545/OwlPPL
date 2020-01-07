@@ -1,7 +1,8 @@
-open Old_dist
+open Dist.Dist(Primitive_dists.Primitive_Dists)
 open Core
 
-
+exception NotImplemented
+type prob = float
 (* INFERENCE *)
 let rec prior': 'a.'a dist -> 'a dist = function
     Conditional (_,d) -> prior' d
@@ -19,6 +20,19 @@ let rec prior: 'a.'a dist -> ('a*prob) dist = function
   | d ->
     let* x = d in
     return (x,1.)
+
+let rec prior1: 'a.'a dist -> ('a*prob) dist = function
+    Conditional (c,d) ->
+    let* (x,s) = prior1 d in
+    return (x, s *. (c x))
+  | Bind (d,f) ->
+    let* (x,s) = prior1 d in
+    let* y,s1 = prior1 (f x) in
+    return (y, s+.s1)
+  | d ->
+    let* x = d in
+    return (x,1.)
+
 
 type 'a samples = ('a * prob) list
 
@@ -50,7 +64,7 @@ For mh, we need a proposal distribution to start choosing values from,
 and a function *proportional* to the density (here the scores assigned by `prior`)
 *)
 let mh n d =
-  let proposal = prior d in
+  let proposal = prior1 d in
   let rec iterate ?(n=n) (x,s) =
     if n = 0 then return [] else
       let* (y,r) = proposal in
