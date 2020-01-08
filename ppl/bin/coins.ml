@@ -7,7 +7,7 @@ let coin_tossing =
     if isFair then return 0.5 else beta 5. 1.
   in
 
-  let toss d b = condition (fun w -> if b then w else 1. -. w) d in
+  let toss d b = condition' (fun w -> if b then w else 1. -. w) d in
 
   let tosses bs d = List.fold bs ~init:d ~f:(toss) in
 

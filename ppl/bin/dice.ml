@@ -17,4 +17,4 @@ let mean4die = sample_mean @@ fmap float_of_int (die 4) (* 14 *)
 
 let sample_n_indep n = sample @@ k_independent_rolls n
 
-let conditional_die n = condition (fun x -> 1. /. float_of_int x) (die n)
+let conditional_die n = condition' (fun x -> 1. /. float_of_int x) (die n)

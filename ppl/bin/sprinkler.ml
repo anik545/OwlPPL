@@ -2,6 +2,7 @@ open Ppl
 
 
 let grass_model = 
+  let (let+) cond dist = Conditional(cond, dist()) in
   (* let (&&) = liftM2 (&&) in
      let (||) = liftM2 (||) in *)
   let* rain = bernoulli 0.3 in
@@ -10,7 +11,8 @@ let grass_model =
   (* let grass_is_wet = bernoulli 0.9 && rain 
                      || bernoulli 0.8 && sprinkler
                      || bernoulli 0.1  *)
-  return (rain, sprinkler, grass_is_wet)
+  let+ _ = fun _ -> if grass_is_wet then 1. else 0. in (* make this look nicer *)
+  return (rain,sprinkler)
 
 let model = 
   let* burglary = bernoulli 0.00 in 

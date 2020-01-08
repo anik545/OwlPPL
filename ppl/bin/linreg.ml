@@ -12,7 +12,7 @@ let linreg =
     return (a,b,c)
   in
   let open Float in
-  let point d (x,y) = condition (fun (a,b,c) -> Primitives.(pdf @@ normal (a*x+b) c) y) d in
+  let point d (x,y) = condition' (fun (a,b,c) -> Primitives.(pdf @@ normal (a*x+b) c) y) d in
 
   let points ps d = List.fold ~f:(point) ~init:d ps in
 

@@ -15,7 +15,7 @@ let hmm =
   in
   (* emmission probabilities for observed state (normal) *)
   let score y x = Primitives.(pdf @@ normal (float_of_int x) 1.) y in
-  let expand d y = condition (fun l ->  score y (List.hd_exn l)) @@ 
+  let expand d y = condition' (fun l ->  score y (List.hd_exn l)) @@ 
     let* rest = d in 
     let* x = trans (List.hd_exn rest) 
     in return (x::rest)
