@@ -1,3 +1,5 @@
+(copy_files# inference/*)
+(rm *.md)
 (library
  (name ppl)
  (public_name ppl)

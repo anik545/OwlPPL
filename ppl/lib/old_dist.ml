@@ -168,6 +168,7 @@ let kl_dist ?(n=1000) (p: ('a * prob) dist) (q: 'a sampleable) =
   kl_samples (Map.Poly.to_alist samples) q
 
 
+
 (* TODO: create a prob_map module *)
 let weighted_dist ?(n=300) (d: 'a dist) : ('a, int) Core.Map.Poly.t =
   let rec loop n map =

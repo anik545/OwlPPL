@@ -1,5 +1,6 @@
 open Core
 
+(* How would an user add a new distribution? *)
 module type Primitives = sig
   type 'a primitive
   val binomial : int -> float -> int primitive
@@ -10,14 +11,15 @@ module type Primitives = sig
   val gamma : float -> float -> float primitive
   val continuous_uniform : float -> float -> float primitive
 
+
   val sample : 'a primitive -> 'a
-  (* pdf = score *)
   val pdf : 'a primitive -> 'a -> float
   val logpdf : 'a primitive -> 'a -> float
 end
 
-
-module Primitive_Dists: Primitives = struct
+type 'a prim_record = {sample: unit -> 'a; pdf: 'a -> float}
+module Primitive_Dists: Primitives with type 'a primitive := 'a prim_record
+= struct
   exception Undefined
 
   type 'a primitive = {sample: unit -> 'a; pdf: 'a -> float}
@@ -133,3 +135,4 @@ module Primitive_Dists_GADT: Primitives = struct
   let continuous_uniform a b = C_Uniform(a,b)
 
 end
+

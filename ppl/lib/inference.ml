@@ -1,37 +1,9 @@
-open Dist.Dist(Primitive_dists.Primitive_Dists)
+open Dist.GADT_Dist
 open Core
-
+module P = Primitive_dists.Primitive_Dists
 exception NotImplemented
 type prob = float
 (* INFERENCE *)
-let rec prior': 'a.'a dist -> 'a dist = function
-    Conditional (_,d) -> prior' d
-  | Bind (d,f) -> Bind((prior' d), f)
-  | d -> d
-
-let rec prior: 'a.'a dist -> ('a*prob) dist = function
-    Conditional (c,d) ->
-    let* (x,s) = prior d in
-    return (x, s *. (c x))
-  | Bind (d,f) ->
-    let* (x,s) = prior d in
-    let* y = f x in
-    return (y, s)
-  | d ->
-    let* x = d in
-    return (x,1.)
-
-let rec prior1: 'a.'a dist -> ('a*prob) dist = function
-    Conditional (c,d) ->
-    let* (x,s) = prior1 d in
-    return (x, s *. (c x))
-  | Bind (d,f) ->
-    let* (x,s) = prior1 d in
-    let* y,s1 = prior1 (f x) in
-    return (y, s+.s1)
-  | d ->
-    let* x = d in
-    return (x,1.)
 
 
 type 'a samples = ('a * prob) list
@@ -85,7 +57,7 @@ let rec smc: 'a.int -> 'a dist -> 'a samples dist =
 
   | Conditional(c,d) ->
     let updated = fmap normalise @@ 
-      condition (List.sum (module Float) ~f:snd) @@
+      condition' (List.sum (module Float) ~f:snd) @@
       let* ps = smc n d in
       let qs = List.map ~f:(fun (x,w) -> (x, (c x) *. w)) ps in
       return qs
@@ -114,47 +86,3 @@ let pimh n d = mh n (smc n d)
 let pimh' k n d = mh' k (smc' n d)
 
 
-(* particle cascade *)
-(* https://arxiv.org/pdf/1407.2864.pdf *)
-(* TODO: make lazy?? *)
-let resamplePC ps n = 
-  let rec iterate n mean ps iters =
-    match ps with
-    | [] -> raise NotImplemented
-    | (x,w)::ps ->
-      let k = float_of_int n in
-      let mean' = (k /. (k +. 1.)) *. mean +. (1. /. (k +. 1.)) *. w in
-      let r = w /. mean' in
-      let flr = Float.round_down r in
-      let probLow = flr in
-      let clr = Float.round_up r  in
-      let probHigh = clr in
-      let spawn x w =
-        if Float.(r < 1.) then
-          choice r (return [(x,mean')]) (return [])
-        else
-          choice (r -. probLow)
-            (return @@ List.init (int_of_float flr) ~f:(fun _ -> x, w /. probLow))
-            (return @@ List.init (int_of_float clr) ~f:(fun _ -> x, w /. probHigh))  
-      in
-      let* children = spawn x w in
-      if iters = 0 then return children else
-        let* rest = iterate (n+1) mean' ps (iters-1) in
-        return (children @ rest)
-  in
-  iterate 0 0. ps n
-
-let rec cascade:'a.int -> 'a dist -> 'a samples dist = fun n -> function
-  | Conditional(c,d) -> 
-    let* ps = cascade n d in
-    let qs = List.map ~f:(fun (x,w) -> (x,(c x) *. w )) ps in
-    resamplePC qs n
-  | Bind (d,f) ->
-    let* ps = cascade n d in
-    let (xs,ws) = List.unzip ps in
-    let* ys = mapM f xs in
-    return (List.zip_exn ys ws)
-
-  | d -> sequence @@ List.init n ~f:(fun _ -> (fmap (fun x -> (x, 1.)) d))
-
-let cascade' n d = (cascade n d) >>= (fun x -> categorical (List.take x n))

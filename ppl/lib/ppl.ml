@@ -1,3 +1,5 @@
-include Dist.Dist(Primitive_dists.Primitive_Dists)
+include Dist.GADT_Dist
 include Inference
+include Helpers
 module Primitives = Primitive_dists.Primitive_Dists
+module KL = Kl.KL

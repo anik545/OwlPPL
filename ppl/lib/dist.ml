@@ -13,8 +13,12 @@ module Dist(P: Primitive_dists.Primitives) = struct
     | Primitive: 'a P.primitive -> 'a dist
     | Conditional: ('a -> float) * 'a dist -> 'a dist
 
-  let condition (c: 'a -> likelihood) d = Conditional (c,d)
+  let condition' (c: 'a -> likelihood) d = Conditional (c,d)
   let primitive p = Primitive p
+
+  let condition b d = Conditional((fun _ -> if b then 1. else 0.), d)
+  let score s d = Conditional((fun _ -> s),d)
+  let observe x dst d = Conditional((fun _ -> P.pdf dst x),d)
 
   module DistMonad: (Monad with type 'a t = 'a dist) = struct
     type 'a t = 'a dist
@@ -45,54 +49,51 @@ module Dist(P: Primitive_dists.Primitives) = struct
   let rec sample_with_score: 'a. 'a dist -> ('a * likelihood) = function
       Return x -> (x, 1.)
     | Bind (d,f) -> 
-      let y, score =  (sample_with_score d) in
-      let d = f y in
-      let a,b = (sample_with_score d) in
-      (a,b+.score)
+      let y, s =  (sample_with_score d) in
+      let a,s1 = (sample_with_score (f y)) in
+      (a,s*.s1)
 
     | Primitive d -> let x  = P.sample d in (x, P.pdf d x) (* this instead?? *)
     (* this is how its done in prior - is it right??? *)
     (* | Primitive d -> let x  = P.sample d in (x, 1.)  *)
     | Conditional (lik,d) -> 
       let x,s = sample_with_score d in
-      (x,s +. lik x)
+      (x,s *. lik x)
 
-  let sample_mean ?(n=100000) d = 
-    let rec loop n d sofar = 
-      if n = 0 
-      then sofar
-      else loop (n-1) d ((sample d) +. sofar)
-    in
-    (loop n d 0.) /. float_of_int n
-  let take_k_samples k d = Core.Array.init k ~f:(fun _ -> sample d)
 
-  let hist_dist ?h ?(n=5000) ?(fname="fig.jpg") d = 
-    let open Owl_plplot in 
-    let samples = take_k_samples n d in
+  let rec prior': 'a.'a dist -> 'a dist = function
+      Conditional (_,d) -> prior' d
+    | Bind (d,f) -> Bind((prior' d), f)
+    | d -> d
 
-    let pl = match h with 
-      | None -> Plot.create ~m:1 ~n:1 fname 
-      | Some h -> h 
-    in
-    Plot.histogram ~h:pl ~bin:50 Owl.(Mat.col (Mat.of_array samples n 1) 0);
-    pl
+  let rec prior: 'a.'a dist -> ('a*prob) dist = function
+      Conditional (c,d) ->
+      let* (x,s) = prior d in
+      return (x, s *. (c x))
+    | Bind (d,f) ->
+      let* (x,s) = prior d in
+      let* y = f x in
+      return (y, s)
+    | d ->
+      let* x = d in
+      return (x,1.)
 
-  let undup xs = 
-    let map = Core.Map.Poly.of_alist_fold xs ~f:(+.) ~init:0. in
-    map
+  let rec prior1: 'a.'a dist -> ('a*prob) dist = function
+      Conditional (c,d) ->
+      let* (x,s) = prior1 d in
+      return (x, s *. (c x))
+    | Bind (d,f) ->
+      let* (x,s) = prior1 d in
+      let* y,s1 = prior1 (f x) in
+      return (y, s*.s1)
+    | Primitive d -> let* x = Primitive d in return (x, P.pdf d x)
+    | d ->
+      let* x = d in
+      return (x,1.)
 
   let dist_of_n_samples n (d: 'a dist): 'a list dist = 
     sequence @@ Core.List.init n ~f:(fun _ -> (d))
 
-  (* TODO: create a prob_map module *)
-  let weighted_dist ?(n=300) (d: 'a dist) : ('a, int) Core.Map.Poly.t =
-    let rec loop n map =
-      if n = 0 then map else
-        let s = sample d in 
-        let map = Core.Map.Poly.update map s ~f:(fun x -> match x with None -> 1 | Some y -> y + 1) in
-        loop (n-1) map
-    in
-    loop n Core.Map.Poly.empty
 end
 
 
