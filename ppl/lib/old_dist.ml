@@ -148,6 +148,10 @@ let undup xs =
   let map = Map.Poly.of_alist_fold xs ~f:(+.) ~init:0. in
   map
 
+let undup' xs = 
+  let map = Core.Map.Poly.of_alist_fold xs ~f:(+.) ~init:0. in
+  Core.Map.Poly.to_alist map
+
 let dist_of_n_samples n (d: 'a dist): 'a list dist = 
   sequence @@ List.init n ~f:(fun _ -> (d))
 

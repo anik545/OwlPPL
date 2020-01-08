@@ -18,8 +18,7 @@ module type Primitives = sig
 end
 
 type 'a prim_record = {sample: unit -> 'a; pdf: 'a -> float}
-module Primitive_Dists: Primitives with type 'a primitive := 'a prim_record
-= struct
+module Primitive_Dists: Primitives = struct
   exception Undefined
 
   type 'a primitive = {sample: unit -> 'a; pdf: 'a -> float}

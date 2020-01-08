@@ -1,3 +1,4 @@
-(test
- (name ppl)
+(executable
+(modules test_models test models)
+ (name test_models)
  (libraries core owl ppl alcotest))

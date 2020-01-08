@@ -1,9 +1,10 @@
 open Dist.GADT_Dist
 open Core
 
-module type D_Samples = sig
+module type Samples = sig
   type 'a t
   val from_dist: ?n:int -> 'a dist -> 'a t
+  val add_sample: 'a -> 'a t -> 'a t
   val get_num: 'a t -> 'a -> int
   val get_prob: 'a t -> 'a -> float
   val to_pdf: 'a t -> ('a -> prob)
@@ -14,18 +15,25 @@ module type D_Samples = sig
 end
 
 
-module Samples: D_Samples with type 'a t = ('a, int) Map.Poly.t = struct 
+module DiscreteSamples: Samples with type 'a t = ('a, int) Map.Poly.t = struct 
   type 'a t = ('a, int) Map.Poly.t
   [@@deriving sexp]
+
+  let update_elt x = match x with 
+    | None -> 1 
+    | Some y -> y + 1
 
   let from_dist ?(n=300) d =
     let rec loop n map =
       if n = 0 then map else
         let s = sample d in 
-        let map = Map.Poly.update map s ~f:(fun x -> match x with None -> 1 | Some y -> y + 1) in
+        let map = Map.Poly.update map s ~f:update_elt in
         loop (n-1) map
     in
     loop n Map.Poly.empty
+
+  let add_sample x map =
+    Map.Poly.update map x ~f:update_elt
 
   let get_num map x = 
     match Map.Poly.find map x with 
@@ -54,3 +62,9 @@ module Samples: D_Samples with type 'a t = ('a, int) Map.Poly.t = struct
   let print_map = print ~ppf:Format.std_formatter
 
 end
+
+(* module WeightedSamples: Samples = struct
+   type 'a t = ('a, float) Map.Poly.t
+   [@@deriving sexp]
+
+   end *)

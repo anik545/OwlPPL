@@ -1,10 +1,14 @@
+(* open Common *)
+open Core
+open Dist.GADT_Dist
+
 (* particle cascade *)
 (* https://arxiv.org/pdf/1407.2864.pdf *)
 (* TODO: make lazy?? *)
 let resamplePC ps n = 
   let rec iterate n mean ps iters =
     match ps with
-    | [] -> raise NotImplemented
+    | [] -> raise Undefined
     | (x,w)::ps ->
       let k = float_of_int n in
       let mean' = (k /. (k +. 1.)) *. mean +. (1. /. (k +. 1.)) *. w in
