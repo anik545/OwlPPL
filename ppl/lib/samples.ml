@@ -4,7 +4,8 @@ open Core
 module type Samples = sig
   type 'a t
   val from_dist: ?n:int -> 'a dist -> 'a t
-  val add_sample: 'a -> 'a t -> 'a t
+  val empty: 'a t
+  val add_sample: 'a t -> 'a -> 'a t
   val get_num: 'a t -> 'a -> int
   val get_prob: 'a t -> 'a -> float
   val to_pdf: 'a t -> ('a -> prob)
@@ -23,6 +24,8 @@ module DiscreteSamples: Samples with type 'a t = ('a, int) Map.Poly.t = struct
     | None -> 1 
     | Some y -> y + 1
 
+  let empty: ('a, int) Map.Poly.t = Map.Poly.empty
+
   let from_dist ?(n=300) d =
     let rec loop n map =
       if n = 0 then map else
@@ -32,7 +35,7 @@ module DiscreteSamples: Samples with type 'a t = ('a, int) Map.Poly.t = struct
     in
     loop n Map.Poly.empty
 
-  let add_sample x map =
+  let add_sample map x =
     Map.Poly.update map x ~f:update_elt
 
   let get_num map x = 
@@ -48,7 +51,7 @@ module DiscreteSamples: Samples with type 'a t = ('a, int) Map.Poly.t = struct
 
   let to_pdf map = 
     let total = Map.Poly.fold map ~f:(fun ~key:_ ~data sofar -> sofar + data)  ~init:0 in
-    fun x -> 
+    fun x ->
       float_of_int (get_num map x) /. float_of_int total
 
   let get_vals = Map.Poly.keys

@@ -12,15 +12,25 @@ let infer_strats n = [
      SMC(n);
      PC(n) *)
 ]
+(* Using kl discrete for continuous distributions will diverge with number of samples *)
+let diff1 = KL.kl_continuous ~n:10 Primitives.(normal 0. 1.) (normal 0. 1.)
+let diff2 = KL.kl_continuous ~n:100 Primitives.(normal 0. 1.) (normal 0. 1.)
+let diff3 = KL.kl_continuous ~n:1000 Primitives.(normal 0. 1.) (normal 0. 1.)
+let diff4 = KL.kl_continuous ~n:10000 Primitives.(normal 0. 1.) (normal 0. 1.)
+let () = Printf.printf "%f %f %f %f\n" diff1 diff2 diff3 diff4
+let diff1 = KL.kl_discrete ~n:10 Primitives.(binomial 10 0.5) (binomial_ 10 0.5)
+let diff2 = KL.kl_discrete ~n:100 Primitives.(binomial 10 0.5) (binomial_ 10 0.5)
+let diff3 = KL.kl_discrete ~n:1000 Primitives.(binomial 10 0.5) (binomial_ 10 0.5)
+let diff4 = KL.kl_discrete ~n:10000 Primitives.(binomial 10 0.5) (binomial_ 10 0.5)
+let () = Printf.printf "%f %f %f %f\n" diff1 diff2 diff3 diff4
+(* let diff5 = KL.kl_continuous ~n:10 Primitives.(beta 10. 2.) (mh' 500 single_coin)
+   let () = Printf.printf "%f\n" diff5 *)
 
 let test_model (m,true_dist) =
 
   let kl_div = fun d -> 
-    KL.kl_discrete 
-      true_dist 
-      (let samples = Ppl.Samples.from_dist ~n:2000 d in
-       (* let () = Ppl.Samples.print_map (module Float) samples in *)
-       samples) 
+    KL.kl_continuous ~n:10000
+      true_dist d
   in
 
   let inferred_dists = List.map (infer_strats 100) ~f:(fun strat -> strat,infer m strat) in
