@@ -1,6 +1,7 @@
 open Monad
 
 module Dist(P: Primitive_dists.Primitives) = struct
+  module P = P
   exception Undefined
   type prob = float
   type likelihood = float
@@ -19,6 +20,8 @@ module Dist(P: Primitive_dists.Primitives) = struct
   let condition b d = Conditional((fun _ -> if b then 1. else 0.), d)
   let score s d = Conditional((fun _ -> s),d)
   let observe x dst d = Conditional((fun _ -> P.pdf dst x),d)
+  (* TODO: *)
+  (* let observe_list lst dst d = Core.List.fold_left ~f:(observe) *)
 
   module DistMonad: (Monad with type 'a t = 'a dist) = struct
     type 'a t = 'a dist
@@ -94,6 +97,21 @@ module Dist(P: Primitive_dists.Primitives) = struct
   let dist_of_n_samples n (d: 'a dist): 'a list dist = 
     sequence @@ Core.List.init n ~f:(fun _ -> (d))
 
+  module PplOps = struct
+    let ( +~ ) = liftM2 ( + )
+    let ( -~ ) = liftM2 ( - )
+    let ( *~ ) = liftM2 ( * )
+    let ( /~ ) = liftM2 ( / )
+    let ( +.~ ) = liftM2 ( +. )
+    let ( -.~ ) = liftM2 ( -. )
+    let ( *.~ ) = liftM2 ( *. )
+    let ( /.~ ) = liftM2 ( /. )
+    let ( &~ ) = liftM2 ( && )
+    let ( |~ ) = liftM2 ( || )
+    let not = liftM not
+
+    let ( ^~ ) = liftM2 ( ^ )
+  end
 end
 
 

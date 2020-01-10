@@ -15,21 +15,28 @@ module type Primitives = sig
   val sample : 'a primitive -> 'a
   val pdf : 'a primitive -> 'a -> float
   val logpdf : 'a primitive -> 'a -> float
+  type 'a support = Discrete of 'a list | Continuous
+
+  val support: 'a primitive -> 'a support
 end
 
-type 'a prim_record = {sample: unit -> 'a; pdf: 'a -> float}
+(* type 'a prim_record = {sample: unit -> 'a; pdf: 'a -> float} *)
 module Primitive_Dists: Primitives = struct
   exception Undefined
 
-  type 'a primitive = {sample: unit -> 'a; pdf: 'a -> float}
+  type 'a support = Discrete of 'a list | Continuous
+
+  type 'a primitive = {sample: unit -> 'a; pdf: 'a -> float; support: 'a support}
 
   let binomial n p = {
     sample = (fun () -> Owl_stats_dist.binomial_rvs ~n ~p);
-    pdf = Owl_stats_dist.binomial_pdf ~n ~p
+    pdf = Owl_stats_dist.binomial_pdf ~n ~p;
+    support = Continuous
   }
   let normal mu sigma = {
     sample=(fun() -> Owl_base_stats.gaussian_rvs ~mu:mu ~sigma:sigma);
-    pdf= Owl_stats_dist.gaussian_pdf ~mu ~sigma
+    pdf= Owl_stats_dist.gaussian_pdf ~mu ~sigma;
+    support = Continuous
   }
 
   let categorical xs = {
@@ -47,33 +54,40 @@ module Primitive_Dists: Primitives = struct
          in
          loop xs r
       );
-    pdf=fun x -> 
-      let rec lookup l = function 
-        | (a,p)::xs -> if Stdlib.(a = x) then p else lookup l xs
-        | [] -> 0. (* not found *)
-      in
-      lookup x xs}
+    pdf=(fun x -> 
+        let rec lookup l = function 
+          | (a,p)::xs -> if Stdlib.(a = x) then p else lookup l xs
+          | [] -> 0. (* not found *)
+        in
+        lookup x xs);
+    support = Discrete (List.map ~f:fst xs)
+  }
 
   let discrete_uniform xs = {
     sample=(fun()->(Owl_base_stats.sample (Array.of_list xs) 1).(0));
-    pdf=fun _ -> 1. /. (float_of_int (List.length xs))
+    pdf=(fun _ -> 1. /. (float_of_int (List.length xs)));
+    support = Discrete xs
   }
   let beta a b = {
     sample=(fun()->Owl_stats_dist.beta_rvs ~a ~b);
-    pdf=Owl_stats_dist.beta_pdf ~a ~b
+    pdf=Owl_stats_dist.beta_pdf ~a ~b;
+    support = Continuous
   }
   let gamma shape scale = {
     sample=(fun()->Owl_stats_dist.gamma_rvs ~shape ~scale);
-    pdf=Owl_stats_dist.gamma_pdf ~shape ~scale
+    pdf=Owl_stats_dist.gamma_pdf ~shape ~scale;
+    support = Continuous
   }
   let continuous_uniform a b = {
     sample=(fun()->Owl_stats_dist.uniform_rvs ~a ~b);
-    pdf=Owl_stats_dist.uniform_pdf ~a ~b
+    pdf=Owl_stats_dist.uniform_pdf ~a ~b;
+    support = Continuous
   }
 
   let sample s = s.sample ()
   let pdf s x = s.pdf x
   let logpdf s x = log (s.pdf x)
+  let support s = s.support
 end
 
 module Primitive_Dists_GADT: Primitives = struct 
@@ -133,5 +147,8 @@ module Primitive_Dists_GADT: Primitives = struct
   let gamma shape scale = Gamma(shape,scale)
   let continuous_uniform a b = C_Uniform(a,b)
 
+  type 'a support = Discrete of 'a list | Continuous
+
+  let support _ = raise NotImplemented
 end
 

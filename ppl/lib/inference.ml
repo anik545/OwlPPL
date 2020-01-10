@@ -38,6 +38,6 @@ let infer dist = function
   | Importance(n) -> importance' n dist
   | Rejection -> raise NotImplemented
   | Prior -> prior' dist
-  | Enum -> raise NotImplemented
+  | Enum -> exact_inference dist
   | None -> dist
 
