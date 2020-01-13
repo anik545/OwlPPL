@@ -1,9 +1,14 @@
 open Core
 open Dist.GADT_Dist
 type prob = float
-type 'a samples = ('a * prob) list
 
-let resample (xs: 'a samples): ('a samples) dist =
+type 'a samples = ('a * likelihood) list
+
+let unduplicate xs = 
+  let map = Map.Poly.of_alist_fold xs ~f:(+.) ~init:0. in
+  Map.Poly.to_alist map
+
+let resample xs =
   let n = List.length xs in
   let old_dist = categorical xs in
   sequence @@ List.init n ~f:(fun _ -> (fmap (fun x-> (x, 1.)) (old_dist)))

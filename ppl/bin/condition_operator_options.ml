@@ -22,10 +22,10 @@ let () =
   let pl = Plot.create ~m:2 ~n:1 "fig.jpg" in
 
   Plot.subplot pl 0 0;
-  let pl = hist_dist ~h:pl ~n x in
+  let pl = hist_dist_continuous ~h:pl ~n x in
 
   Plot.subplot pl 1 0;
-  let pl = hist_dist ~h:pl ~n x' in
+  let pl = hist_dist_continuous ~h:pl ~n x' in
 
   Plot.output pl
 

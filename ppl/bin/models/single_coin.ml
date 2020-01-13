@@ -1,13 +1,6 @@
 open Ppl
 open Core
 
-(* TODO: This won't work until we make dist lazy (stack overflow) *)
-let rec geometric' p n = 
-  let* c = (bernoulli p) in 
-  if c then (return n) else (geometric' p (n+1))
-
-let geometric p = geometric' p 0  
-
 (* https://www.cl.cam.ac.uk/teaching/1819/DataSci/notes0.pdf pg33 *)
 let single_coin = 
   let pr = c_uniform 0. 1. in
@@ -19,6 +12,11 @@ let single_coin =
   let posterior = toss obs pr in
   (* let posterior' = condition (fun p -> pdf (Binomial(10,p)) obs) (c_uniform 0. 1.) in *)
   posterior
+
+let coin heads = 
+  let* coinweight = c_uniform 0. 1. in
+  observe heads Primitives.(binomial 10 coinweight)
+    (return coinweight)
 
 let post_single_coin = mh' 700 @@ single_coin
 let mn = sample_mean ~n:10000 (post_single_coin) (* 0.833 *)
@@ -32,7 +30,7 @@ let () =
   let pl = Plot.create ~m:2 ~n:1 "b1.png" in
 
   Plot.subplot pl 0 0;
-  let pl = hist_dist ~h:pl ~n post_single_coin in
+  let pl = hist_dist_continuous ~h:pl ~n post_single_coin in
 
   Plot.plot_fun ~h:pl (fun x -> (570. /. 4.26) *. (Owl_stats_dist.beta_pdf ~a:10. ~b:2. x)) 0. 1.;
 

@@ -1,22 +1,70 @@
 open Monad
 
+module type Ops = sig 
+  type 'a dist
+  val ( +~ ) : int dist -> int dist -> int dist
+  val ( -~ ) : int dist -> int dist -> int dist
+  val ( *~ ) : int dist -> int dist -> int dist
+  val ( /~ ) : int dist -> int dist -> int dist
+  val ( +.~ ) : float dist -> float dist -> float dist
+  val ( -.~ ) : float dist -> float dist -> float dist
+  val ( *.~ ) : float dist -> float dist -> float dist
+  val ( /.~ ) : float dist -> float dist -> float dist
+  val ( &~ ) : bool dist -> bool dist -> bool dist
+  val ( |~ ) : bool dist -> bool dist -> bool dist
+  val not : bool dist -> bool dist
+  val ( ^~ ) : string dist -> string dist -> string dist
+end
+
+
+module type Dist = sig 
+  module P: Primitive_dists.Primitives
+  type prob
+  type likelihood
+  type 'a samples
+  type 'a dist
+
+  val condition' : ('a -> likelihood) -> 'a dist -> 'a dist
+  val condition : bool -> 'a dist -> 'a dist
+  val score : likelihood -> 'a dist -> 'a dist
+  val observe : 'a -> 'a P.primitive -> 'b dist -> 'b dist
+  module DistMonad: Monad
+  include Monad.EMonad with type 'a t := 'a dist
+
+  val uniform : 'a list -> 'a dist
+  val categorical : ('a * likelihood) list -> 'a dist
+  val bernoulli : likelihood -> bool dist
+  val choice : likelihood -> 'a dist -> 'a dist -> 'a dist
+  val binomial : int -> likelihood -> int dist
+  val normal : likelihood -> likelihood -> likelihood dist
+  val gamma : likelihood -> likelihood -> likelihood dist
+  val beta : likelihood -> likelihood -> likelihood dist
+  val c_uniform : likelihood -> likelihood -> likelihood dist
+  val sample : 'a dist -> 'a
+  val sample_n : int -> 'a dist -> 'a array
+  val sample_with_score : 'a dist -> 'a * likelihood
+  val prior' : 'a dist -> 'a dist
+  val prior : 'a dist -> ('a * likelihood) dist
+  val prior1 : 'a dist -> ('a * likelihood) dist
+  val dist_of_n_samples : int -> 'a dist -> 'a list dist
+  module PplOps: Ops with type 'a dist := 'a dist
+end
+
+
 module Dist(P: Primitive_dists.Primitives) = struct
   module P = P
   exception Undefined
   type prob = float
   type likelihood = float
   type 'a samples = ('a * prob) list
-  type 'a no_dup_vals_samples = ('a , prob) Core.Map.Poly.t
-
   type _ dist = 
       Return: 'a -> 'a dist
+    (* bind is lazy since it contains a function *)
     | Bind: 'a dist * ('a -> 'b dist) -> 'b dist
     | Primitive: 'a P.primitive -> 'a dist
     | Conditional: ('a -> float) * 'a dist -> 'a dist
 
   let condition' (c: 'a -> likelihood) d = Conditional (c,d)
-  let primitive p = Primitive p
-
   let condition b d = Conditional((fun _ -> if b then 1. else 0.), d)
   let score s d = Conditional((fun _ -> s),d)
   let observe x dst d = Conditional((fun _ -> P.pdf dst x),d)
@@ -34,8 +82,7 @@ module Dist(P: Primitive_dists.Primitives) = struct
   let categorical xs = Primitive (P.categorical xs)
   let bernoulli p = categorical [(true, p); (false, 1. -. p)]
   let choice p x y = Bind ((bernoulli p), (fun c -> if c then x else y))
-  let binomial_ n p = Primitive (P.binomial n p) 
-  let binomial n p = P.binomial n p (* TODO: ?? why was it like this ??*)
+  let binomial n p = Primitive (P.binomial n p)
 
   (* continuous *)
   let normal mu sigma = Primitive (P.normal mu sigma)
@@ -49,6 +96,13 @@ module Dist(P: Primitive_dists.Primitives) = struct
     | Primitive d -> P.sample d
     | Conditional (_,_) -> raise Undefined
 
+  let rec sample_n: 'a. int -> 'a dist -> 'a array = fun n -> function
+      Return x -> Array.init n (fun _ -> x)
+    | Bind (d,f) -> let y = Array.map f (sample_n n d) in Array.map sample y
+    | Primitive d -> Array.init n (fun _ -> P.sample d)
+    | Conditional (_,_) -> raise Undefined
+
+  (* same as sample (prior1 d) *)
   let rec sample_with_score: 'a. 'a dist -> ('a * likelihood) = function
       Return x -> (x, 1.)
     | Bind (d,f) -> 
@@ -81,6 +135,7 @@ module Dist(P: Primitive_dists.Primitives) = struct
       let* x = d in
       return (x,1.)
 
+  (* same as sample_with_score *)
   let rec prior1: 'a.'a dist -> ('a*prob) dist = function
       Conditional (c,d) ->
       let* (x,s) = prior1 d in
@@ -90,12 +145,11 @@ module Dist(P: Primitive_dists.Primitives) = struct
       let* y,s1 = prior1 (f x) in
       return (y, s*.s1)
     | Primitive d -> let* x = Primitive d in return (x, P.pdf d x)
-    | d ->
-      let* x = d in
+    | Return x ->
       return (x,1.)
 
   let dist_of_n_samples n (d: 'a dist): 'a list dist = 
-    sequence @@ Core.List.init n ~f:(fun _ -> (d))
+    sequence @@ Core.List.init n ~f:(fun _ -> d)
 
   module PplOps = struct
     let ( +~ ) = liftM2 ( + )
@@ -118,3 +172,5 @@ end
 open Dist(Primitive_dists.Primitive_Dists)
 
 module GADT_Dist = Dist(Primitive_dists.Primitive_Dists)
+
+module Ppl: Dist = GADT_Dist

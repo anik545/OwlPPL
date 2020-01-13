@@ -41,3 +41,4 @@ let infer dist = function
   | Enum -> exact_inference dist
   | None -> dist
 
+let infer_sampler dist strat = let new_dist = infer dist strat in fun () -> sample new_dist

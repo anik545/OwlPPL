@@ -8,12 +8,9 @@ exception Undefined
 let fsts = List.map ~f:fst
 type score = float
 
-let unduplicate xs = 
-  let map = Core.Map.Poly.of_alist_fold xs ~f:(+.) ~init:0. in
-  Core.Map.Poly.to_alist map
-
 (* 'a. 'a dist -> ('a * score list) -> ('a * prob list)  *)
 (* produces a list of value,score, not prob (i.e. unnormalised) *)
+(* depth-first search *)
 (* todo produce a map instead *)
 let rec enumerate: type a.a dist -> score -> ((a * score)list)
   = fun d multiplier ->

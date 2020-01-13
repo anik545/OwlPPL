@@ -22,7 +22,7 @@ end
 
 (* type 'a prim_record = {sample: unit -> 'a; pdf: 'a -> float} *)
 module Primitive_Dists: Primitives = struct
-  exception Undefined
+  (* exception Undefined *)
 
   type 'a support = Discrete of 'a list | Continuous
 
@@ -33,35 +33,39 @@ module Primitive_Dists: Primitives = struct
     pdf = Owl_stats_dist.binomial_pdf ~n ~p;
     support = Continuous
   }
+
   let normal mu sigma = {
     sample=(fun() -> Owl_base_stats.gaussian_rvs ~mu:mu ~sigma:sigma);
     pdf= Owl_stats_dist.gaussian_pdf ~mu ~sigma;
     support = Continuous
   }
 
-  let categorical xs = {
-    sample=
-      (fun()->
-         let xs = List.sort xs 
-             ~compare:(fun a b ->  if Float.(snd a -. snd b < 0.) then 1 else -1) in
-         let r = Owl_base_stats.uniform_rvs ~a:0.0 ~b:1. in
-         let rec loop p_left remaining = match p_left with
-             (v,p)::xs -> 
-             if Float.(remaining < p) || Stdlib.(xs = []) 
-             then v 
-             else loop xs (remaining -. p)
-           | [] -> raise Undefined
+  let categorical xs = 
+    let ps = Array.of_list_map ~f:snd xs in
+    let xs_arr = Array.of_list_map ~f:fst xs in
+    {sample=
+       (fun()->
+          xs_arr.(Owl_stats.categorical_rvs ps)
+          (* let xs = List.sort xs 
+              ~compare:(fun a b ->  if Float.(snd a -. snd b < 0.) then 1 else -1) in
+             let r = Owl_base_stats.uniform_rvs ~a:0.0 ~b:1. in
+             let rec loop p_left remaining = match p_left with
+              (v,p)::xs -> 
+              if Float.(remaining < p) || Stdlib.(xs = []) 
+              then v 
+              else loop xs (remaining -. p)
+             | [] -> raise Undefined
+             in
+             loop xs r *)
+       );
+     pdf=(fun x -> 
+         let rec lookup l = function 
+           | (a,p)::xs -> if Stdlib.(a = x) then p else lookup l xs
+           | [] -> 0. (* not found *)
          in
-         loop xs r
-      );
-    pdf=(fun x -> 
-        let rec lookup l = function 
-          | (a,p)::xs -> if Stdlib.(a = x) then p else lookup l xs
-          | [] -> 0. (* not found *)
-        in
-        lookup x xs);
-    support = Discrete (List.map ~f:fst xs)
-  }
+         lookup x xs);
+     support = Discrete (List.map ~f:fst xs)
+    }
 
   let discrete_uniform xs = {
     sample=(fun()->(Owl_base_stats.sample (Array.of_list xs) 1).(0));

@@ -8,11 +8,13 @@ module type Samples = sig
   val add_sample: 'a t -> 'a -> 'a t
   val get_num: 'a t -> 'a -> int
   val get_prob: 'a t -> 'a -> float
-  val to_pdf: 'a t -> ('a -> prob)
+  val to_pdf: 'a t -> ('a -> float)
   val get_vals: 'a t -> 'a list
   (* val print: 'a t -> unit *)
   val print_map: (module Pretty_printer.S with type t = 'a) -> 'a t -> unit
   include Sexpable.S1 with type 'a t := 'a t
+  val to_arr : ('a, 'b) Core.Map.Poly.t -> ('a * 'b) array
+  val support : ('a, 'b) Core.Map.Poly.t -> 'a list
 end
 
 
@@ -20,9 +22,12 @@ module DiscreteSamples: Samples with type 'a t = ('a, int) Map.Poly.t = struct
   type 'a t = ('a, int) Map.Poly.t
   [@@deriving sexp]
 
-  let update_elt x = match x with 
-    | None -> 1 
-    | Some y -> y + 1
+  let update_elt x = 
+    let open Option in
+    value_map x ~default:1 ~f:((+) 1) 
+  (* match x with 
+     | None -> 1 
+     | Some y -> y + 1 *)
 
   let empty: ('a, int) Map.Poly.t = Map.Poly.empty
 
@@ -56,7 +61,7 @@ module DiscreteSamples: Samples with type 'a t = ('a, int) Map.Poly.t = struct
 
   let get_vals = Map.Poly.keys
 
-  let print (type a) (printer) ~ppf map = 
+  let print (type a) printer ~ppf map = 
     let (module P: Pretty_printer.S with type t = a) = printer in
     Map.Poly.iteri 
       map 
@@ -64,6 +69,8 @@ module DiscreteSamples: Samples with type 'a t = ('a, int) Map.Poly.t = struct
 
   let print_map = print ~ppf:Format.std_formatter
 
+  let to_arr samples = Array.of_list @@ Map.Poly.to_alist samples 
+  let support samples = Map.Poly.keys samples
 end
 
 (* module WeightedSamples: Samples = struct
