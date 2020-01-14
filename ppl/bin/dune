@@ -1,4 +1,4 @@
 (copy_files# models/*)
 (executables
- (names ppl_50_line dice sprinkler coins single_coin linreg hmm)
+ (names ppl_50_line dice sprinkler coins single_coin linreg hmm geometric)
  (libraries ppl core owl owl-plplot))

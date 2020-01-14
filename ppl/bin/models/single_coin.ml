@@ -19,10 +19,10 @@ let coin heads =
     (return coinweight)
 
 let post_single_coin = mh' 700 @@ single_coin
-let mn = sample_mean ~n:10000 (post_single_coin) (* 0.833 *)
+let mn = sample_mean ~n:100 (post_single_coin) (* 0.833 *)
 
 let () = Printf.printf "%f\n" mn
-
+(* 
 let () =
   let open Owl_plplot in
 
@@ -42,4 +42,4 @@ let () =
     ~dist:(Owl_stats_dist.beta_ppf ~a:10. ~b:2.)
     (Owl.(Mat.col (Mat.of_array (take_k_samples n post_single_coin) n 1) 0 ));
 
-  Plot.output pl;
+  Plot.output pl; *)

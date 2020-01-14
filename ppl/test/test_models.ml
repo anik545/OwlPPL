@@ -4,7 +4,8 @@ open Models
 
 let models = [
   (* tuples of model (posterior), and exact dist *)
-  (single_coin, Primitives.(beta 10. 2.))
+  (single_coin, Primitives.(beta 10. 2.)); (*discrete observation, continuous prior, continuous posterior *)
+  (sprinkler, Primitives.(beta 10. 2.)) (*discrete observation, discrete prior, discrete posterior *)
 ]
 
 let infer_strats n = [

@@ -20,6 +20,19 @@ let mh n d =
 
 let mh' n d = fmap (fun x -> List.nth_exn x (n-1)) (mh n d)
 
+(* Don't generate entire list - only care about distribution over final state *)
+let mh'' n d =
+  let proposal = prior1 d in
+  let rec iterate ?(n=n) (x,s) =
+    if n = 0 then return (x,s) else
+      let* (y,r) = proposal in
+      let* accept = bernoulli @@ Float.min 1. (r /. s) in
+      let next = if accept then (y,r) else (x,s) in
+      let* final = iterate ~n:(n-1) next in
+      return (final)
+  in
+  fmap fst (let* x = proposal in iterate x)
+
 
 (* particle independent metropolis hastings *)
 let pimh n d = mh n (Smc.smc n d)

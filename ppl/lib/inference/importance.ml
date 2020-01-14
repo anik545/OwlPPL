@@ -4,7 +4,9 @@ open Dist.GADT_Dist
 open Common
 (* likelihood weighting *)
 let importance n d = sequence @@ List.init n ~f:(fun _ -> prior d)
-let importance' n d = (importance n d) >>= categorical
+let importance' n d = 
+  let* l = (importance n d) in 
+  categorical l
 
 
 let rejection_soft  d = 

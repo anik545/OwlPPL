@@ -1,8 +1,8 @@
 open Common
 open Core
 open Dist.GADT_Dist
-(* sequential monte carlo *)
 
+(* sequential monte carlo - particle filter *)
 let rec smc: 'a.int -> 'a dist -> 'a samples dist =
   fun n ->
   function
@@ -22,13 +22,15 @@ let rec smc: 'a.int -> 'a dist -> 'a samples dist =
     let* ys = mapM f xs in
     return (List.zip_exn ys ws)
 
+  | Primitive d -> sequence @@ List.init n ~f:(fun _ -> (fmap (fun x-> (x, P.pdf d x)) (Primitive d)))
   | d -> sequence @@ List.init n ~f:(fun _ -> (fmap (fun x-> (x, 1.)) d))
 
-let smc' n d = (smc n d) >>= categorical 
+let smc' n d = (smc n d) >>= categorical
 
 let smcStandard n d = prior' (smc n d)
 let smcStandard' n d = prior' (smc' n d)
 
 (* TODO: fix importance sampling first *)
-(* let smcMultiple k n d = (fmap flatten (importance k (smc n d)))
-   let smcMultiple' k n d = (importance' k (smc' n d)) *)
+open Importance
+let smcMultiple k n d = (fmap flatten (importance k (smc n d)))
+let smcMultiple' k n d = (importance' k (smc' n d))
