@@ -9,6 +9,15 @@ let importance' n d =
   categorical l
 
 
+let rec create' n d sofar =
+  if n = 0 then sofar
+  else 
+    match sample d with
+    | Some x -> create' (n-1) d (x::sofar)
+    | None -> create' n d sofar
+
+let create n d = create' n d []
+
 let rejection_soft  d = 
   let* (x,s) = prior1 d in
   let* accept = bernoulli s in
@@ -23,10 +32,19 @@ let rejection ?(n=10000) (s:[> `Hard | `Soft]) d =
     | `Hard -> rejection_hard ~threshold:0. 
     | `Soft -> rejection_soft 
   in
-  List.init n ~f:(fun _ -> sample (reject_dist d))
-  |> List.filter ~f:(is_some)
-  |> List.filter_opt
+  (* List.init n ~f:(fun _ -> sample (reject_dist d))
+     |> List.filter ~f:(is_some)
+     |> List.filter_opt *)
+  create n (reject_dist d)
   |> unduplicate
   |> normalise
   |> categorical
+
+(* 
+let rec create d n =
+  if n = 0 then [] 
+  else 
+    match sample d with
+    | Some x -> x::(create d (n-1))
+    | None -> create d n *)
 
