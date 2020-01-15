@@ -7,6 +7,7 @@ let rec smc: 'a.int -> 'a dist -> 'a samples dist =
   fun n ->
   function
 
+  (* At each piece of evidence/data, update each particle by the weight given by c *)
   | Conditional(c,d) ->
     let updated = fmap normalise @@ 
       condition' (List.sum (module Float) ~f:snd) @@

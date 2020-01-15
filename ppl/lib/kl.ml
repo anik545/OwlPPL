@@ -23,7 +23,7 @@ struct
     let q = D.from_dist q ~n in
     let pdf_p = P.pdf p in
     let pdf_q = D.to_pdf q in
-    let support_q = D.get_vals q in
+    let support_q = D.support q in
 
     let f x = 
       let p_x = pdf_p x in
@@ -74,12 +74,6 @@ struct
       if  Float.(f_q = 0.) then () else sum := !sum +. (f_p *. log (f_p /. f_q))
     done;
     !sum /. float_of_int n
-
-  (* let kl_continuous ?(n=1000) p q = 
-     (* q is samples of dist, p is exact dist*)
-     let samples = Array.init n ~f:(fun _ -> sample q) in
-     let q = Array.fold samples ~init:D.empty ~f:D.add_sample in
-     kl_discrete p q *)
 
 end
 

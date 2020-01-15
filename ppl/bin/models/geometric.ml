@@ -1,5 +1,5 @@
 open Ppl
-open Printf
+(* open Printf *)
 (* stochastic recursion *)
 let rec geometric' p n = 
   let* c = (bernoulli p) in 
@@ -11,7 +11,12 @@ let g2 =
   let* x = geometric 0.5 in
   condition (x > 2)
     (return x)
-(* Bind(geomer) *)
+(* Bind(geometric 0.5, fun x ->
+    Condition( fun _ -> if x > 2 then 1 else 0, 
+      Return(x)
+    )
+   ) 
+*)
 
 let g2' = 
   let d = 
@@ -19,10 +24,11 @@ let g2' =
     return x
   in
 
-  let d' = condition' (fun x -> if x > 2 then 0. else 1. /. float_of_int x) d in
+  let d' = condition' (fun x -> if x < 2 then 0. else 1. /. float_of_int x) d in
   d'
 
 (* let h = hist_dist_discrete ~fname:"geo.png" (fmap float_of_int (geometric 0.5))
    let () = Owl_plplot.Plot.output h *)
-let inferred = mh' 500 g2
-let () = printf "%d " @@ sample inferred 
+let inferred = smcStandard' 500 g2
+let () = Printf.printf "%d" @@ sample inferred 
+let () = Samples.print_map (module Base.Int) (Samples.from_dist inferred)

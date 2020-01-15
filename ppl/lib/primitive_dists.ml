@@ -56,7 +56,7 @@ module Primitive_Dists: Primitives = struct
               if Float.(remaining < p) || Stdlib.(xs = []) 
               then v 
               else loop xs (remaining -. p)
-             | [] -> raise Undefined
+             | [] -> raise Undefined  
              in
              loop xs r *)
        );

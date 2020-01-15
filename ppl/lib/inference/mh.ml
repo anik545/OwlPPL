@@ -11,7 +11,8 @@ let mh n d =
   let rec iterate ?(n=n) (x,s) =
     if n = 0 then return [] else
       let* (y,r) = proposal in
-      let* accept = bernoulli @@ Float.min 1. (r /. s) in
+      let ratio = if Float.(s = 0.) then 1. else r /. s in
+      let* accept = bernoulli @@ Float.min 1. ratio in
       let next = if accept then (y,r) else (x,s) in
       let* rest = iterate ~n:(n-1) next in
       return (next::rest)
@@ -26,7 +27,8 @@ let mh'' n d =
   let rec iterate ?(n=n) (x,s) =
     if n = 0 then return (x,s) else
       let* (y,r) = proposal in
-      let* accept = bernoulli @@ Float.min 1. (r /. s) in
+      let ratio = if Float.(s = 0.) then 1. else r /. s in
+      let* accept = bernoulli @@ Float.min 1. ratio in
       let next = if accept then (y,r) else (x,s) in
       let* final = iterate ~n:(n-1) next in
       return (final)

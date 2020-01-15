@@ -18,7 +18,29 @@ let rec create' n d sofar =
 
 let create n d = create' n d []
 
-let rejection_soft  d = 
+let reject_transform_hard ?(threshold=0.) d = 
+  let rec repeat () =
+    let* (x,s) = prior1 d in
+    if Float.(s > threshold) then return (x,s) else repeat ()
+  in
+  repeat ()
+
+let reject_transform_soft d = 
+  let rec repeat () =
+    let* (x,s) = prior1 d in
+    let* accept = bernoulli s in
+    if accept then return (x,s) else repeat ()
+  in
+  repeat ()
+
+let rejection_transform ?(n=10000) (s:[> `Hard | `Soft]) d = 
+  let reject_dist = match s with 
+    | `Hard -> reject_transform_hard ~threshold:0. 
+    | `Soft -> reject_transform_soft 
+  in
+  (sequence @@ List.init n ~f:(fun _ -> (reject_dist d))) >>= categorical
+
+let rejection_soft d = 
   let* (x,s) = prior1 d in
   let* accept = bernoulli s in
   if accept then return (Some (x,s)) else return None
