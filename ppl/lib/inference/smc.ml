@@ -31,7 +31,6 @@ let smc' n d = (smc n d) >>= categorical
 let smcStandard n d = prior' (smc n d)
 let smcStandard' n d = prior' (smc' n d)
 
-(* TODO: fix importance sampling first *)
 open Importance
 let smcMultiple k n d = (fmap flatten (importance k (smc n d)))
 let smcMultiple' k n d = (importance' k (smc' n d))

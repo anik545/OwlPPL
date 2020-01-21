@@ -7,7 +7,7 @@ let rec geometric' p n =
 
 let geometric p = geometric' p 0  
 
-let g2 = 
+let geo_above_2 = 
   let* x = geometric 0.5 in
   condition (x > 2)
     (return x)
@@ -29,6 +29,6 @@ let g2' =
 
 (* let h = hist_dist_discrete ~fname:"geo.png" (fmap float_of_int (geometric 0.5))
    let () = Owl_plplot.Plot.output h *)
-let inferred = smcStandard' 500 g2
+let inferred = smcStandard' 500 geo_above_2
 let () = Printf.printf "%d" @@ sample inferred 
 let () = Samples.print_map (module Base.Int) (Samples.from_dist inferred)

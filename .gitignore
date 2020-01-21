@@ -1,7 +1,8 @@
 .vscode/
 _build/
-
-
+.merlin
+hansei/
+owl/
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

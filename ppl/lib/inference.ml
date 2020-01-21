@@ -7,28 +7,20 @@ include Mh
 open Dist.GADT_Dist
 
 exception NotImplemented
+
 type infer_strat = 
   | MH of int
   | SMC of int
   | PC of int
   | PIMH of int
   | Importance of int
-  | Rejection
+  | Rejection of int * rejection_type
+  | RejectionTrans of int * rejection_type
   | Prior
   | Enum
-  | None (* forward sampling in webppl *)
+  | Forward (* forward sampling in webppl, no sampling *)
 [@@deriving show]
 
-(* let print_strat = function
-   | MH -> 
-   | SMC -> 
-   | PC ->
-   | PIMH 
-   | Importance of int
-   | Rejection
-   | Prior
-   | Enum
-   | None *)
 
 let infer dist = function
   | MH(n) -> mh' n dist
@@ -36,9 +28,10 @@ let infer dist = function
   | PC(n) -> cascade' n dist
   | PIMH(n) -> pimh' n n dist
   | Importance(n) -> importance' n dist
-  | Rejection -> raise NotImplemented
-  | Prior -> prior' dist
+  | Rejection(n,s) -> rejection s dist ~n
+  | RejectionTrans(n,s) -> rejection_transform s dist ~n
   | Enum -> exact_inference dist
-  | None -> dist
+  | Prior -> prior' dist
+  | Forward -> prior' dist
 
 let infer_sampler dist strat = let new_dist = infer dist strat in fun () -> sample new_dist

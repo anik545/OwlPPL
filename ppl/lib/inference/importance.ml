@@ -2,6 +2,7 @@
 open Core
 open Dist.GADT_Dist
 open Common
+
 (* likelihood weighting *)
 let importance n d = sequence @@ List.init n ~f:(fun _ -> prior d)
 let importance' n d = 
@@ -18,6 +19,9 @@ let rec create' n d sofar =
 
 let create n d = create' n d []
 
+type rejection_type = Hard | Soft
+[@@deriving show]
+
 let reject_transform_hard ?(threshold=0.) d = 
   let rec repeat () =
     let* (x,s) = prior1 d in
@@ -33,10 +37,10 @@ let reject_transform_soft d =
   in
   repeat ()
 
-let rejection_transform ?(n=10000) (s:[> `Hard | `Soft]) d = 
+let rejection_transform ?(n=10000) s d = 
   let reject_dist = match s with 
-    | `Hard -> reject_transform_hard ~threshold:0. 
-    | `Soft -> reject_transform_soft 
+    | Hard -> reject_transform_hard ~threshold:0. 
+    | Soft -> reject_transform_soft 
   in
   (sequence @@ List.init n ~f:(fun _ -> (reject_dist d))) >>= categorical
 
@@ -49,10 +53,10 @@ let rejection_hard ?(threshold=0.) d =
   let* (x,s) = prior1 d in
   if Float.(s > threshold) then return (Some (x,s)) else return None
 
-let rejection ?(n=10000) (s:[> `Hard | `Soft]) d = 
+let rejection ?(n=10000) s d = 
   let reject_dist = match s with 
-    | `Hard -> rejection_hard ~threshold:0. 
-    | `Soft -> rejection_soft 
+    | Hard -> rejection_hard ~threshold:0. 
+    | Soft -> rejection_soft 
   in
   (* List.init n ~f:(fun _ -> sample (reject_dist d))
      |> List.filter ~f:(is_some)

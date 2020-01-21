@@ -1,0 +1,17 @@
+Main progress:
+ - Designed a simple DSL which can be used to describe generative models
+ - Distributions are modeled as a monad to allow composition of Distributions
+ - DSL is shallowly embedded, so distributions can be composed using OCaml language constructs including:
+    - functions/lambdas
+    - recursion
+    - if/then/else
+ - Currently a set of primitive distributions - categorical, uniform, binomial, etc. 
+ - Inference algorithms have been implemented:
+    - exact inference (bfs)
+    - importance sampling
+    - rejection sampling
+    - metropolis-hastings
+    - sequential monte-carlo (particle filter)
+    - particle cascade
+    - particle independent metropolis hastings
+ - set of example models - e.g. hmm, linear regression, geometric (recursive), coins, sprinkler, etc.

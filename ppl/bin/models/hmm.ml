@@ -24,6 +24,32 @@ let hmm =
   let states = List.fold_left ~f:expand ~init:start values in
   liftM List.rev states
 
+type 'a hidden_state = 'a
+type 'a observed_state = 'a
+
+let hmm_general 
+    (transition: 'a hidden_state -> 'a hidden_state dist) 
+    (emission: 'a hidden_state -> 'b observed_state Primitives.primitive) (* need a pdf for emissions *)
+    (observed_values: 'a observed_state list)
+    (start: 'b hidden_state list dist) 
+  = 
+  let score y x =  Primitives.pdf (emission x) y in
+  let expand d y = condition' (fun l ->  score y (List.hd_exn l)) @@ 
+    let* rest = d in 
+    let* x = transition (List.hd_exn rest) 
+    in return (x::rest)
+  in
+
+  let states = List.fold_left ~f:expand ~init:start observed_values in
+  liftM List.rev states
+
+let transition = function
+  | -1 -> categorical @@ List.zip_exn [-1;0;1] [0.1; 0.4; 0.5]
+  | 0 -> categorical @@ List.zip_exn [-1;0;1] [0.2; 0.6; 0.2]
+  | 1 -> categorical @@ List.zip_exn [-1;0;1] [0.15;0.7;0.15]
+  | _ -> raise Undefined
+
+
 let posterior = (mh' 300 hmm)
 let nth_of_dist n d = fmap ((fun l->List.nth_exn l n)) d
 let s = sample posterior

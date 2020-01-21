@@ -4,11 +4,10 @@ open Dist.GADT_Dist
 
 (* particle cascade *)
 (* https://arxiv.org/pdf/1407.2864.pdf *)
-(* TODO: make lazy?? *)
 let resamplePC ps n = 
   let rec iterate n mean ps iters =
     match ps with
-    | [] -> raise Undefined
+    | [] -> return []
     | (x,w)::ps ->
       let k = float_of_int n in
       let mean' = (k /. (k +. 1.)) *. mean +. (1. /. (k +. 1.)) *. w in
@@ -23,7 +22,7 @@ let resamplePC ps n =
         else
           choice (r -. probLow)
             (return @@ List.init (int_of_float flr) ~f:(fun _ -> x, w /. probLow))
-            (return @@ List.init (int_of_float clr) ~f:(fun _ -> x, w /. probHigh))  
+            (return @@ List.init (int_of_float clr) ~f:(fun _ -> x, w /. probHigh))
       in
       let* children = spawn x w in
       if iters = 0 then return children else
@@ -45,4 +44,4 @@ let rec cascade:'a.int -> 'a dist -> 'a samples dist = fun n -> function
 
   | d -> sequence @@ List.init n ~f:(fun _ -> (fmap (fun x -> (x, 1.)) d))
 
-let cascade' n d = (cascade n d) >>= (fun x -> categorical (List.take x n))
+let cascade' n d = (cascade n d) >>= categorical

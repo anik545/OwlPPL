@@ -42,8 +42,8 @@ module Primitive_Dists: Primitives = struct
 
   let categorical xs = 
     let ps = Array.of_list_map ~f:snd xs in
-    Array.iter ps ~f:(fun x -> Printf.printf "%f " x);
-    Printf.printf "\n";
+    (* Array.iter ps ~f:(fun x -> Printf.printf "%f " x);
+       Printf.printf "\n"; *)
     let xs_arr = Array.of_list_map ~f:fst xs in
     {sample=
        (fun()->

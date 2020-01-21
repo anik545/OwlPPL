@@ -57,12 +57,17 @@ module Dist(P: Primitive_dists.Primitives) = struct
   type prob = float
   type likelihood = float
   type 'a samples = ('a * prob) list
-  type _ dist = 
+
+  (* enable watching intermediate variables through plots *)
+  type 'a var_dist = string * 'a dist
+  and  _ dist = 
       Return: 'a -> 'a dist
     (* bind is lazy since it contains a function *)
     | Bind: 'a dist * ('a -> 'b dist) -> 'b dist
+    (* | Bind_var: 'a var_dist * ('a -> 'b dist) -> 'b dist *)
     | Primitive: 'a P.primitive -> 'a dist
     | Conditional: ('a -> float) * 'a dist -> 'a dist
+    (* | Conditional: ('a -> float) * 'a var_dist -> 'a dist *)
 
   let condition' (c: 'a -> likelihood) d = Conditional (c,d)
   let condition b d = Conditional((fun _ -> if b then 1. else 0.), d)

@@ -11,12 +11,9 @@ let grass_model =
   condition grass_is_wet 
     (return (rain))
 
-let s = exact_inference grass_model
-let () = Samples.print_map (module Base.Bool) (Samples.from_dist s)
-
 (* The example used in hansei *)
 let flip = bernoulli
-let grass_model' = fun () ->
+let grass_model' =
   let* cloudy    = flip 0.5 in
   let* rain      = flip (if cloudy then 0.8 else 0.2) in
   let* sprinkler = flip (if cloudy then 0.1 else 0.5) in
@@ -29,11 +26,11 @@ let grass_model' = fun () ->
     (return rain)
 ;;
 
-let () = match (exact_inference @@ grass_model' ()) with 
+(* let () = match (exact_inference @@ grass_model') with 
     Primitive xs -> 
     let p = P.pdf xs in
     Printf.printf "true:%f false:%f" (p true) (p false)
-  | _ -> ()
+   | _ -> () *)
 
 
 (* [(0.707927677329624472, V true); (0.292072322670375473, V false)] *)
