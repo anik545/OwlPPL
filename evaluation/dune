@@ -1,0 +1,5 @@
+(copy_files# coin/*)
+
+(executables
+ (names coin)
+ (libraries ppl))

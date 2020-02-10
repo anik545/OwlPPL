@@ -1,0 +1,20 @@
+opam-version: "2.0"
+name: "OwlPPL"
+version: "0.1"
+synopsis: "Owl PPL"
+description: """
+PPL for third year project
+"""
+maintainer: "Anik Roy"
+authors: "ar899@cam.ac.uk"
+license: ""
+homepage: "https://github.com/anik545/OwlPPL"
+bug-reports: ""
+dev-repo: "git@github.com:anik545/OwlPPL.git"
+
+depends: [ "ocaml" "ocamlfind" "owl" "core"]
+
+build: [
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs]
+]
