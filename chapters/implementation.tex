@@ -1,1 +1,52 @@
 % !TeX root = ../diss.tex
+\section{Repository Overview}
+
+\section{Representing Distributions}
+
+As mentioned before, monads are a natural way to represent probability distributions. They allow the output from one distribution (essentially a sample), to be used as if it was of the type that the distribution is defined over. Essentially, the \texttt{bind} operation allows us to 'unwrap' the 'a dist type to allow us to manipulate a value of type 'a. We must then use \texttt{return} to `wrap' the value back into a value of type 'a dist.
+
+Using monads also allows us to define several helper functions which can be used when working with distributions. For example, we can `lift' operators to the \texttt{dist} type, for example allowing us to define adding two distributions over integers or floats using liftM or liftM2. We can also fold lists of distributions using a similar technique.
+
+Using monads also allows the use of the extended let operators introduced in OCaml 4.08. These allow the definition of custom let operators, which mimic do-notation in Haskell. This means that sampling from a distribution (within a model) can be done using the \texttt{let*} operator, and the variable that is bound to can be used as if it were a normal value. The one caveat is that the user must remember to \texttt{return} at the end of the model with whatever variable(s) they want to find the posterior over.
+
+The type signature of bind is \texttt{'a m -> ('a -> 'b m) -> 'b m}, and return is \texttt{'a -> 'a m}, with m being the monad type.
+
+% explain monads here?
+
+However, there are many different underlying data structures which can be used to represent distributions. The simplest is a list of pairs representing a set of values and corresponding probabilities, \texttt{('a * float) list}. This is a very convenient and natural way to represent discrete distributions, with return and bind defined as in listing \ref{lst:monad1}. Here, \texttt{return} gives us the distribution with just one value, and bind combines a distribution with a function that takes every element from the initial distribution and applies a function that creates a set of new distributions. The new distributions are then 'flattened' and normalised. This approach has been used to create functional probabilistic languages \cite{erwig}, but has several drawbacks, primarily the fact that it cannot be used to represent continuous distributions, and that inference is not efficient - there is no information from the model, encoded in this representation, such as how random variables are combined or from what distributions they came from.
+
+% TODO: finish the snippet, write unduplicate properly
+\lstinputlisting[language={Caml},caption={Simple Probability Monad},label={lst:monad1}]{code_snippets/probmonad_list.ml}
+
+A major problem with this approach is that in flattening distributions, we must make sure that duplicated values are combined, and this approach is $O(n^2)$ when using a list since we must scan up to the length of the entire list for every element. A better option is to use a polymorphic map, which is provided in the Jane Street Core library, and implemented as a balanced tree, significantly improving the time complexity of combining distributions.
+
+\lstinputlisting[language={Caml},caption={Simple Probability Monad using a map},label={lst:monad1}]{code_snippets/probmonad_map.ml}
+
+Although this is not the final data structure I chose for general probabilistic models, it is the one I used for discrete distributions. I also used a Map for the data structure that produced approximations to posterior distributions, when that posterior is discrete.
+
+\section{GADT}
+
+\section{Inference}
+
+\subsection{Enumeration}
+\subsection{Importance Sampling}
+\subsection{Rejection Sampling}
+\subsection{Metropolis-hastings}
+\subsection{Sequential Monte Carlo}
+\subsubsection{Particle Filter}
+\subsubsection{Particle Cascade}
+
+
+\section{Examples}
+
+\subsection{Sprinkler}
+% to show exact inference on discrete model
+
+\subsection{Biased Coin}
+% to show analytically solvable continuous distribution
+% include graph of beta compared to computed posterior
+
+\subsection{HMM}
+% use forward-backward to get exact posterior
+
+\subsection{Linear Regression}
