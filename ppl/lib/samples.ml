@@ -77,6 +77,8 @@ module DiscreteSamples: Samples with type 'a t = ('a, int) Map.Poly.t = struct
 
 end
 
+(* TODO: do one for continuous dists as well *)
+
 (* module WeightedSamples: Samples = struct
    type 'a t = ('a, float) Map.Poly.t
    [@@deriving sexp]

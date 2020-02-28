@@ -5,7 +5,7 @@ open Core
 let hmm = 
   (* Observed values O(t) ~ N(X_t, 1) *)
   let values = [0.9;0.8;0.7;0.;-0.025;5.;2.;0.1;0.;0.13;0.45;6.;0.2;0.3;-1.;-1.] in
-  let start = uniform [[-1];[0];[1]] in
+  let start = discrete_uniform [[-1];[0];[1]] in
   (* transition probabilities for hidden states [-1,0,1] *)
   let trans = function
     | -1 -> categorical @@ List.zip_exn [-1;0;1] [0.1; 0.4; 0.5]
@@ -35,8 +35,8 @@ let hmm_general
   = 
   let score y x =  Primitives.pdf (emission x) y in
   let expand d y = condition' (fun l ->  score y (List.hd_exn l)) @@ 
-    let* rest = d in 
-    let* x = transition (List.hd_exn rest) 
+    let* rest = d in
+    let* x = transition (List.hd_exn rest)
     in return (x::rest)
   in
 

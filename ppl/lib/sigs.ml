@@ -7,10 +7,10 @@ module type ExactDist = sig
 end
 
 (* A distribution that can have inference applied *)
-module type InferDist = sig
+module type ApproximateDist = sig
   type 'a t
-  val infer: 'a t -> 'a t 
 end
+
 
 (* A distribution that can be directly sampled from (i.e. result of inference, or a primitive) *)
 module type SampleDist = sig

@@ -9,6 +9,7 @@ module type KL_sig = sig
   val kl_discrete: ?n:int -> 'a primitive -> 'a dist -> float
   val kl_continuous: ?n:int -> float primitive -> float dist -> float
 end
+
 module KL_Div(P: Primitive_dists.Primitives)(D: Samples.Samples): 
   KL_sig with type 'a samples = 'a D.t 
           and type 'a primitive = 'a P.primitive = 
@@ -74,6 +75,9 @@ struct
       if  Float.(f_q = 0.) then () else sum := !sum +. (f_p *. log (f_p /. f_q))
     done;
     !sum /. float_of_int n
+
+  (* let kolmogorov_smirnov d d' =
+     d d' *)
 
 end
 

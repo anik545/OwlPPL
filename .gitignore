@@ -3,6 +3,8 @@ _build/
 .merlin
 hansei/
 owl/
+*spacetime*
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

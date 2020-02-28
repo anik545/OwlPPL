@@ -2,16 +2,16 @@ open Ppl
 
 let f () = 
   (* let coin heads = 
-     let* coinweight = c_uniform 0. 1. in
+     let* coinweight = continuous_uniform 0. 1. in
      observe heads Primitives.(binomial 10 coinweight)
       (return coinweight)
      in *)
   let coin heads = 
-    let posterior = condition' (fun p -> Primitives.(pdf @@ binomial 10 p) heads) (c_uniform 0. 1.) in
+    let posterior = condition' (fun p -> Primitives.(pdf @@ binomial 10 p) heads) (continuous_uniform 0. 1.) in
     posterior
   in
 
-  let post_single_coin = smcStandard' 1000 @@ coin 9 in
+  let post_single_coin = smcStandard' 100 @@ coin 9 in
   let mn  = sample_mean ~n:10000 (post_single_coin) (* 0.833 *) in
   mn
 

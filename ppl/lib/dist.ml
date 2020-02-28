@@ -20,7 +20,7 @@ end
 module type Dist = sig 
   module P: Primitive_dists.Primitives
   type prob
-  type likelihood
+  type likelihood = float
   type 'a samples
   type 'a dist
 
@@ -31,15 +31,9 @@ module type Dist = sig
   module DistMonad: Monad
   include Monad.EMonad with type 'a t := 'a dist
 
-  val uniform : 'a list -> 'a dist
-  val categorical : ('a * likelihood) list -> 'a dist
-  val bernoulli : likelihood -> bool dist
+  include Primitive_dists.Primitive_Distributions with type 'a primitive := 'a dist
+
   val choice : likelihood -> 'a dist -> 'a dist -> 'a dist
-  val binomial : int -> likelihood -> int dist
-  val normal : likelihood -> likelihood -> likelihood dist
-  val gamma : likelihood -> likelihood -> likelihood dist
-  val beta : likelihood -> likelihood -> likelihood dist
-  val c_uniform : likelihood -> likelihood -> likelihood dist
   val sample : 'a dist -> 'a
   val sample_n : int -> 'a dist -> 'a array
   val sample_with_score : 'a dist -> 'a * likelihood
@@ -59,8 +53,8 @@ module Dist(P: Primitive_dists.Primitives) = struct
   type 'a samples = ('a * prob) list
 
   (* enable watching intermediate variables through plots *)
-  type 'a var_dist = string * 'a dist
-  and  _ dist = 
+  (* type 'a var_dist = string * 'a dist *)
+  type  _ dist = 
       Return: 'a -> 'a dist
     (* bind is lazy since it contains a function *)
     | Bind: 'a dist * ('a -> 'b dist) -> 'b dist
@@ -83,7 +77,7 @@ module Dist(P: Primitive_dists.Primitives) = struct
   end
   include Make_Extended(DistMonad)
 
-  let uniform xs = Primitive (P.discrete_uniform xs)
+  let discrete_uniform xs = Primitive (P.discrete_uniform xs)
   let categorical xs = Primitive (P.categorical xs)
   let bernoulli p = categorical [(true, p); (false, 1. -. p)]
   let choice p x y = Bind ((bernoulli p), (fun c -> if c then x else y))
@@ -93,7 +87,7 @@ module Dist(P: Primitive_dists.Primitives) = struct
   let normal mu sigma = Primitive (P.normal mu sigma)
   let gamma shape scale = Primitive (P.gamma shape scale)
   let beta a b = Primitive (P.beta a b)
-  let c_uniform a b = Primitive (P.continuous_uniform a b)
+  let continuous_uniform a b = Primitive (P.continuous_uniform a b)
 
   let rec sample: 'a. 'a dist -> 'a = function
       Return x -> x

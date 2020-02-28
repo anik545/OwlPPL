@@ -30,9 +30,9 @@ let () =
   Plot.output pl
 
 let model =
-  let* a = uniform [0;1] in
-  let* b = uniform [0;1] in
-  let* c = uniform [0;1] in
+  let* a = discrete_uniform [0;1] in
+  let* b = discrete_uniform [0;1] in
+  let* c = discrete_uniform [0;1] in
   let d = return ((a,b),c) in
   let d = condition' (fun ((a,b),c) -> if a+b+c=3 then 1. else -.Float.infinity) d in
   let* (a,_),_ = d in
@@ -42,9 +42,9 @@ let model1_a =
   let (let+) cond dist = Conditional(cond, dist ()) in 
   let (let*) = (let*) in
 
-  let* a = uniform [0;1] in
-  let* b = uniform [0;1] in
-  let* c = uniform [0;1] in
+  let* a = discrete_uniform [0;1] in
+  let* b = discrete_uniform [0;1] in
+  let* c = discrete_uniform [0;1] in
   (* an instance of the >> operator in haskell (sequence) in do notation - used in monad-bayes *)
   (* let c = Conditional((fun _ -> (if a+b+c = 3 then 0. else -.infinity)), return a) in
      c *)
@@ -53,18 +53,18 @@ let model1_a =
 
 let model1_b =
   let condition b d = Conditional((fun _ -> if b then 1. else 0.), d) in
-  let* a = uniform [0;1] in
-  let* b = uniform [0;1] in
-  let* c = uniform [0;1] in
+  let* a = discrete_uniform [0;1] in
+  let* b = discrete_uniform [0;1] in
+  let* c = discrete_uniform [0;1] in
   condition (a+b+c=3) 
     (return a)
 
 
 (* TODO: are both models below the same? *)
 let model_desugar_cond_end: int dist =
-  Bind(uniform [0;1],fun a ->
-      (Bind(uniform [0;1],fun b-> 
-           (Bind(uniform [0;1], fun c->
+  Bind(discrete_uniform [0;1],fun a ->
+      (Bind(discrete_uniform [0;1],fun b-> 
+           (Bind(discrete_uniform [0;1], fun c->
                 (Conditional(
                     (fun _ -> if a+b+c=3 then 1. else 0.), 
                     (return a)))
@@ -74,9 +74,9 @@ let model_desugar_cond_end: int dist =
 
 let model_desugar_cond_start: (int * int * int) dist  = 
   Conditional((fun (a,b,c) -> if a+b+c=3 then 1. else 0.),
-              Bind(uniform [0;1],fun a ->
-                  (Bind(uniform [0;1],fun b-> 
-                       (Bind(uniform [0;1], fun c-> return (a,b,c)
+              Bind(discrete_uniform [0;1],fun a ->
+                  (Bind(discrete_uniform [0;1],fun b-> 
+                       (Bind(discrete_uniform [0;1], fun c-> return (a,b,c)
                             ))
                      ))
                 ))

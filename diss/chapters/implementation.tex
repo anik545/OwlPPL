@@ -22,11 +22,18 @@ A major problem with this approach is that in flattening distributions, we must 
 
 \lstinputlisting[language={Caml},caption={Simple Probability Monad using a map},label={lst:monad1}]{code_snippets/probmonad_map.ml}
 
-Although this is not the final data structure I chose for general probabilistic models, it is the one I used for discrete distributions. I also used a Map for the data structure that produced approximations to posterior distributions, when that posterior is discrete.
+Although this is not the final data structure I chose for general probabilistic models, it is the one I used for discrete distributions. I also used a Map for the data structure that produced approximations to discrete posterior distributions.
 
 \section{GADT}
 
+% TODO: check this
+The structure that I landed on to represent general models is a generalised algebraic data type. GADTs have been used to represent probabilistic models \cite{scibior2015practical} and are widely used to implement interpreters in functional languages. GADTs are similar to ADTs (sum types), in that they have a set of constructors, but the main difference is that these constructors can have type arguments, making sure that programs are well-typed and rejecting invalid programs. The GADT represents a model, and can then be 'interpreted' by a sampler or an inference algorithm. For sampling, I traverse the model, ignoring conditionals to enable forward sampling. For inference, I provide functions which transform the conditional distributions to distributions without any conditional statements, allowing sampling to be performed as normal. Primitive distributions also have a special variant (which takes a different \texttt{primitive} type), since we can find exact the exact pdf/cdf of these distributions, unlike the \texttt{dist} type, which can only be sampled from. The implementation can be seen in listing \ref{lst:gadt1}. The monad functions are also provided, which just construct the corresponding variant in the GADT.
+
+\lstinputlisting[language={Caml},label={lst:gadt1},caption={Representing a probabilistic model using a GADT}]{code_snippets/gadt.ml}
+
 \section{Inference}
+z
+Inference is the key motivation behind probabilistic programming. Inference can be thought of as a program transformation \cite{scibior2015practical} \cite{Zinkov2016ComposingIA}. In my ppl, this corresponds to a function of type \texttt{'a dist -> 'a dist}. This method allows for the composition of inference algorithms, exemplified in section \ref{sec:pimh}.
 
 \subsection{Enumeration}
 \subsection{Importance Sampling}
@@ -35,7 +42,7 @@ Although this is not the final data structure I chose for general probabilistic 
 \subsection{Sequential Monte Carlo}
 \subsubsection{Particle Filter}
 \subsubsection{Particle Cascade}
-
+\subsubsection{Particle-Independent Metropolis-Hastings} \label{sec:pimh}
 
 \section{Examples}
 

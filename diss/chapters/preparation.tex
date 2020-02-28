@@ -14,9 +14,9 @@ I have experience with the core SML language, which will aid in learning basic O
 
 Before starting to write any code, I made sure to set out the features I aimed to implement for my DSL. The main goal is to produce a usable language, which is defined by the following criteria:
 
-% TODO: which tense to use here?
+% TODO: which tense to use here - past, say "this met the success criteria as follows"
 \begin{itemize}
-    \item \textbf{Language Features}: Since I will write an embedded DSL, a user of my PPL should be able to take advantage of all standard OCaml features in their models. I need to make sure that this is the case, and features such as recursive functions will work.
+    \item \textbf{Language Features}: Since I will write an embedded DSL, a user of my PPL should be able to take advantage of all standard OCaml features in the deterministic parts of their models. I need to make sure that this is the case, and features such as recursive functions will work.
     \item \textbf{Available distributions}: I will aim to make sure my PPL has at minimum the bernoulli and normal distributions available as basic building blocks to build more complex probabilistic programs.
     \item \textbf{Correctness} of inference: I will use the PPL developed on sample problems mentioned before to ensure correct results are produced. This would be determined by comparing to results produced in other PPLs as well as comparisons to analytic solutions for simple problems. I will aim to include at least one inference algorithm.
     \item \textbf{Performance}: This is a quantitative measure, comparing programs written in my PPL to equivalent programs in other PPLs. I can use tools such as spacetime or landmarks to profile my OCaml code. Performing inference should be possible within a reasonable amount of time, even though the project does not have a significant focus on performance. I will also benchmark the performance with regards to scalability, i.e. ensure the performance is still reasonable as models are conditioned on more data.
@@ -30,7 +30,18 @@ I adopted several best practices in order to ensure the project was successful. 
 
 \subsection{Testing}
 
-Testing systems which are linked to randomness can be quite tricky, as it is difficult to test behaviour that is expected to change from one execution to the next. One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. Even with a fixed random seed, a change in code may cause new outputs even though the fundamental statistical property desired hasn't changed. Another approach is to perform some statistical test such as kolmogorov-smirnov \cite{}, to ensure distributions produced by my library are equal to what is expected. A problem with tests of this kind is that they are expected to fail sometimes, meaning unit tests will provide limited utility due to their inherent flakiness with random programs. As such, most of the unit tests I will write will be fairly simple and only catch very basic bugs. However, I will still carry out evaluation 
+Testing systems which are linked to randomness can be quite tricky, as it is difficult to test behaviour that is expected to change from one execution to the next. One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. Even with a fixed random seed, a change in code may cause new outputs even though the fundamental statistical property desired hasn't changed. Another approach is to perform some statistical test such as kolmogorov-smirnov \cite{}, to ensure distributions produced by my library are equal to what is expected. A problem with tests of this kind is that they are expected to fail sometimes, meaning unit tests will provide limited utility due to their inherent flakiness with random programs. In fact, since we expect these tests to fail a certain percentage of the time, if they do not fail they show a problem with our program.
+
+As such, most of the unit tests I wrote are fairly simple and only catch very basic bugs. Unit tests were possible to write for the exact inference procedure when working with discrete distributions, since we always expect the same output distribution. However, all the other inference algorithms are approximate, so tests suffer from the problems described above.
+
+Despite this, I will still be able to carry out a full evaluation, performing hypothesis tests such as kolmogorov-smirnov.
+
+% talk about using very basic unit tests
+% unit testing ppl is 
+% include maths about hypothesis tests here - HAVE TO FAIL SOMETIMES otherwise the program is wrong
+% include unit tests for exact inference
+% go though how to solve this in implementations
+% find some sources for how other people solve this, reference that here.
 
 \subsection{Licenses}
 
@@ -57,14 +68,14 @@ Using OCaml 4.08 allows me to use new features of OCaml, in particular the abili
 \section{Language Design}
 I chose to implement my language as a domain specific language (DSL) shallowly embedded into the main OCaml language. This allows models built in the ppl to be easily composed with other standard OCaml programs.
 
-Using a shallow embedding means we can use all of the features of OCaml as normal, including branching (if/then/else), loops, references, functions, and importantly, recursion. This can allow us to define models that do not terminate and are therefore invalid. However, we can write functions which are \textit{stochastic recursive}, that is, functions which have a probability of termination that tends to 1 as the number of successive calls tends to infinity.
+Using a shallow embedding means we can use all of the features of OCaml as normal, including branching (if/then/else), loops, references, functions, and importantly, recursion. This can allow us to define models that do not terminate and are therefore invalid. However, we can write functions which are \textit{stochastic recursive}, that is, functions which have a probability of termination that tends to 1 as the number of successive calls tends to infinity. This leads to functions which terminate their recursion non-deterministically.
 
 I use a set of primitive distributions which can be combined (using arbitrarily complex deterministic OCaml code) to produce new more complex distribution. For example, one can take the sum of two discrete uniform distributions to simulate the addition of two dice rolls. 
 
 PPLs in general are similar to normal programming languages, but need to support two extra operations - \texttt{sample} and \texttt{condition} \cite{}. The sample function is for sampling from some distribution - either a primitive distribution or a user defined distribution.
 
 \section{OCaml}
-I have chosen to use the OCaml language to implement my PPL. There are many features of OCaml 
+I have chosen to use the OCaml language to implement my PPL. There are many features of OCaml which make it suitable for writing a DSL. Using OCaml, I can make sure that expressions in the DSL are well-typed
 
 \section{Owl}
 
@@ -78,29 +89,66 @@ Owl is a scientific computing library written for OCaml \cite{}. Importantly for
 
 Monads are a design pattern commonly used in functional programming languages.
 
-The key data structure I use to model probability distributions is a monad. This allows me to compose distributions easily, by using the output from one distribution in another using the bind operator. In OCaml, I can also use the new (let*) operators to make this more ergonomic, and make code look more natural (as opposed to using the >>= operator everywhere).
+The key data structure I use to model probability distributions is a monad. This allows me to compose distributions easily, by using the output from one distribution in another using the bind operator. In OCaml, I can also use the new (let*) operators to make this more ergonomic, and make code look more natural (as opposed to using the \texttt{>>=} operator everywhere).
 
 \section{Approaches to probabilistic programming}
-Existing PPLs take several different forms and can 
+Existing PPLs take several different forms and 
 
 
 \section{Bayesian Inference}
-Inference is a key motivating feature of probabilistic language, and is a way to infer parameters from the data we observe.
+Inference is the key motivating feature of probabilistic programming, and is a way to infer a distribution over the parameters based on the data we observe. The main feature of bayesian inference is that we assign every model some prior belief. Often this prior is chosen based on our knowledge of the problem, but the prior can also be uninformative. The goal of bayesian inference is to calculate the posterior distribution, which can be represented by bayes formula,
+
+$$P(A\mid B)={\frac {P(B\mid A)P(A)}{P(B)}}$$
+
+with $P(A)$ being the prior, and $P(B\mid A)$ being the likelihood model we define (which is a program in the PPL setting).
+
+This formula hold for the continuous case too, using probability density functions ($f_X$),
+
+$$ f_{X\mid Y=y}(x)={\frac {f_{Y\mid X=x}(y)f_{X}(x)}{f_{Y}(y)}} $$
+
+Unfortunately, exact bayesian inference is usually computationally infeasible, especially when the number of random variables we consider is large. For example, consider a set of discrete random variables ${X_i}$, with p the joint probability distribution of all $X_i$. The marginal distribution of any individual $X_i$ is:
+
+$$P(X_i=x_i) = \Sigma_{} $$
+
+If we have 50 variables which can take one of two values, then we have to sum over $2^{50}$ values. There do exist some algorithms which operate on bayesian networks (DAGs which represent random variables and their interdependence), and reduce the number of calculations needed. These include methods such as \textit{Variable Elimination} or \textit{Message Passing}.
+
+
+Alternatively, in the continuous case the formula 
+
+$$P(\theta|x)=P(x|\theta)P(\theta)\over{P(x)}$$
+with 
+$$ P(x)=\int_{\Theta}P(x,\theta)d\theta $$
+
+The normalizing constant here is an integral that often does not have an analytic solution, and so must be approximated. Another issue is that directly sampling from a distribution requires that we also invert this formula.
 
 \section{Inference Algorithms}
-
-Inference algorithms are ways of computing a posterior distribution given a prior and a generative model. We cannot usually compute an exact distribution, 
+% https://ermongroup.github.io/cs228-notes/inference/sampling/
+Inference algorithms are ways to systematically generate samples from posterior distributions given a generative model and a prior. In probabilistic programming, we have a set of random variables, some of which are latent 
 
 \subsection{Exact Inference}
 
-Exact Inference is the simplest method of calculating the posterior, but is usually computationally intractable. It involves calculating bayes formula exactly, of which calculating the normalising constant is usually the problem.
+Exact Inference is the simplest method of calculating the posterior, but is usually computationally intractable. It involves calculating bayes formula exactly, of which calculating the normalising constant is usually the problem. To sample directly, we would also need to find the inverse cumulative distribution to be able to use the inversion sampling method.
+
+For discrete posterior distributions it can be thought of as calculating the probability of every possible value of the variable of interest. Since a random variable will be dependent on several others, this involves finding every possible combination of these variables and their outcomes.
+
+\subsection{Rejection Sampling}
+
+Rejection sampling is a very simple inference method which 
 
 \subsection{Importance Sampling}
+
+Importance sampling is another simple method, improving on rejection sampling, that can be used to sample from a target distribution using another distribution, known as the proposal distribution. We then calculate the ratio of the likelihoods between the two distributions to weight samples from the proposal. From doing this repeatedly with multiple samples from the proposal, we can build a posterior represented by a set of weighted samples.
+
+% put proofs of inference methods here/implementation/appendix?
+% Add equations
+
 \subsection{Monte Carlo Markov Chains (MCMC)}
 
-MCMC methods involve finding a Markov chain whose stationary distribution is equal to the posterior distribution of interest
+MCMC methods involve constructing a Markov chain with a stationary distribution equal to the posterior distribution. A markov chain is a statistical model consisting of a sequence of events, where the probability of any event depends only on the previous event. The stationary distribution is the distribution over successive states that the chain converges to.
+
+There exists several algorithms for finding this markov chain, for example metropolis-hastings. This algorithm requires that we have a function, $f(x)$, which is proportional to the density of the distribution. This function is easy to compute for the posterior, since it is simply the prior multiplied by the posterior - the normalising constant can be ignored since we only need a proportional function.
 
 \subsection{Sequential Monte Carlo (SMC)}
 
-SMC methods 
+SMC methods are algorithms which are based on using large numbers of weighted samples (`particles') to represent a posterior distribution. These particles are updated and resampled from in order to converge the set of particles to the posterior.
 

@@ -1,13 +1,13 @@
 open Ppl
 (* open Printf *)
 (* stochastic recursion *)
-let rec geometric' p n = 
-  let* c = (bernoulli p) in 
+let rec geometric' p n =
+  let* c = (bernoulli p) in
   if c then (return n) else (geometric' p (n+1))
 
-let geometric p = geometric' p 0  
+let geometric p = geometric' p 0
 
-let geo_above_2 = 
+let geo_above_2 =
   let* x = geometric 0.5 in
   condition (x > 2)
     (return x)
@@ -15,11 +15,11 @@ let geo_above_2 =
     Condition( fun _ -> if x > 2 then 1 else 0, 
       Return(x)
     )
-   ) 
+   )
 *)
 
-let g2' = 
-  let d = 
+let g2' =
+  let d =
     let* x = geometric 0.5 in
     return x
   in

@@ -1,5 +1,10 @@
 import time
-import pymc3 as pm
+import pyro
+import pyro.optim
+import pyro.distributions as dist
+import pyro.poutine as poutine
+from pyro.infer import MCMC, NUTS, Importance
+import torch
 import numpy as np
 
 
@@ -17,14 +22,21 @@ def f():
     return t/10000
 
 def f1():
-    m = pm.Model()
-    with m as model:
-        theta = pm.Uniform('theta', 0, 1)
-        obs = pm.Binomial('obs', n=10, p=theta, observed=9)
-        step = pm.Metropolis()
-        trace = pm.sample(1, chains=10000, step=step, tune=100)
-        
-    return np.mean(trace['theta'])
+
+    def coin():
+        weight = pyro.sample("weight", dist.Uniform(0, 1))
+        # here we condition on measurement == 9.5
+        return pyro.sample("heads", dist.Binomial(10, weight), obs=9)
+
+    # nuts_kernel = NUTS(coin)
+    # mcmc = MCMC(nuts_kernel,
+    #             num_samples=10_000,
+    #             warmup_steps=100,
+    #             num_chains=1)
+    # mcmc.run(model, data.sigma, data.y)
+    # mcmc.summary(prob=0.5)
+    posterior = Importance(coin, num_samples=10_000)
+    return posterior.run()
 
 if __name__ == "__main__":
     print(timer(f1))

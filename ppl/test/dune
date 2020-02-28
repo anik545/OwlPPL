@@ -1,4 +1,10 @@
 (executable
-(modules test_models test models)
+(modules test_models models)
  (name test_models)
  (libraries core owl ppl alcotest))
+
+(tests
+ (names test)
+ (modules test)
+ (libraries core owl ppl alcotest qcheck qcheck-alcotest)
+ (action (run %{test} -e)))

@@ -3,23 +3,23 @@ open Core
 
 (* https://www.cl.cam.ac.uk/teaching/1819/DataSci/notes0.pdf pg33 *)
 let single_coin = 
-  let pr = c_uniform 0. 1. in
+  let pr = continuous_uniform 0. 1. in
 
   let toss t = condition' (fun p -> Primitives.(pdf @@ binomial 10 p) t) in
 
   let obs = 9 in (* we see x=9 heads *)
 
   let posterior = toss obs pr in
-  (* let posterior' = condition (fun p -> pdf (Binomial(10,p)) obs) (c_uniform 0. 1.) in *)
+  (* let posterior' = condition (fun p -> pdf (Binomial(10,p)) obs) (continuous_uniform 0. 1.) in *)
   posterior
 
-let coin heads = 
-  let* coinweight = c_uniform 0. 1. in
-  observe heads Primitives.(binomial 10 coinweight)
-    (return coinweight)
+(* let coin heads = 
+   let* coinweight = continuous_uniform 0. 1. in
+   observe heads Primitives.(binomial 10 coinweight)
+    (return coinweight) *)
 
 let post_single_coin = mh' 700 @@ single_coin
-let mn = sample_mean ~n:100 (post_single_coin) (* 0.833 *)
+let mn = sample_mean ~n:100000 (post_single_coin) (* 0.833 *)
 
 let () = Printf.printf "%f\n" mn
 (* 

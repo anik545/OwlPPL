@@ -12,17 +12,16 @@ type score = float
 (* produces a list of value,score, not prob (i.e. unnormalised) *)
 (* depth-first search *)
 (* todo produce a map instead *)
-let rec enumerate: type a.a dist -> score -> ((a * score)list)
+let rec enumerate: type a.a dist -> score -> ((a * score) list)
   = fun d multiplier ->
-    if Float.(multiplier = 0.) then [] 
-    else 
+    if Float.(multiplier = 0.) then []
+    else
       match d with
       | Bind (d,f) ->
         let c = enumerate d multiplier in
-        let mul_snd q = List.map ~f:(fun (x,p) -> (x, p*.q)) in
-        List.concat_map c ~f:(fun (opt, p) -> enumerate (f opt) multiplier |> (mul_snd p))
+        List.concat_map c ~f:(fun (opt, p) -> enumerate (f opt) p)
 
-      | Conditional (c,d) -> 
+      | Conditional (c,d) ->
         let ch = enumerate d multiplier in
         List.map ch ~f:(fun (x,p) -> x, p *. (c x))
 
@@ -33,15 +32,16 @@ let rec enumerate: type a.a dist -> score -> ((a * score)list)
 
       | Return x -> [(x,multiplier)]
 
-let exact_inference d = 
-  enumerate d 1. 
-  |> unduplicate 
-  |> normalise 
-  |> categorical 
 
-let test = 
-  let* x = uniform [0;1] in
-  let* y  = uniform [0;1] in
+let exact_inference d =
+  enumerate d 1.
+  |> unduplicate
+  |> normalise
+  |> categorical
+
+let test =
+  let* x = discrete_uniform [0;1] in
+  let* y  = discrete_uniform [0;1] in
   condition (x=1)
     (return (x + y))
 
