@@ -1,6 +1,15 @@
 % !TeX root = ../diss.tex
 \section{Repository Overview}
 
+The majority of my code is in the \texttt{ppl} directory, which contains the core library, unit tests, statistical testing code and some example programs written using the library. The build system dune makes 
+
+
+I have implemented my ppl as a library (in the \texttt{lib} subdirectory), contained within the module \texttt{Ppl}. This contains several submodules, most importantly the \texttt{Dist} module, which contains the code for representing, creating and combining distributions. The Primitives module contains the signatr
+
+The \texttt{evaluation} directory contains code to compare my ppl to both hand-written inference procedures, as well as equivalent programs in other ppls. There are several directories, which each correspond to a particular problem/model, for example the \texttt{hmm} folder for an example of a hidden markov model.
+
+All code is written in OCaml 4.08, with the main dependencies being Jane Street's \texttt{Core} and \texttt{Owl} \cite{owl}.
+
 \section{Representing Distributions}
 
 As mentioned before, monads are a natural way to represent probability distributions. They allow the output from one distribution (essentially a sample), to be used as if it was of the type that the distribution is defined over. Essentially, the \texttt{bind} operation allows us to 'unwrap' the 'a dist type to allow us to manipulate a value of type 'a. We must then use \texttt{return} to `wrap' the value back into a value of type 'a dist.
@@ -13,14 +22,14 @@ The type signature of bind is \texttt{'a m -> ('a -> 'b m) -> 'b m}, and return 
 
 % explain monads here?
 
-However, there are many different underlying data structures which can be used to represent distributions. The simplest is a list of pairs representing a set of values and corresponding probabilities, \texttt{('a * float) list}. This is a very convenient and natural way to represent discrete distributions, with return and bind defined as in listing \ref{lst:monad1}. Here, \texttt{return} gives us the distribution with just one value, and bind combines a distribution with a function that takes every element from the initial distribution and applies a function that creates a set of new distributions. The new distributions are then 'flattened' and normalised. This approach has been used to create functional probabilistic languages \cite{erwig}, but has several drawbacks, primarily the fact that it cannot be used to represent continuous distributions, and that inference is not efficient - there is no information from the model, encoded in this representation, such as how random variables are combined or from what distributions they came from.
+However, there are many different underlying data structures which can be used to represent distributions. The simplest is a list of pairs representing a set of values and corresponding probabilities, \texttt{('a * float) list}. This is a very convenient and natural way to represent discrete distributions, with return and bind defined as in listing \ref{lst:monad_plist}. Here, \texttt{return} gives us the distribution with just one value, and bind combines a distribution with a function that takes every element from the initial distribution and applies a function that creates a set of new distributions. The new distributions are then 'flattened' and normalised. This approach has been used to create functional probabilistic languages \cite{erwig}, but has several drawbacks, primarily the fact that it cannot be used to represent continuous distributions, and that inference is not efficient - there is no information from the model, encoded in this representation, such as how random variables are combined or from what distributions they came from.
 
 % TODO: finish the snippet, write unduplicate properly
-\lstinputlisting[language={Caml},caption={Simple Probability Monad},label={lst:monad1}]{code_snippets/probmonad_list.ml}
+\lstinputlisting[language={Caml},caption={Simple Probability Monad},label={lst:monad_plist}]{code_snippets/probmonad_list.ml}
 
 A major problem with this approach is that in flattening distributions, we must make sure that duplicated values are combined, and this approach is $O(n^2)$ when using a list since we must scan up to the length of the entire list for every element. A better option is to use a polymorphic map, which is provided in the Jane Street Core library, and implemented as a balanced tree, significantly improving the time complexity of combining distributions.
 
-\lstinputlisting[language={Caml},caption={Simple Probability Monad using a map},label={lst:monad1}]{code_snippets/probmonad_map.ml}
+\lstinputlisting[language={Caml},caption={Simple Probability Monad using a map},label={lst:monad_pmap}]{code_snippets/probmonad_map.ml}
 
 Although this is not the final data structure I chose for general probabilistic models, it is the one I used for discrete distributions. I also used a Map for the data structure that produced approximations to discrete posterior distributions.
 
@@ -31,29 +40,72 @@ The structure that I landed on to represent general models is a generalised alge
 
 \lstinputlisting[language={Caml},label={lst:gadt1},caption={Representing a probabilistic model using a GADT}]{code_snippets/gadt.ml}
 
-\section{Inference}
-z
-Inference is the key motivation behind probabilistic programming. Inference can be thought of as a program transformation \cite{scibior2015practical} \cite{Zinkov2016ComposingIA}. In my ppl, this corresponds to a function of type \texttt{'a dist -> 'a dist}. This method allows for the composition of inference algorithms, exemplified in section \ref{sec:pimh}.
 
-\subsection{Enumeration}
-\subsection{Importance Sampling}
-\subsection{Rejection Sampling}
-\subsection{Metropolis-hastings}
-\subsection{Sequential Monte Carlo}
-\subsubsection{Particle Filter}
-\subsubsection{Particle Cascade}
+The condition variant is used to assign scores to traces, and takes a function which takes an element and returns a float, a `score', which represents how likely that element is. I have also implemented a few helpers to make it easier to condition models. The three main helpers are \texttt{condition}, \texttt{score} and \texttt{observe}, which are all specific cases of the general \texttt{Condition} variant. 
+
+The \texttt{condition} operator is used for hard conditioning, which conditions the model on an observation being true. If true is passed in, then the score assigned is 0, and if false, the score assigned is -infinity.
+
+For soft conditioning, for example an observation that we know comes from a certain distribution, there is an \texttt{observe} function. This function is essential for continuous distributions, since the probability of observing any one value is 0, making hard conditioning redundant.
+
+The \texttt{score} function is similar to the condition operator, except instead of 0, it assigns a particular score (any float) to the trace. An example is %todo.
+
+\section{Primitive Distributions}
+In PPLs, users build complex models by composing more simple elementary primitive distributions (ERPs) \cite{pmlr-v15-wingate11a}. These primitive distributions need to have a few operations defined on them, namely \texttt{sample, pdf, cdf} and \texttt{support}.
+
+\section{Forward Sampling}
+
+In order to perform inference, we will often need to find a prior distribution. For a posterior, $P(\theta\mid x)$, the model written by the user is $P(x\mid\theta)$, and the prior is $P(\theta)$, so finding the prior is the same as disregarding the conditionals (essentially ignoring the data). Since sampling is only difficult in the presence of conditionals, this allows us to sample from the prior using essentially the same sample function. We can also take into account the conditionals, and produce weighted samples, with the weight being the score assigned by each conditional branch, accumulated (by multiplying).
+
+\section{Inference}
+
+Inference is the key motivation behind probabilistic programming. 
+
+Inference can be thought of as a program transformation \cite{scibior2015practical} \cite{Zinkov2016ComposingIA}. In my ppl, this corresponds to a function of type \texttt{'a dist -> 'a dist}. This method allows for the composition of inference algorithms, exemplified in section \ref{sec:pimh}.
+
+\subsection{Enumeration} \label{sec:enum}
+Enumeration is the simplest way to perform exact inference on probabilistic programs, and essentially consists of computing the joint distribution over all the random variables in the model. This involves enumerating every execution path in the model, in this case performing a depth first search over the \texttt{dist} data structure. For every \texttt{bind} (i.e. every \texttt{let*}), there is a distribution ($d$) and a function from samples to new distributions ($f$). I call this function on every value in the support of the distribution $d$, and then enumerate all the possibilities. The final output is a \texttt{('a * float) list}, which needs to have duplicates removed and then be normalised.
+
+
+
+\subsection{Importance Sampling} \label{sec:imp}
+\subsection{Rejection Sampling} \label{sec:rej}
+\subsection{Markov Chain Monte Carlo} \label{sec:mcmc}
+\subsubsection{Metropolis-hastings} \label{sec:mh}
+\subsection{Sequential Monte Carlo} \label{sec:smc}
+\subsubsection{Particle Filter} \label{sec:pf}
+\subsubsection{Particle Cascade} \label{sec:pc}
 \subsubsection{Particle-Independent Metropolis-Hastings} \label{sec:pimh}
 
 \section{Examples}
 
 \subsection{Sprinkler}
 % to show exact inference on discrete model
+The Sprinkler model is a commonly used example in bayesian inference due to it's simplicity. It is an example of a \textit{bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\textwidth]{figs/sprinkler-network.png}
+    \caption{Bayesian Network example}
+    \label{fig:sprinkler-network}
+\end{figure}
 
 \subsection{Biased Coin}
 % to show analytically solvable continuous distribution
 % include graph of beta compared to computed posterior
 
 \subsection{HMM}
+Hidden markov models are slightly more involved models, where we have a sequence of hidden states, which emit observed states. There are two distributions involved here, the transition distribution, which defines how likely the next state is given the current state, and the emmission distribution, which is the 
 % use forward-backward to get exact posterior
 
 \subsection{Linear Regression}
+
+\subsection{Dirichlet process}
+
+% Need to show examples which can't be done in graph based thing
+% Need to explain why these examples are actually difficult.
+
+\section{Statistical tests}
+I had to implement a number of statistical tests in order to test the correctness of the output distribution. These tests are known as goodness-of-fit tests, and 
+
+\section{Visualisations}
+Visualising the output distributions from inference can be done using the \texttt{Owl\_plplot} module, which allows plotting directly from OCaml, rather than having to interface with other programs manually.
