@@ -1,7 +1,7 @@
-\documentclass[12pt,twoside,notitlepage,a4paper]{report}
+\documentclass[12pt,notitlepage,twoside,a4paper]{report}
 
 \usepackage{verbatim}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage[parfill]{parskip}
 \usepackage{enumitem}
 \usepackage{hyperref}
@@ -10,6 +10,7 @@
 \usepackage{amsmath}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage[margin=1in,headheight=13.6pt]{geometry}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -42,8 +43,8 @@
 \clubpenalty1000%
 \widowpenalty1000%
 
-\addtolength{\oddsidemargin}{6mm}       % adjust margins
-\addtolength{\evensidemargin}{-8mm}
+% \addtolength{\oddsidemargin}{6mm}       % adjust margins
+% \addtolength{\evensidemargin}{-8mm}
 
 \renewcommand{\baselinestretch}{1.1}    % adjust line spacing to make
                                         % more readable
@@ -66,7 +67,7 @@
 \Huge
 {\bf A probabilistic programming language in Ocaml} \\
 \vspace*{5mm}
-Diploma in Computer Science \\
+Computer Science Tripos - Part II \\
 \vspace*{5mm}
 Christ's College \\
 \vspace*{5mm}
@@ -82,51 +83,55 @@ Christ's College \\
 \pagenumbering{roman}
 \pagestyle{plain}
 
+\chapter*{Declaration of Originality}
+
+I, Anik Roy of Christ's College, being a candidate for Part II of the Computer Science Tripos, hereby declare that this dissertation and the work described in it are my own work, unaided except as may be specified below, and that the dissertation does not contain material that has already been used to any substantial extent for a comparable purpose.
+
+I, Anik Roy of Christ's College, am content for my dissertation to be made available to the students and staff of the University. 
+
+\bigskip
+\leftline{Signed [signature]}
+
+\medskip
+\leftline{Date:  \today}
+\clearpage
+
 \chapter*{Proforma}
+\immediate\write18{texcount -inc -sum -1 diss.tex > wordcount.txt}
+\immediate\write18{cloc  --yaml `git ls-files evaluation ppl` | grep 'code: ' | tail -n 1 | sed  's/  code://g'}
 
 {\large
+
 \begin{tabular}{ll}
-Name:               & \bf Anik Roy                       \\
-College:            & \bf Christ's College                     \\
-Project Title:      & \bf A probabilistic programming language in Ocaml \\
-Examination:        & \bf Computer Science Tripos Part II        \\
-Word Count:         & \bf --\footnotemark[1] (well less than the 12000 limit) \\
-Final Line Count:         & \bf --\footnotemark[2] \\
+Candidate Number:               &  Anik Roy                       \\
+College:            &  Christ's College                     \\
+Project Title:      &  A Probabilistic Programming \\
+&
+ Language in Ocaml \\
+Examination:        & Computer Science Tripos Part II        \\
+Word Count:  
+& \input{wordcount.txt}\footnotemark[1]\\
+Final Line Count:         & \input{linecount.txt}\footnotemark[2] \\
 Project Originator: & Dr R.~Mortier                    \\
 Supervisor:         & Dr R.~Mortier                    \\ 
 \end{tabular}
 }
-\footnotetext[1]{This word count was computed by \texttt{detex diss.tex | tr -cd '0-9A-Za-z $\tt\backslash$n' | wc -w}}
+\footnotetext[1]{This word count was computed by \texttt{texcount -inc -sum -1 diss.tex}}
 \stepcounter{footnote}
+
 
 \footnotetext[2]{This line count was computed by \texttt{cloc (git ls-files)} and excludes blank lines and comments}
 \stepcounter{footnote}
 
 \section*{Original Aims of the Project}
 
-
 \section*{Work Completed}
-
 
 \section*{Special Difficulties}
 None
 
 \newpage
 
-\section*{Declaration}
-
-I, Anik Roy of Christ's College, being a candidate for Part II of the Computer
-Science Tripos, hereby declare
-that this dissertation and the work described in it are my own work,
-unaided except as may be specified below, and that the dissertation
-does not contain material that has already been used to any substantial
-extent for a comparable purpose.
-
-\bigskip
-\leftline{Signed [signature]}
-
-\medskip
-\leftline{Date [date]}
 
 \cleardoublepage
 

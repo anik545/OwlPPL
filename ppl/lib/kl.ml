@@ -1,5 +1,6 @@
 open Core
 open Dist.GADT_Dist
+open Sigs
 
 exception Undefined
 module type KL_sig = sig
@@ -8,9 +9,11 @@ module type KL_sig = sig
 
   val kl_discrete: ?n:int -> 'a primitive -> 'a dist -> float
   val kl_continuous: ?n:int -> float primitive -> float dist -> float
+  val kolmogorov_smirnov: ('a -> 'b) -> 'a -> 'b
+
 end
 
-module KL_Div(P: Primitive_dists.Primitives)(D: Samples.Samples): 
+module KL_Div(P: Primitives)(D: Samples.Samples): 
   KL_sig with type 'a samples = 'a D.t 
           and type 'a primitive = 'a P.primitive = 
 struct
@@ -76,8 +79,8 @@ struct
     done;
     !sum /. float_of_int n
 
-  (* let kolmogorov_smirnov d d' =
-     d d' *)
+  let kolmogorov_smirnov d d' =
+    d d'
 
 end
 

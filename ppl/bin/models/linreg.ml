@@ -27,7 +27,7 @@ let linreg' =
   let open Float in
   let* m = normal 0. 2. in
   let* c = normal 0. 2. in
-  List.fold obs ~init:(return (m,c)) ~f:(fun d (x,y) -> observe y (Primitives.(normal (m*x+c) 1.)) d)
+  List.fold obs ~init:(return (m,c)) ~f:(fun d (x,y) -> observe y (P.(normal (m*x+c) 1.)) d)
 
 let m' = fmap fst linreg'
 let c' = fmap snd linreg'

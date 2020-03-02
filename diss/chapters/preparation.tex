@@ -112,7 +112,6 @@ $$P(X_i=x_i) = \Sigma_{} $$
 
 If we have 50 variables which can take one of two values, then we have to sum over $2^{50}$ values. There do exist some algorithms which operate on bayesian networks (DAGs which represent random variables and their interdependence), and reduce the number of calculations needed. These include methods such as \textit{Variable Elimination} or \textit{Message Passing}.
 
-
 Alternatively, in the continuous case the formula 
 
 $$P(\theta|x)=P(x|\theta)P(\theta)\over{P(x)}$$
@@ -123,7 +122,11 @@ The normalizing constant here is an integral that often does not have an analyti
 
 \section{Inference Algorithms}
 % https://ermongroup.github.io/cs228-notes/inference/sampling/
-Inference algorithms are ways to systematically generate samples from posterior distributions given a generative model and a prior. In probabilistic programming, we have a set of random variables, some of which are latent 
+% https://people.eecs.berkeley.edu/~jordan/courses/260-spring10/lectures/lecture17.pdf
+
+% https://www.cs.ubc.ca/~fwood/teaching/OXWASP_CDT/probabilistic_programming.pdf
+% http://www.robots.ox.ac.uk/~fwood/anglican/assets/pdf/Wood-AISTATS-2014.pdf
+Inference algorithms are ways to systematically generate samples from posterior distributions given a generative model and a prior. In probabilistic programming, a model consists of latent variables and observed variables, and executing  which gives rise to the notion of an execution trace.
 
 \subsection{Exact Inference}
 
@@ -133,7 +136,9 @@ For discrete posterior distributions it can be thought of as calculating the pro
 
 \subsection{Rejection Sampling}
 
-Rejection sampling is a very simple inference method which 
+Since exact inference is too difficult in practice, we usually have to resort to \textit{Monte Carlo} sampling methods.
+
+One such method, rejection sampling, is a very simple inference method which takes uses another distribution which can be sampled from.
 
 \subsection{Importance Sampling}
 

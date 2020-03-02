@@ -1,0 +1,19 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup OCaml
+        uses: avsm/setup-ocaml@v1.0
+        with:
+          ocaml-version: 4.08.1
+      - name: opam install
+        run: |
+          opam install ppl
+      - name: doc
+        run: |
+          dune build @doc

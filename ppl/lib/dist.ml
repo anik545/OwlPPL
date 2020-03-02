@@ -1,4 +1,5 @@
 open Monad
+open Sigs
 
 module type Ops = sig 
   type 'a dist
@@ -18,11 +19,18 @@ end
 
 
 module type Dist = sig 
-  module P: Primitive_dists.Primitives
-  type prob
+  module P: Primitives
+  type prob = float
   type likelihood = float
-  type 'a samples
-  type 'a dist
+  type 'a samples = ('a * prob) list
+  type  _ dist = 
+      Return: 'a -> 'a dist
+    (* bind is lazy since it contains a function *)
+    | Bind: 'a dist * ('a -> 'b dist) -> 'b dist
+    (* | Bind_var: 'a var_dist * ('a -> 'b dist) -> 'b dist *)
+    | Primitive: 'a P.primitive -> 'a dist
+    | Conditional: ('a -> float) * 'a dist -> 'a dist
+    (* | Conditional: ('a -> float) * 'a var_dist -> 'a dist *)
 
   val condition' : ('a -> likelihood) -> 'a dist -> 'a dist
   val condition : bool -> 'a dist -> 'a dist
@@ -31,7 +39,9 @@ module type Dist = sig
   module DistMonad: Monad
   include Monad.EMonad with type 'a t := 'a dist
 
-  include Primitive_dists.Primitive_Distributions with type 'a primitive := 'a dist
+  include Primitive_Distributions with type 'a primitive := 'a dist
+
+  val bernoulli: likelihood -> bool dist
 
   val choice : likelihood -> 'a dist -> 'a dist -> 'a dist
   val sample : 'a dist -> 'a
@@ -45,7 +55,7 @@ module type Dist = sig
 end
 
 
-module Dist(P: Primitive_dists.Primitives) = struct
+module Dist(P: Primitives):Dist = struct
   module P = P
   exception Undefined
   type prob = float

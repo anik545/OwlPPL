@@ -19,7 +19,7 @@ let single_coin =
     (return coinweight) *)
 
 let post_single_coin = mh' 700 @@ single_coin
-let mn = sample_mean ~n:100000 (post_single_coin) (* 0.833 *)
+let mn = sample_mean ~n:100 (post_single_coin) (* 0.833 *)
 
 let () = Printf.printf "%f\n" mn
 (* 

@@ -1,31 +1,5 @@
 open Core
-
-module type Primitive_Distributions = sig 
-  type 'a primitive
-  val binomial : int -> float -> int primitive
-  val normal : float -> float -> float primitive
-  val categorical : ('a * float) list -> 'a primitive
-  val discrete_uniform : 'a list -> 'a primitive
-  val beta : float -> float -> float primitive
-  val gamma : float -> float -> float primitive
-  val continuous_uniform : float -> float -> float primitive
-end
-
-(* How would an user add a new distribution? *)
-module type Primitives = sig
-  type 'a primitive
-  include Primitive_Distributions with type 'a primitive := 'a primitive
-
-  val sample : 'a primitive -> 'a
-  val pdf : 'a primitive -> 'a -> float
-  val cdf : 'a primitive -> 'a -> float
-  val logpdf : 'a primitive -> 'a -> float
-  type 'a support = Discrete of 'a list | Continuous
-
-  val support: 'a primitive -> 'a support
-end
-
-
+open Sigs
 
 (* type 'a prim_record = {sample: unit -> 'a; pdf: 'a -> float} *)
 module Primitive_Dists: Primitives = struct

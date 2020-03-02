@@ -33,9 +33,9 @@ let model =
   let* a = discrete_uniform [0;1] in
   let* b = discrete_uniform [0;1] in
   let* c = discrete_uniform [0;1] in
-  let d = return ((a,b),c) in
-  let d = condition' (fun ((a,b),c) -> if a+b+c=3 then 1. else -.Float.infinity) d in
-  let* (a,_),_ = d in
+  let d = return (a,b,c) in
+  let d = condition' (fun (a,b,c) -> if a+b+c=3 then 1. else -.Float.infinity) d in
+  let* (a,_,_) = d in
   return a
 
 let model1_a =
@@ -52,13 +52,19 @@ let model1_a =
   return a
 
 let model1_b =
-  let condition b d = Conditional((fun _ -> if b then 1. else 0.), d) in
   let* a = discrete_uniform [0;1] in
   let* b = discrete_uniform [0;1] in
   let* c = discrete_uniform [0;1] in
-  condition (a+b+c=3) 
+  condition (a+b+c=3)
     (return a)
 
+let model1_b1 =
+  (* LISP style *)
+  (bind (discrete_uniform [0;1]) (fun a -> 
+       (bind (discrete_uniform [0;1]) (fun b->
+            (bind (discrete_uniform [0;1]) (fun c->
+                 (condition (a+b+c=3)
+                    (return a))))))))
 
 (* TODO: are both models below the same? *)
 let model_desugar_cond_end: int dist =
