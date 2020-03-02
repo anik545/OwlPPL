@@ -63,6 +63,8 @@ The main tools I used are listed here:
 
 Using OCaml 4.08 allows me to use new features of OCaml, in particular the ability to define custom let operators as syntax sugar for monads. The dune build system also allows me to more easily manage building and testing my code, as well as automatically creating documentation from comments and function signatures in my code. The profilers I used allowed me to work out the causes of performance issues and remedy them. 
 
+\subsection{Continuous Integration}
+Since I will be developing a library, it is important to make sure that any unit tests are run regularly to ensure there are no regressions - no new code affects old behaviour. It is also important to make sure the library will function on different platforms, and that documentation is built (and possibly uploaded) automatically. To achieve this, I will be using GitHub's continuous integration service, `actions' to make sure the code on the master branch always works. The CI can also be used to ensure the library works with older versions of OCaml, and is backwards-compatible.
 
 % This feels like it should be in implementation.
 \section{Language Design}
