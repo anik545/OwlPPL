@@ -11,10 +11,11 @@ jobs:
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@master
         with:
-          root_file: diss/diss.tex
+          working_directory: diss
+          root_file: diss.tex
           args: "-pdf -file-line-error -interaction=nonstopmode --shell-escape"
-          extra_system_packages: "cloc"
+          extra_system_packages: "cloc git"
       - uses: actions/upload-artifact@v1
         with:
           name: ar899_disseration.pdf
-          path: diss.pdf
+          path: diss/diss.pdf

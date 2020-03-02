@@ -4,7 +4,7 @@ _build/
 hansei/
 owl/
 *spacetime*
-
+doc.zip
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

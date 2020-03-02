@@ -4,16 +4,28 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+        ocaml-version: ["4.08.1"]
 
     steps:
       - name: Setup OCaml
         uses: avsm/setup-ocaml@v1.0
         with:
-          ocaml-version: 4.08.1
-      - name: opam install
-        run: |
-          opam install ppl
-      - name: doc
-        run: |
-          dune build @doc
+          ocaml-version: ${{ matrix.ocaml-version }}
+      - run: opam pin add ppl -n ./ppl
+      - run: opam install --deps-only --with-test ppl
+      - run: opam depext -yt ppl
+      - run: (cd ppl;opam exec -- dune build)
+      - run: (cd ppl;opam exec -- dune runtest)
+      - run: (cd ppl; opam exec -- dune build @doc)
+      - run: (cd ppl/_build/default/_doc/_html/ ;zip -r doc.zip .)
+      - uses: actions/upload-artifact@v1
+        with:
+          name: documentation.zip
+          path: doc.zip
+    #   - name: Upload Documentation
+    #     run: |
+    #       rsync

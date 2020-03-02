@@ -12,7 +12,16 @@ homepage: "https://github.com/anik545/OwlPPL"
 bug-reports: ""
 dev-repo: "git@github.com:anik545/OwlPPL.git"
 
-depends: [ "ocaml" "ocamlfind" "owl" "core"]
+depends: [ 
+  "ocaml"
+  "ocamlfind"
+  "owl"
+  "owl-plplot"
+  "core"
+  "alcotest" {with-test}
+  "qcheck" {with-test}
+  "qcheck-alcotest" {with-test}
+]
 
 build: [
   ["dune" "subst"] {pinned}
