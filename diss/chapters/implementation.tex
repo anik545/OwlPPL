@@ -4,7 +4,11 @@
 The majority of my code is in the \texttt{ppl} directory, which contains the core library, unit tests, statistical testing code and some example programs written using the library. The build system dune makes 
 
 
-I have implemented my ppl as a library (in the \texttt{lib} subdirectory), contained within the module \texttt{Ppl}. This contains several submodules, most importantly the \texttt{Dist} module, which contains the code for representing, creating and combining distributions. The Primitives module contains the signatr
+I have implemented my ppl as a library (in the \texttt{lib} subdirectory), contained within the module \texttt{Ppl}. This contains several submodules, most importantly the \texttt{Dist} module, which contains the code for representing, creating and combining distributions. 
+% TODO: this might change?
+The Primitives module contains an type for representing primitive distributions. This type is not abstract, in order to allow users to create their own distributions outside of the ones provided in the module.
+
+The Plot module contains helper functions which wrap around Owl_plplot, allowing users to easily create visualisations from distributions defined in my ppl.
 
 The \texttt{evaluation} directory contains code to compare my ppl to both hand-written inference procedures, as well as equivalent programs in other ppls. There are several directories, which each correspond to a particular problem/model, for example the \texttt{hmm} folder for an example of a hidden markov model.
 
@@ -40,6 +44,7 @@ The structure that I landed on to represent general models is a generalised alge
 
 \lstinputlisting[language={Caml},label={lst:gadt1},caption={Representing a probabilistic model using a GADT}]{code_snippets/gadt.ml}
 
+\section{Conditioning}
 
 The condition variant is used to assign scores to traces, and takes a function which takes an element and returns a float, a `score', which represents how likely that element is. I have also implemented a few helpers to make it easier to condition models. The three main helpers are \texttt{condition}, \texttt{score} and \texttt{observe}, which are all specific cases of the general \texttt{Condition} variant. 
 
@@ -65,16 +70,16 @@ Inference can be thought of as a program transformation \cite{scibior2015practic
 \subsection{Enumeration} \label{sec:enum}
 Enumeration is the simplest way to perform exact inference on probabilistic programs, and essentially consists of computing the joint distribution over all the random variables in the model. This involves enumerating every execution path in the model, in this case performing a depth first search over the \texttt{dist} data structure. For every \texttt{bind} (i.e. every \texttt{let*}), there is a distribution ($d$) and a function from samples to new distributions ($f$). I call this function on every value in the support of the distribution $d$, and then enumerate all the possibilities. The final output is a \texttt{('a * float) list}, which needs to have duplicates removed and then be normalised.
 
+\lstinputlisting[language={Caml},caption={Enumerating all paths through a model},label={lst:enum}]{code_snippets/enumerate.ml}
 
+This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions. Exact inference of this kind only works on models known as bayesian networks, and exact inference for bayesian networks is in fact NP-hard\cite{cooper1990computational}. So, instead, most of my project focuses on approximate inference.
 
-\subsection{Importance Sampling} \label{sec:imp}
 \subsection{Rejection Sampling} \label{sec:rej}
-\subsection{Markov Chain Monte Carlo} \label{sec:mcmc}
-\subsubsection{Metropolis-hastings} \label{sec:mh}
-\subsection{Sequential Monte Carlo} \label{sec:smc}
-\subsubsection{Particle Filter} \label{sec:pf}
-\subsubsection{Particle Cascade} \label{sec:pc}
-\subsubsection{Particle-Independent Metropolis-Hastings} \label{sec:pimh}
+\subsection{Importance Sampling} \label{sec:imp}
+\subsection{Metropolis Hastings} \label{sec:mh}
+\subsection{Particle Filter} \label{sec:pf}
+\subsection{Particle Cascade} \label{sec:pc}
+\subsection{Particle-Independent Metropolis-Hastings} \label{sec:pimh}
 
 \section{Examples}
 

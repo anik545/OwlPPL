@@ -12,17 +12,16 @@ I have experience with the core SML language, which will aid in learning basic O
 
 \section{Requirements}
 
-Before starting to write any code, I made sure to set out the features I aimed to implement for my DSL. The main goal is to produce a usable language, which is defined by the following criteria:
+Before starting to write any code, I made sure to set out the features I aimed to implement for my DSL. The main goal was to produce a usable language, which was defined by the following criteria:
 
 % TODO: which tense to use here - past, say "this met the success criteria as follows"
 \begin{itemize}
-    \item \textbf{Language Features}: Since I will write an embedded DSL, a user of my PPL should be able to take advantage of all standard OCaml features in the deterministic parts of their models. I need to make sure that this is the case, and features such as recursive functions will work.
-    \item \textbf{Available distributions}: I will aim to make sure my PPL has at minimum the bernoulli and normal distributions available as basic building blocks to build more complex probabilistic programs.
-    \item \textbf{Correctness} of inference: I will use the PPL developed on sample problems mentioned before to ensure correct results are produced. This would be determined by comparing to results produced in other PPLs as well as comparisons to analytic solutions for simple problems. I will aim to include at least one inference algorithm.
-    \item \textbf{Performance}: This is a quantitative measure, comparing programs written in my PPL to equivalent programs in other PPLs. I can use tools such as spacetime or landmarks to profile my OCaml code. Performing inference should be possible within a reasonable amount of time, even though the project does not have a significant focus on performance. I will also benchmark the performance with regards to scalability, i.e. ensure the performance is still reasonable as models are conditioned on more data.
+    \item \textbf{Language Features}: Since I have written an embedded DSL, a user of my PPL should be able to take advantage of all standard OCaml features in the deterministic parts of their models. I need to make sure that this is the case, and features such as recursive functions will work.
+    \item \textbf{Available distributions}: I aimed to make sure my PPL has at minimum the bernoulli and normal distributions available as basic building blocks to build more complex probabilistic programs.
+    \item \textbf{Correctness} of inference: I used the PPL developed on example problems to ensure correct results are produced. These results were compared to results produced in other PPLs as well as comparisons to analytic solutions for simple problems.
+    \item \textbf{Available Inference Algorithms}: I aimed to include at least one available inference algorithm. However, since different problems are more or less well suited to different general-purpose inference procedures, I wrote implementations for five separate algorithms.
+    \item \textbf{Performance}: This is a quantitative measure, comparing programs written in my PPL to equivalent programs in other PPLs. I used the profiling tools spacetime and gprof to profile my OCaml code. Performing inference should be possible within a reasonable amount of time, even though the project does not have a significant focus on performance. I also benchmarked the performance with regards to scalability, i.e. made sure the performance is still reasonable as models are conditioned on more data.
 \end{itemize}
-
-
 
 \section{Professional Practice}
 
@@ -34,7 +33,7 @@ Testing systems which are linked to randomness can be quite tricky, as it is dif
 
 As such, most of the unit tests I wrote are fairly simple and only catch very basic bugs. Unit tests were possible to write for the exact inference procedure when working with discrete distributions, since we always expect the same output distribution. However, all the other inference algorithms are approximate, so tests suffer from the problems described above.
 
-Despite this, I will still be able to carry out a full evaluation, performing hypothesis tests such as kolmogorov-smirnov.
+Despite this, I will still be able to carry out a full evaluation, performing hypothesis tests such as the kolmogorov-smirnov or chi-squared tests.
 
 % talk about using very basic unit tests
 % unit testing ppl is 
@@ -55,10 +54,12 @@ The main tools I used are listed here:
     \item Dune - Build system for OCaml
     \item Opam - OCaml package manager
     \item Alcotest - Unit testing framework
+    \item Quickcheck - Random testing library
     \item Spacetime - Memory profiler for OCaml
     \item Landmarks - Profiler for OCaml
     \item Owl - Scientific computing library in OCaml
     \item VSCode (with ocaml extensions) - IDE for OCaml development
+    \item Git with GitHub - version control
 \end{itemize}
 
 Using OCaml 4.08 allows me to use new features of OCaml, in particular the ability to define custom let operators as syntax sugar for monads. The dune build system also allows me to more easily manage building and testing my code, as well as automatically creating documentation from comments and function signatures in my code. The profilers I used allowed me to work out the causes of performance issues and remedy them. 
@@ -77,11 +78,11 @@ I use a set of primitive distributions which can be combined (using arbitrarily 
 PPLs in general are similar to normal programming languages, but need to support two extra operations - \texttt{sample} and \texttt{condition} \cite{}. The sample function is for sampling from some distribution - either a primitive distribution or a user defined distribution.
 
 \section{OCaml}
-I have chosen to use the OCaml language to implement my PPL. There are many features of OCaml which make it suitable for writing a DSL. Using OCaml, I can make sure that expressions in the DSL are well-typed
+I have chosen to use the OCaml language to implement my PPL. There are many features of OCaml which make it suitable for writing a DSL. Using OCaml, I can make sure that expressions in the DSL are well-typed, so that programs don't fail to run. OCaml's algebraic datatypes also make it easy to represent probabilistic programs as trees, and pattern matching makes it easy to 'interpret' and transform these trees. The module system also makes sure that certain types are hidden from the user, which can ensure only valid structures are created by the user.
 
 \section{Owl}
 
-Owl is a scientific computing library written for OCaml \cite{}. Importantly for my PPL, it contains functions for working with multi-dimensional arrays, as well as a wide variety of statistical functions. In particular, it contains functionality relating to many common distributions, e.g. normal, beta, binomial, etc. Since my language will allow the user to combine these basic distributions into larger models, I will need to use these functions to allow sampling from and the ability to perform inference on these models. In particular, it is important to be able to find the probability density function (pdf) and cumulative density function (cdf) of these distributions as well as sample from them. Another important feature of owl is it's plotting functionality which enabled me to write functions which let me visualise output distributions, as well as visualising performance statistics, all directly from OCaml.
+Owl is a scientific computing library written for OCaml \cite{owl}. Importantly for my PPL, it contains functions for working with multi-dimensional arrays, as well as a wide variety of statistical functions. In particular, it contains functionality relating to many common distributions, efs.g. normal, beta, binomial, etc. Since my language will allow the user to combine these basic distributions into larger models, I will need to use these functions to allow sampling from and the ability to perform inference on these models. In particular, it is important to be able to find the probability density function (pdf) and cumulative density function (cdf) of these distributions as well as sample from them. Another important feature of owl is it's plotting functionality which enabled me to write functions which let me visualise output distributions, as well as visualising performance statistics, all directly from OCaml.
 
 % Should these parts be here? Do I explain the methods here or in the implementation section?
 \section{Probability Monad}
@@ -94,11 +95,11 @@ Monads are a design pattern commonly used in functional programming languages.
 The key data structure I use to model probability distributions is a monad. This allows me to compose distributions easily, by using the output from one distribution in another using the bind operator. In OCaml, I can also use the new (let*) operators to make this more ergonomic, and make code look more natural (as opposed to using the \texttt{>>=} operator everywhere).
 
 \section{Approaches to probabilistic programming}
-Existing PPLs take several different forms and 
-
+Existing PPLs take several different forms, both as standalone and embedded languages. The main tradeoff that is made in the design of PPLs is the number of models that can be expressed in the language compared to how efficient inference is. One approach is graph-based, where a \textit{factor graph} is generated from the program, over which efficient inference can take place. This approach can be seen in languages such as infer.NET or JAGS, and has the benefit of very fast inference, particularly since efficient computation graph frameworks can be leveraged - an example is edward \cite{}, which uses tensorflow. However, these languages usually cannot represent infinite models or unbounded recursion. Another approach, taken by the likes of webppl or anglican, is trace-based. This approach considers execution traces, with a `trace' being one run of a program, with all the intermediate variables taking a particular value. Inference algorithms can reason about these traces in order to produce a posterior distribution, as will be seen in the next section. A trace-based approach often leads to clearer programs, since we are not working with a computation graph. It also leads to more models being able to be expressed, since we are not limited by the constraints of a graph. However inference is often slower, particularly when dealing with data in high dimensions, since the algorithms need to be more general purpose, and often converge slower.
 
 \section{Bayesian Inference}
 Inference is the key motivating feature of probabilistic programming, and is a way to infer a distribution over the parameters based on the data we observe. The main feature of bayesian inference is that we assign every model some prior belief. Often this prior is chosen based on our knowledge of the problem, but the prior can also be uninformative. The goal of bayesian inference is to calculate the posterior distribution, which can be represented by bayes formula,
+
 
 $$P(A\mid B)={\frac {P(B\mid A)P(A)}{P(B)}}$$
 
@@ -128,7 +129,14 @@ The normalizing constant here is an integral that often does not have an analyti
 
 % https://www.cs.ubc.ca/~fwood/teaching/OXWASP_CDT/probabilistic_programming.pdf
 % http://www.robots.ox.ac.uk/~fwood/anglican/assets/pdf/Wood-AISTATS-2014.pdf
-Inference algorithms are ways to systematically generate samples from posterior distributions given a generative model and a prior. In probabilistic programming, a model consists of latent variables and observed variables, and executing  which gives rise to the notion of an execution trace.
+Inference algorithms are ways to systematically generate samples from posterior distributions given a generative model and a prior. In probabilistic programming, a model consists of latent variables and observed variables, and a single execution of a model (a program) can be thought of as an assignment to each of these variables, known as an \textit{execution trace}. This can be defined mathematically as below, by bayes rule:
+
+$$p(x_{1:N}|y_{1:N})\propto ̃\tilde{p}(y_{1:N},x_{1:N})$$ 
+
+Here, $p$ is the posterior distribution of a particular trace $x$, given the observed variables $y$
+The aim then is to find the posterior over the latent variables we are interested in, which we can specify within the program, either as part of the model, or outside it in a query to the model.
+
+Show how this relates to a program here or in implementation?
 
 \subsection{Exact Inference}
 

@@ -1,3 +1,4 @@
+% TC:ignore
 \documentclass[12pt,notitlepage,twoside,a4paper]{report}
 
 \usepackage{verbatim}
@@ -97,41 +98,8 @@ I, Anik Roy of Christ's College, am content for my dissertation to be made avail
 \clearpage
 
 \chapter*{Proforma}
-\immediate\write18{texcount -inc -sum -1 diss.tex > wordcount.txt}
-\immediate\write18{cloc  --yaml `git ls-files evaluation ppl` | grep 'code: ' | tail -n 1 | sed  's/  code://g'}
-
-{\large
-
-\begin{tabular}{ll}
-Candidate Number:               &  Anik Roy                       \\
-College:            &  Christ's College                     \\
-Project Title:      &  A Probabilistic Programming \\
-&
- Language in Ocaml \\
-Examination:        & Computer Science Tripos Part II        \\
-Word Count:  
-& \input{wordcount.txt}\footnotemark[1]\\
-Final Line Count:         & \input{linecount.txt}\footnotemark[2] \\
-Project Originator: & Dr R.~Mortier                    \\
-Supervisor:         & Dr R.~Mortier                    \\ 
-\end{tabular}
-}
-\footnotetext[1]{This word count was computed by \texttt{texcount -inc -sum -1 diss.tex}}
-\stepcounter{footnote}
-
-
-\footnotetext[2]{This line count was computed by \texttt{cloc (git ls-files)} and excludes blank lines and comments}
-\stepcounter{footnote}
-
-\section*{Original Aims of the Project}
-
-\section*{Work Completed}
-
-\section*{Special Difficulties}
-None
-
+\input{chapters/proforma.tex}
 \newpage
-
 
 \cleardoublepage
 
@@ -150,6 +118,7 @@ None
 \pagestyle{headings}
 
 
+% TC:endignore
 
 \chapter{Introduction}
 \input{chapters/introduction.tex}
@@ -170,7 +139,7 @@ None
 \chapter{Conclusion}
 \input{chapters/conclusion.tex}
 \cleardoublepage
-
+% TC:ignore
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the bibliography
 
@@ -186,3 +155,4 @@ None
 \input{propbody}
 
 \end{document}
+% TC:endignore

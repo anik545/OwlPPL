@@ -9,6 +9,7 @@ module type Samples = sig
   val get_num: 'a t -> 'a -> int
   val get_prob: 'a t -> 'a -> float
   val to_pdf: 'a t -> ('a -> float)
+  (* val to_cdf: 'a t -> ('a -> float) *)
   (* val print: 'a t -> unit *)
   val print_map: (module Pretty_printer.S with type t = 'a) -> 'a t -> unit
   include Sexpable.S1 with type 'a t := 'a t
@@ -17,7 +18,7 @@ module type Samples = sig
   val support : 'a t -> 'a list
 end
 
-
+(* TODO: stop using map.poly, slow - take a first class module in the creater functions *)
 module DiscreteSamples: Samples with type 'a t = ('a, int) Map.Poly.t = struct 
   type 'a t = ('a, int) Map.Poly.t
   [@@deriving sexp]
@@ -79,8 +80,8 @@ end
 
 (* TODO: do one for continuous dists as well *)
 
-(* module WeightedSamples: Samples = struct
-   type 'a t = ('a, float) Map.Poly.t
-   [@@deriving sexp]
+module ContinuousSamples: Samples = struct
+  type 'a t = ('a, float) Map.Poly.t
+  [@@deriving sexp]
 
-   end *)
+end

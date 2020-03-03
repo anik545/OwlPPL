@@ -1,6 +1,7 @@
 open Core
 open Dist.GADT_Dist
 open Sigs
+open Helpers
 
 exception Undefined
 module type KL_sig = sig
@@ -9,8 +10,8 @@ module type KL_sig = sig
 
   val kl_discrete: ?n:int -> 'a primitive -> 'a dist -> float
   val kl_continuous: ?n:int -> float primitive -> float dist -> float
-  val kolmogorov_smirnov: ('a -> 'b) -> 'a -> 'b
-
+  val kolmogorov_smirnov: ?n:int -> ?alpha:float -> float dist -> float primitive -> Owl_stats.hypothesis
+  val chi_sq: ?n:int -> ?alpha:float -> 'a dist -> 'a primitive -> Owl_stats.hypothesis
 end
 
 module KL_Div(P: Primitives)(D: Samples.Samples): 
@@ -79,9 +80,37 @@ struct
     done;
     !sum /. float_of_int n
 
-  let kolmogorov_smirnov d d' =
-    d d'
+  (* d is inferred dist, d' is exact dist, default 1% signifigance level *)
+  (* Only works for float dist, make it work for dists of any comparable type (take in a first class comparator module like maps) *)
+  let kolmogorov_smirnov ?(n=10000) ?(alpha=0.01) d d' =
+    (* let ecdf_map d: (float, float) Core.Map = Core.Map.of_sorted_array (module Float) (Owl_stats.ecdf (take_k_samples n d)) in *)
+    (* let ecdf x = ecdf_map d in *)
+    let h = Owl_stats.ks_test ~alpha (take_k_samples n d) (P.cdf d') in
+    if h.reject then
+      Printf.printf "two dists are not equal with p=%f" h.p_value
+    else
+      Printf.printf "two dists are equal with p=%f" h.p_value
+    ;
+    h
 
+  (* d is inferred dist, d' is exact dist, default 1% signifigance level *)
+  let chi_sq ?(n=10000) ?(alpha=0.01) d d' : Owl_stats.hypothesis= 
+    let supp = match P.support d' with
+        Discrete xs -> xs
+      | Continuous -> raise Undefined (* Can't do this test on continuous dists*)
+    in
+    let samples = D.from_dist ~n d in
+    let num_observed x = Float.of_int @@ D.get_num samples x in
+    let num_expected x = Float.of_int n *. (P.pdf d' x) in
+    let test_stat = List.sum (module Float) supp ~f:(fun x -> (((num_observed x) -. (num_expected x))**2. /. (num_expected x))) in
+    let df = Float.of_int @@ List.length supp - 1 in
+    let p = Owl_stats.chi2_cdf ~df test_stat in
+    if Float.(p < alpha) then
+      Printf.printf "two dists are not equal with p=%f" p
+    else
+      Printf.printf "two dists are equal with p=%f" p
+    ;
+    {reject = Float.(p > test_stat);p_value=p;score=p}
 end
 
 module KL = KL_Div(Primitive_dists.Primitive_Dists)(Samples.DiscreteSamples)
