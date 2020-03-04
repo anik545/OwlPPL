@@ -5,7 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"] [anglican "1.0.0"]
 ]
-  ; :resource-paths ["/home/anik/anglican"]
+  :resource-paths ["/home/anik/anglican"]
   :main ^:skip-aot coin.coin
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}})pl
