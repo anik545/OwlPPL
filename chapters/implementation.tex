@@ -5,10 +5,11 @@ The majority of my code is in the \texttt{ppl} directory, which contains the cor
 
 
 I have implemented my ppl as a library (in the \texttt{lib} subdirectory), contained within the module \texttt{Ppl}. This contains several submodules, most importantly the \texttt{Dist} module, which contains the code for representing, creating and combining distributions. 
+
 % TODO: this might change?
 The Primitives module contains an type for representing primitive distributions. This type is not abstract, in order to allow users to create their own distributions outside of the ones provided in the module.
 
-The Plot module contains helper functions which wrap around Owl_plplot, allowing users to easily create visualisations from distributions defined in my ppl.
+The Plot module contains helper functions which wrap around Owl\_plplot, allowing users to easily create visualisations from distributions defined in my ppl.
 
 The \texttt{evaluation} directory contains code to compare my ppl to both hand-written inference procedures, as well as equivalent programs in other ppls. There are several directories, which each correspond to a particular problem/model, for example the \texttt{hmm} folder for an example of a hidden markov model.
 
@@ -45,7 +46,7 @@ The structure that I landed on to represent general models is a generalised alge
 \lstinputlisting[language={Caml},label={lst:gadt1},caption={Representing a probabilistic model using a GADT}]{code_snippets/gadt.ml}
 
 \section{Conditioning}
-
+% https://www.robots.ox.ac.uk/~twgr/assets/pdf/rainforth2017thesis.pdf - section on conditioning, pg.42
 The condition variant is used to assign scores to traces, and takes a function which takes an element and returns a float, a `score', which represents how likely that element is. I have also implemented a few helpers to make it easier to condition models. The three main helpers are \texttt{condition}, \texttt{score} and \texttt{observe}, which are all specific cases of the general \texttt{Condition} variant. 
 
 The \texttt{condition} operator is used for hard conditioning, which conditions the model on an observation being true. If true is passed in, then the score assigned is 0, and if false, the score assigned is -infinity.
@@ -58,7 +59,7 @@ The \texttt{score} function is similar to the condition operator, except instead
 In PPLs, users build complex models by composing more simple elementary primitive distributions (ERPs) \cite{pmlr-v15-wingate11a}. These primitive distributions need to have a few operations defined on them, namely \texttt{sample, pdf, cdf} and \texttt{support}.
 
 \section{Forward Sampling}
-
+% https://www.robots.ox.ac.uk/~twgr/assets/pdf/rainforth2017thesis.pdf - sec 7.1, pg 135
 In order to perform inference, we will often need to find a prior distribution. For a posterior, $P(\theta\mid x)$, the model written by the user is $P(x\mid\theta)$, and the prior is $P(\theta)$, so finding the prior is the same as disregarding the conditionals (essentially ignoring the data). Since sampling is only difficult in the presence of conditionals, this allows us to sample from the prior using essentially the same sample function. We can also take into account the conditionals, and produce weighted samples, with the weight being the score assigned by each conditional branch, accumulated (by multiplying).
 
 \section{Inference}
@@ -67,12 +68,20 @@ Inference is the key motivation behind probabilistic programming.
 
 Inference can be thought of as a program transformation \cite{scibior2015practical} \cite{Zinkov2016ComposingIA}. In my ppl, this corresponds to a function of type \texttt{'a dist -> 'a dist}. This method allows for the composition of inference algorithms, exemplified in section \ref{sec:pimh}.
 
+Since I have used a trace-based approach, we can characterise the posterior probability of a trace as (from the previous chapter):
+% https://www.robots.ox.ac.uk/~twgr/assets/pdf/rainforth2017thesis.pdf - pg.52
+$$p(x_{1:N}|y_{1:N})\propto ̃\tilde{p}(y_{1:N},x_{1:N})$$
+
+We can now see how this formula corresponds to a program in my ppl. The example below is a very simple model, which adds two numbers drawn from discrete distributions, and observes a value.
+
+% TODO: write example program, and relate to terms in formula
+
 \subsection{Enumeration} \label{sec:enum}
 Enumeration is the simplest way to perform exact inference on probabilistic programs, and essentially consists of computing the joint distribution over all the random variables in the model. This involves enumerating every execution path in the model, in this case performing a depth first search over the \texttt{dist} data structure. For every \texttt{bind} (i.e. every \texttt{let*}), there is a distribution ($d$) and a function from samples to new distributions ($f$). I call this function on every value in the support of the distribution $d$, and then enumerate all the possibilities. The final output is a \texttt{('a * float) list}, which needs to have duplicates removed and then be normalised.
 
 \lstinputlisting[language={Caml},caption={Enumerating all paths through a model},label={lst:enum}]{code_snippets/enumerate.ml}
 
-This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions. Exact inference of this kind only works on models known as bayesian networks, and exact inference for bayesian networks is in fact NP-hard\cite{cooper1990computational}. So, instead, most of my project focuses on approximate inference.
+This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions. Exact inference of this kind only works on models that can be represented as finite networks, and exact inference for bayesian networks is in fact NP-hard\cite{cooper1990computational}. So, instead, most of my project focuses on approximate inference.
 
 \subsection{Rejection Sampling} \label{sec:rej}
 \subsection{Importance Sampling} \label{sec:imp}

@@ -1,4 +1,4 @@
-let rec enumerate: type a.a dist -> score -> ((a * score) list)
+let rec enumerate: type a.a dist -> float -> ((a * float) list)
   = fun d multiplier ->
     if Float.(multiplier = 0.) then []
     else

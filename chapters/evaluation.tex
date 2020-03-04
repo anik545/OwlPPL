@@ -5,7 +5,15 @@
 % - plot of kl divergence wrt number of samples taken
 % - plot of running time wrt amount of data conditioned on
 % - plot of running time wrt number of particles (for smc)
-%  - plot s
+% - maximum memory footprint (against parameters as above)
+% - total memory footprint over time
+% box plots instead of just lines
+
+% use ppl to do evaluation? good to show code in my language which does evaluation
+
+% explain WHY in evaluation, how just what - e.g. explain why plot looks how it does, don't just describe
+
+% show some output from merlin to show the fact that type inference works and is good?s
 
 \section{Statistical tests}
 To evaluate the correctness of my PPL, I used statistical tests which measure goodness-of-fit, i.e. how similar two distributions are to each other. I compare the empirical distribution of 10,000 samples from an approximated distribution to an exact distribution which is calculated analytically. 
@@ -13,9 +21,59 @@ To evaluate the correctness of my PPL, I used statistical tests which measure go
 For all tests described below, I set the null and alternative hypotheses as follows:
 
 $H_0:$ The sample data follow the exact distribution
+
 $H_1:$ The sample data do not follow the exact distribution
 
-Setting the significance level, $\alpha = 0.01$ for all tests
+I set the significance level, $\alpha = 0.01$ for all subsequent tests.
 
 \subsection{Kolmogorov-smirnov}
-\subsection{}
+
+The Kolmogorov-Smirnov test is a non parametric test which is used to compare a set of samples with a distribution - this is the one-sample K-S test. There is also a two-sample K-S test, which compares two sets of samples against each other. I use the one-sample test here to compare samples from the inferred posteriors to their analytic solutions.
+
+The test statistic is as follows, with $F_n(x)$ being the empirical cumulative distribution of n samples, and $F(x)$ being the exact cumulative distribution
+
+$$F_{n}(x)={1 \over n}\sum _{i=1}^{n}I_{[-\infty ,x]}(X_{i})$$\\
+$$D_{n}=\sup _{x}|F_{n}(x)-F(x)|$$
+
+This test statistic is compared against the critical values of the Kolmogorov distribution, rejecting the null hypothesis if $\sqrt{n}D_n > K_\alpha$, where $K_\alpha$ is the critical value at the significance level $\alpha$, and $n$ is the number of samples.
+
+\subsection{Chi-squared}
+
+Since Kolmogorov-smirnov requires a ordering on elements (due to it's use of the cdf), it can be tricky to use with discrete distributions which don't have a default ordering. A different test that can be used in this case is the $\chi^2$ test.
+
+The test statistic is as follows, with each i being an element in the distribution, $x_i$ is the observed number of samples with the value $i$, and $m_i$ is the expected number of samples for the value $i$.
+
+$$X^{2}=\sum _{i=1}^{k}{\frac {(x_{i}-m_{i})^{2}}{m_{i}}}$$
+
+This test statistic is compared against the critical value (at the significance level) of the chi-squared distribution, with the degrees of freedom being $k-1$, where k is the number of possible values of the distribution.
+
+\section{Convergence of sampling}
+
+I also used the KL-divergence metric to determine the (dis)similarity of two distributions. The formula for KL Divergence of discrete distributions $P$ and $Q$ is
+
+$${D_{\text{KL}}(P\parallel Q)=\sum _{x\in {\mathcal {X}}}P(x)\log \left({\frac {P(x)}{Q(x)}}\right)}$$
+
+The continuous version is similar, with $p$ and $q$ now being density functions:
+
+$${D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx$$
+
+Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins, and then used the discrete formula.
+
+The idea behind conducting this test is ensuring that the KL divergence decreases as we take more samples from the posterior. This ensures that the solution converges to the correct distribution. I also investigate the rate of convergence using this method.
+
+% Insert figures of num. samples against KL
+
+\section{Performance}
+I evaluated the performance of my ppl against anglican, webppl, and edward.
+% explain why i chose these languages to compare against?
+For sequential monte carlo algorithms, I compared running times with regards to the number of particles used.
+
+% don't have jsut one subsection
+\subsection{Profiling}
+\subsubsection{Spacetime}
+\subsubsection{Gprof}
+
+\section{Comparison to other PPLs}
+
+\subsection{A simple model}
+\subsection{A more complex model}

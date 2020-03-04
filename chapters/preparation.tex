@@ -42,6 +42,9 @@ Despite this, I will still be able to carry out a full evaluation, performing hy
 % go though how to solve this in implementations
 % find some sources for how other people solve this, reference that here.
 
+\subsection{Continuous Integration}
+Since I will be developing a library, it is important to make sure that any unit tests are run regularly to ensure there are no regressions - no new code affects old behaviour. It is also important to make sure the library will function on different platforms, and that documentation is built (and possibly uploaded) automatically. To achieve this, I will be using GitHub's continuous integration service, `actions' to make sure the code on the master branch always works. The CI can also be used to ensure the library works with older versions of OCaml, and is backwards-compatible.
+
 \subsection{Licenses}
 
 The major libraries I use, Owl and Jane Street Core, are both licensed under the MIT license.
@@ -63,9 +66,6 @@ The main tools I used are listed here:
 \end{itemize}
 
 Using OCaml 4.08 allows me to use new features of OCaml, in particular the ability to define custom let operators as syntax sugar for monads. The dune build system also allows me to more easily manage building and testing my code, as well as automatically creating documentation from comments and function signatures in my code. The profilers I used allowed me to work out the causes of performance issues and remedy them. 
-
-\subsection{Continuous Integration}
-Since I will be developing a library, it is important to make sure that any unit tests are run regularly to ensure there are no regressions - no new code affects old behaviour. It is also important to make sure the library will function on different platforms, and that documentation is built (and possibly uploaded) automatically. To achieve this, I will be using GitHub's continuous integration service, `actions' to make sure the code on the master branch always works. The CI can also be used to ensure the library works with older versions of OCaml, and is backwards-compatible.
 
 % This feels like it should be in implementation.
 \section{Language Design}
@@ -136,8 +136,8 @@ $$p(x_{1:N}|y_{1:N})\propto ̃\tilde{p}(y_{1:N},x_{1:N})$$
 Here, $p$ is the posterior distribution of a particular trace $x$, given the observed variables $y$
 The aim then is to find the posterior over the latent variables we are interested in, which we can specify within the program, either as part of the model, or outside it in a query to the model.
 
-Show how this relates to a program here or in implementation?
-
+% TODO: Show how this relates to a program here or in implementation?
+% probably in implementation
 \subsection{Exact Inference}
 
 Exact Inference is the simplest method of calculating the posterior, but is usually computationally intractable. It involves calculating bayes formula exactly, of which calculating the normalising constant is usually the problem. To sample directly, we would also need to find the inverse cumulative distribution to be able to use the inversion sampling method.
@@ -146,9 +146,9 @@ For discrete posterior distributions it can be thought of as calculating the pro
 
 \subsection{Rejection Sampling}
 
-Since exact inference is too difficult in practice, we usually have to resort to \textit{Monte Carlo} sampling methods.
+Since exact inference is too difficult in practice, we usually have to resort to \textit{Monte Carlo} \cite{monte-carlo} methods.
 
-One such method, rejection sampling, is a very simple inference method which takes uses another distribution which can be sampled from.
+One such method, rejection sampling, is a very simple inference method which uses another distribution which can be sampled from.
 
 \subsection{Importance Sampling}
 
