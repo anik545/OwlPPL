@@ -81,7 +81,7 @@ Enumeration is the simplest way to perform exact inference on probabilistic prog
 
 \lstinputlisting[language={Caml},caption={Enumerating all paths through a model},label={lst:enum}]{code_snippets/enumerate.ml}
 
-This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions. Exact inference of this kind only works on models that can be represented as finite networks, and exact inference for bayesian networks is in fact NP-hard\cite{cooper1990computational}. So, instead, most of my project focuses on approximate inference.
+This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions. Exact inference of this kind only works on models that can be represented as finite networks, and exact inference for bayesian networks is in fact NP-hard\cite{cooper1990computational}. So instead, most of my project focuses on approximate inference.
 
 \subsection{Rejection Sampling} \label{sec:rej}
 \subsection{Importance Sampling} \label{sec:imp}
