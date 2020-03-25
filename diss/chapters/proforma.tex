@@ -1,40 +1,33 @@
 \immediate\write18{texcount -inc -sum -1 diss.tex > wordcount.txt}
 \immediate\write18{cloc  --yaml `git ls-files ..` | grep 'code: ' | tail -n 1 | sed  's/  code://g' > linecount.txt}
 
-
 {\large
-
 \begin{tabular}{ll}
-Candidate Number:   & Anik Roy                               \\
-College:            & Christ's College                       \\
-Project Title:      & A Probabilistic Programming            \\
-                    & Language in Ocaml                      \\
-Examination:        & Computer Science Tripos Part II        \\
-Word Count:         & \input{wordcount.txt}\footnotemark[1]  \\
-Final Line Count:   & \input{linecount.txt}\footnotemark[2]  \\
-Project Originator: & Dr R.~Mortier                          \\
-Supervisor:         & Dr R.~Mortier                          \\ 
-\end{tabular}
+Candidate Number:   & Anik Roy\\
+College:            & Christ's College\\
+Project Title:      & A Probabilistic Programming\\
+                    & Language in Ocaml\\
+Examination:        & Computer Science Tripos Part II\\
+Word Count:         & \input{wordcount.txt}\footnotemark[1]\\
+Final Line Count:   & \input{linecount.txt}\footnotemark[2]\\
+Project Originator: & Dr R. Mortier\\
+Supervisor:         & Dr R. Mortier\\ 
+\end{tabular} 
 }
 \footnotetext[1]{This word count was computed by \texttt{texcount -inc -sum -1 diss.tex}}
 \stepcounter{footnote}
 
-\footnotetext[2]{This line count was computed by \texttt{cloc (git ls-files)} and excludes blank lines and comments}
+\footnotetext[2]{This line count was computed by \texttt{cloc} and excludes blank lines and comments}
 \stepcounter{footnote}
 
 \section*{Original Aims of the Project}
 
-The original aim of was to design and implement a language in OCaml, which allows the user to specify probabilistic models in code, and perform inference on these models automatically. Since bayesian inference is intractable in practice, approximate algorithms need to be developed to achieve this. I aimed to allow users to build models from a set of primitive distributions, and choose from a selection of inference algorithms to perform inference. An efficient and expressive way to represent and combine distributions needed to be developed. The motivation is to separate the concerns of the defining generative models and performing inference.
+The original aim of was to design and implement a language in OCaml, which allows the user to specify probabilistic models in code, and perform inference on these models automatically. Since Bayesian inference is intractable in practice, approximate algorithms need to be developed to achieve this. I aimed to allow users to build models from a set of primitive distributions, and choose from a selection of inference algorithms to perform inference. An efficient and expressive way to represent and combine distributions needed to be developed. The motivation is to separate the concerns of the defining generative models and performing inference.
 
 \section*{Work Completed}
 I have successfully implemented the core of my project, completing all the initial requirements. My PPL exists as a shallowly embedded DSL in OCaml, and is able to represent a wide variety of models, and is not limited to finite graphical models or discrete distributions. I have implemented several inference procedures, exceeding my initial requirements, and shown that they are correct using statistical tests on simple problems solved analytically. I represent distributions as a GADT which is a monad, allowing distributions to be combined to build up models. I have also included functionality to easily create plots from distributions.
 
 % Can I say "universal" here, and if so, how do I justify it?
 
-
-
 \section*{Special Difficulties}
 None
-
-
-

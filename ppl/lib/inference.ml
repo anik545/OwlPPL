@@ -21,6 +21,18 @@ type infer_strat =
   | Forward (* forward sampling in webppl, no sampling *)
 [@@deriving show]
 
+let print_infer_strat = function
+    MH _ -> "metropolis hastings"
+  | SMC _ -> "particle filter"
+  | PC _ -> "particle cascade"
+  | PIMH _ -> "particle-independent metropolis-hastings"
+  | Importance _ -> "importance"
+  | Rejection _ -> "rejection"
+  | RejectionTrans _ -> "rejection"
+  | Prior -> "prior"
+  | Enum -> "enumeration"
+  | Forward -> "forward"
+
 
 let infer dist = function
   | MH(n) -> mh' n dist

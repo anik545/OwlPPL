@@ -2,9 +2,9 @@
 
 
 % sketch out what plots to include here
-% - plot of kl divergence wrt number of samples taken
-% - plot of running time wrt amount of data conditioned on
-% - plot of running time wrt number of particles (for smc)
+% - plot of kl divergence w.r.t. number of samples taken
+% - plot of running time w.r.t. amount of data conditioned on
+% - plot of running time w.r.t. number of particles (for smc)
 % - maximum memory footprint (against parameters as above)
 % - total memory footprint over time
 % box plots instead of just lines
@@ -18,34 +18,64 @@
 \section{Statistical tests}
 To evaluate the correctness of my PPL, I used statistical tests which measure goodness-of-fit, i.e. how similar two distributions are to each other. I compare the empirical distribution of 10,000 samples from an approximated distribution to an exact distribution which is calculated analytically. 
 
-For all tests described below, I set the null and alternative hypotheses as follows:
+For all tests described below, I set the significance level, $\alpha = 0.05$ and use null and alternative hypotheses as follows:
 
-$H_0:$ The sample data follow the exact distribution
-
+$H_0:$ The sample data follow the exact distribution\\
 $H_1:$ The sample data do not follow the exact distribution
 
-I set the significance level, $\alpha = 0.01$ for all subsequent tests.
-
-\subsection{Kolmogorov-smirnov}
-
-The Kolmogorov-Smirnov test is a non parametric test which is used to compare a set of samples with a distribution - this is the one-sample K-S test. There is also a two-sample K-S test, which compares two sets of samples against each other. I use the one-sample test here to compare samples from the inferred posteriors to their analytic solutions.
-
-The test statistic is as follows, with $F_n(x)$ being the empirical cumulative distribution of n samples, and $F(x)$ being the exact cumulative distribution
-
-$$F_{n}(x)={1 \over n}\sum _{i=1}^{n}I_{[-\infty ,x]}(X_{i})$$\\
-$$D_{n}=\sup _{x}|F_{n}(x)-F(x)|$$
-
-This test statistic is compared against the critical values of the Kolmogorov distribution, rejecting the null hypothesis if $\sqrt{n}D_n > K_\alpha$, where $K_\alpha$ is the critical value at the significance level $\alpha$, and $n$ is the number of samples.
 
 \subsection{Chi-squared}
 
-Since Kolmogorov-smirnov requires a ordering on elements (due to it's use of the cdf), it can be tricky to use with discrete distributions which don't have a default ordering. A different test that can be used in this case is the $\chi^2$ test.
+The $\chi^2$ test is a simple goodness-of-fit test which can test whether or not a given discrete distribution 
 
-The test statistic is as follows, with each i being an element in the distribution, $x_i$ is the observed number of samples with the value $i$, and $m_i$ is the expected number of samples for the value $i$.
+
+The test statistic is as follows, with each $i$ being a distinct element in the distribution, $x_i$ is the observed number of samples with the value $i$, and $m_i$ is the expected number of samples for the value $i$.
 
 $$X^{2}=\sum _{i=1}^{k}{\frac {(x_{i}-m_{i})^{2}}{m_{i}}}$$
 
 This test statistic is compared against the critical value (at the significance level) of the chi-squared distribution, with the degrees of freedom being $k-1$, where k is the number of possible values of the distribution.
+\subsubsection{Results}
+\begin{table}[!ht]
+	\centering
+	% \begin{tabular}{|l|l|l|l|l|}
+	% 	\hline
+	% 	          & rejection & importance & metropolis-hastings & particle filter \\ \hline
+	% 	sprinkler &           &            &                     &                 \\ \hline
+	% 	dice      &           &            &                     &                 \\ \hline
+	% \end{tabular}
+	\csvautotabular{data/hypothesis-chi.csv}
+	\caption{p-values of $\chi^2$ test on different models using different inference procedures}
+	\label{tab:chi-pvals}
+\end{table}
+
+\subsection{Kolmogorov-Smirnov}
+
+The Kolmogorov-Smirnov test is a non parametric test which is used to compare a set of samples with a distribution - this is the one-sample K-S test. There is also a two-sample K-S test, which compares two sets of samples against each other. I use the one-sample test here to compare samples taken from the inferred posteriors to their exact analytic solutions.
+
+The test statistic is as follows, with $F_n(x)$ being the empirical cumulative distribution of n samples, and $F(x)$ being the exact cumulative distribution
+
+$$F_{n}(x)=\frac{1}{n}\sum_{i=1}^{n}I_{[-\infty ,x]}(X_{i})$$\\
+$$D_{n}=\sup_{x}|F_{n}(x)-F(x)|$$
+
+This test statistic is compared against the critical values of the Kolmogorov distribution, rejecting the null hypothesis if $\sqrt{n}D_n > K_\alpha$, where $K_\alpha$ is the critical value at the significance level $\alpha$, and $n$ is the number of samples.
+
+\subsubsection{Results}
+
+Table \ref{tab:ks-pvals} shows that for all the continuous models considered, the p-value obtained from all tests are greater than then 0.05. This means we do not reject $H_0$ for any model/inference procedure combination, so can be confident (at the 5\% significance level) that the inference procedures are correct. This shows that the generated posterior is not significantly different from the real solution.
+
+\begin{table}[!ht]
+	\centering
+	% \begin{tabular}{|l|l|l|l|l|}
+	% 	\hline
+	% 	            & rejection & importance & metropolis-hastings & particle filter \\ \hline
+	% 	single coin &           &            &                     &                 \\ \hline
+	% 	hmm         &           &            &                     &                 \\ \hline
+	% \end{tabular}
+	\csvautotabular{data/hypothesis-ks.csv}
+	\caption{p-values of K-S test on different models using different inference procedures}
+	\label{tab:ks-pvals}
+\end{table}
+
 
 \section{Convergence of sampling}
 
@@ -61,19 +91,60 @@ Since we cannot compute this integral exactly (we only have the exact density fu
 
 The idea behind conducting this test is ensuring that the KL divergence decreases as we take more samples from the posterior. This ensures that the solution converges to the correct distribution. I also investigate the rate of convergence using this method.
 
-% Insert figures of num. samples against KL
+\begin{figure}[!ht]
+	\centering
+	\begin{tikzpicture}
+		\begin{loglogaxis}[
+				title={Coin model}, 
+				xlabel={number of samples}, 
+				ylabel={KL divergence},
+				width=0.45\textwidth
+			]
+			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_mh.csv};
+			\addlegendentry{mh}
+			% 
+			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_imp.csv};
+			\addlegendentry{importance}
+			% 
+			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_rej.csv};
+			\addlegendentry{rejection}			
+			% 
+			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_smc.csv};
+			\addlegendentry{smc}
+			% 
+		\end{loglogaxis}
+	\end{tikzpicture}
+	\begin{tikzpicture}
+		\begin{loglogaxis}[
+				title={Sprinkler model}, 
+				xlabel={number of samples}, 
+				ylabel={KL divergence},
+				width=0.45\textwidth
+			]
+			\addplot table [x index=0, y index=1, col sep=comma] {data/sprinkler_mh.csv};
+			\addlegendentry{mh}
+			% 
+			\addplot table [x index=0, y index=1, col sep=comma] {data/sprinkler_rej.csv};
+			\addlegendentry{rejection}
+			% 
+		\end{loglogaxis}
+	\end{tikzpicture}
+	\caption{Plot of KL-divergence with increasing number of samples for different models and inference procedures}
+	\label{fig:kl}
+\end{figure}
+
 
 \section{Performance}
-I evaluated the performance of my ppl against anglican, webppl, and edward.
+I evaluated the performance of my ppl against Anglican, WebPPL, and Edward.
 % explain why i chose these languages to compare against?
-For sequential monte carlo algorithms, I compared running times with regards to the number of particles used.
-
-% don't have jsut one subsection
+For sequential Monte Carlo algorithms, I compared running times with regards to the number of particles used.
+				
+% don't have just one subsection
 \subsection{Profiling}
 \subsubsection{Spacetime}
-\subsubsection{Gprof}
-
+\subsubsection{GProf}
+				
 \section{Comparison to other PPLs}
-
+				
 \subsection{A simple model}
 \subsection{A more complex model}

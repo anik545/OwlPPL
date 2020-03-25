@@ -1,6 +1,6 @@
-(executable
-(modules test_models models)
- (name test_models)
+(executables
+ (names test_models test_hypothesis test_kl)
+ (modules test_models models test_kl test_hypothesis)
  (libraries core owl ppl alcotest))
 
 (tests

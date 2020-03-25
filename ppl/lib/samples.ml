@@ -80,8 +80,8 @@ end
 
 (* TODO: do one for continuous dists as well *)
 
-module ContinuousSamples: Samples = struct
-  type 'a t = ('a, float) Map.Poly.t
-  [@@deriving sexp]
+(* module ContinuousSamples: Samples = struct
+   type 'a t = ('a, float) Map.Poly.t
+   [@@deriving sexp]
 
-end
+   end *)

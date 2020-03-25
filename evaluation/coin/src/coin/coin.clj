@@ -1,4 +1,4 @@
-(ns coin
+(ns coin.coin
   (:use [anglican emit runtime]))
 
 (defquery coin

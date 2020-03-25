@@ -2,6 +2,7 @@
 open Ppl
 open Core
 
+(* coin, see 9 heads out of 10 flips *)
 let single_coin = 
   let pr = continuous_uniform 0. 1. in
   let toss t = condition' (fun p -> Primitives.(pdf @@ binomial 10 p) t) in
@@ -10,9 +11,11 @@ let single_coin =
   (* let posterior' = condition (fun p -> pdf (Binomial(10,p)) obs) (continuous_uniform 0. 1.) in *)
   posterior
 (* exact posterior:  Beta(x+ 1; n-x+ 1) *)
+(* here, x=9, n=10 *)
+let single_coin_exact = Primitives.beta 10. 2.
 
 let flip = bernoulli
-let grass_model = fun () ->
+let grass_model' = fun () ->
   let* cloudy    = flip 0.5 in
   let* rain      = flip (if cloudy then 0.8 else 0.2) in
   let* sprinkler = flip (if cloudy then 0.1 else 0.5) in
@@ -23,4 +26,5 @@ let grass_model = fun () ->
   let wet_grass = b && rain || c && sprinkler in
   condition wet_grass 
     (return rain)
-;;
+let grass_model = grass_model' ()
+let grass_model_exact = Primitives.categorical [(true,0.704225);(false,0.295775)]

@@ -56,26 +56,12 @@ struct
             |> normalise
             |> normalise_density
     in
-    (* pp_hist Format.std_formatter h;
-       printf "\n";
-       Array.iter samples ~f:(fun i -> printf "%f " i);
-       printf "\n";
-       Array.iter h.bins ~f:(fun i -> printf "%f " i);
-       printf "\n";
-       Array.iter h.counts ~f:(fun i -> printf "%d " i);
-       printf "\n"; *)
-    (* let () = match h.normalised_counts with 
-        Some s ->
-        Array.iter s ~f:(fun i -> printf "%f " i);
-        printf "\n";
-       | None -> () in *)
     let pdf_q = match h.density with Some pdf_q -> pdf_q | None -> [||] in
     let sum = ref 0. in 
     for i = 0 to Array.length pdf_q - 1 do
       let mp = (h.bins.(i + 1) +. h.bins.(i)) /. 2. in
       let f_p = P.pdf p mp in
       let f_q = pdf_q.(i) in
-      (* printf "%d %f %f %f %f %f %f \n" i h.bins.(i + 1) h.bins.(i) f_p f_q mp (f_p *. log (f_p /. f_q)); *)
       if  Float.(f_q = 0.) then () else sum := !sum +. (f_p *. log (f_p /. f_q))
     done;
     !sum /. float_of_int n
@@ -87,9 +73,9 @@ struct
     (* let ecdf x = ecdf_map d in *)
     let h = Owl_stats.ks_test ~alpha (take_k_samples n d) (P.cdf d') in
     if h.reject then
-      Printf.printf "two dists are not equal with p=%f" h.p_value
+      Printf.printf "two dists are not equal with p=%f\n" h.p_value
     else
-      Printf.printf "two dists are equal with p=%f" h.p_value
+      Printf.printf "two dists are equal with p=%f\n" h.p_value
     ;
     h
 
@@ -106,9 +92,9 @@ struct
     let df = Float.of_int @@ List.length supp - 1 in
     let p = Owl_stats.chi2_cdf ~df test_stat in
     if Float.(p < alpha) then
-      Printf.printf "two dists are not equal with p=%f" p
+      Printf.printf "two dists are not equal with p=%f\n" p
     else
-      Printf.printf "two dists are equal with p=%f" p
+      Printf.printf "two dists are equal with p=%f\n" p
     ;
     {reject = Float.(p > test_stat);p_value=p;score=p}
 end
