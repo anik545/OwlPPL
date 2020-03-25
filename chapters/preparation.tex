@@ -4,7 +4,7 @@ In this chapter, I will discuss the research done before starting the project, a
 
 \section{Starting Point}
 
-There do exist PPLs for OCaml, such as IBAL \cite{kiselyov2009embedded}, as well as PPLs for other languages, such as WebPPL - JS\cite{mobus2018structure}, Church - LISP\cite{goodman2012church} or Infer.Net - F\#\cite{wang2011using} to name a few. My PPL can draw on some of the ideas introduced by these languages, particularly in implementing efficient inference engines. I will need to research the different approaches taken by these PPLs and decide what form of PPL to implement, especially in deciding the types of model I will want my PPL to be able to represent and the inference methods I implement.
+There do exist PPLs for OCaml, such as IBAL \cite{kiselyov2009embedded}, as well as PPLs for other languages, such as WebPPL - JavaScript\cite{mobus2018structure}, Church - LISP\cite{goodman2012church} or Infer.Net - F\#\cite{wang2011using} to name a few. My PPL can draw on some of the ideas introduced by these languages, particularly in implementing efficient inference engines. I will need to research the different approaches taken by these PPLs and decide what form of PPL to implement, especially in deciding the types of model I will want my PPL to be able to represent and the inference methods I implement.
 
 I will be using an existing OCaml numerical computation library (Owl). This library does not contain methods for probabilistic programming in general, although it does contain modules which will help in the implementation of an inference engine such as efficient random number generation and lazy evaluation.
 
@@ -16,11 +16,11 @@ Before starting to write any code, I made sure to set out the features I aimed t
 
 % TODO: which tense to use here - past, say "this met the success criteria as follows"
 \begin{itemize}
-    \item \textbf{Language Features}: Since I have written an embedded DSL, a user of my PPL should be able to take advantage of all standard OCaml features in the deterministic parts of their models. I need to make sure that this is the case, and features such as recursive functions will work.
-    \item \textbf{Available distributions}: I aimed to make sure my PPL has at minimum the bernoulli and normal distributions available as basic building blocks to build more complex probabilistic programs.
-    \item \textbf{Correctness} of inference: I used the PPL developed on example problems to ensure correct results are produced. These results were compared to results produced in other PPLs as well as comparisons to analytic solutions for simple problems.
-    \item \textbf{Available Inference Algorithms}: I aimed to include at least one available inference algorithm. However, since different problems are more or less well suited to different general-purpose inference procedures, I wrote implementations for five separate algorithms.
-    \item \textbf{Performance}: This is a quantitative measure, comparing programs written in my PPL to equivalent programs in other PPLs. I used the profiling tools spacetime and gprof to profile my OCaml code. Performing inference should be possible within a reasonable amount of time, even though the project does not have a significant focus on performance. I also benchmarked the performance with regards to scalability, i.e. made sure the performance is still reasonable as models are conditioned on more data.
+	\item \textbf{Language Features}: Since I have written an embedded DSL, a user of my PPL should be able to take advantage of all standard OCaml features in the deterministic parts of their models. I need to make sure that this is the case, and features such as recursive functions will work.
+	\item \textbf{Available distributions}: I aimed to make sure my PPL has at minimum the Bernoulli and normal distributions available as basic building blocks to build more complex probabilistic programs.
+	\item \textbf{Correctness} of inference: I used the PPL developed on example problems to ensure correct results are produced. These results were compared to results produced in other PPLs as well as comparisons to analytic solutions for simple problems.
+	\item \textbf{Available Inference Algorithms}: I aimed to include at least one available inference algorithm. However, since different problems are more or less well suited to different general-purpose inference procedures, I wrote implementations for five separate algorithms.
+	\item \textbf{Performance}: This is a quantitative measure, comparing programs written in my PPL to equivalent programs in other PPLs. I used the profiling tools spacetime and GProf to profile my OCaml code. Performing inference should be possible within a reasonable amount of time, even though the project does not have a significant focus on performance. I also benchmarked the performance with regards to scalability, i.e. made sure the performance is still reasonable as models are conditioned on more data.
 \end{itemize}
 
 \section{Professional Practice}
@@ -53,16 +53,16 @@ The major libraries I use, Owl and Jane Street Core, are both licensed under the
 \section{Tools and Technologies}
 The main tools I used are listed here:
 \begin{itemize}
-    \item Ocaml 4.08 - The language I wrote the main PPL library in
-    \item Dune - Build system for OCaml
-    \item Opam - OCaml package manager
-    \item Alcotest - Unit testing framework
-    \item Quickcheck - Random testing library
-    \item Spacetime - Memory profiler for OCaml
-    \item Landmarks - Profiler for OCaml
-    \item Owl - Scientific computing library in OCaml
-    \item VSCode (with ocaml extensions) - IDE for OCaml development
-    \item Git with GitHub - version control
+	\item Ocaml 4.08 - The language I wrote the main PPL library in
+	\item Dune - Build system for OCaml
+	\item Opam - OCaml package manager
+	\item Alcotest - Unit testing framework
+	\item Quickcheck - Random testing library
+	\item Spacetime - Memory profiler for OCaml
+	\item Landmarks - Profiler for OCaml
+	\item Owl - Scientific computing library in OCaml
+	\item VSCode (with ocaml extensions) - IDE for OCaml development
+	\item Git with GitHub - version control
 \end{itemize}
 
 Using OCaml 4.08 allows me to use new features of OCaml, in particular the ability to define custom let operators as syntax sugar for monads. The dune build system also allows me to more easily manage building and testing my code, as well as automatically creating documentation from comments and function signatures in my code. The profilers I used allowed me to work out the causes of performance issues and remedy them. 
@@ -82,7 +82,7 @@ I have chosen to use the OCaml language to implement my PPL. There are many feat
 
 \section{Owl}
 
-Owl is a scientific computing library written for OCaml \cite{owl}. Importantly for my PPL, it contains functions for working with multi-dimensional arrays, as well as a wide variety of statistical functions. In particular, it contains functionality relating to many common distributions, efs.g. normal, beta, binomial, etc. Since my language will allow the user to combine these basic distributions into larger models, I will need to use these functions to allow sampling from and the ability to perform inference on these models. In particular, it is important to be able to find the probability density function (pdf) and cumulative density function (cdf) of these distributions as well as sample from them. Another important feature of owl is it's plotting functionality which enabled me to write functions which let me visualise output distributions, as well as visualising performance statistics, all directly from OCaml.
+Owl is a scientific computing library written for OCaml \cite{owl}. Importantly for my PPL, it contains functions for working with multi-dimensional arrays, as well as a wide variety of statistical functions. In particular, it contains functionality relating to many common distributions, e.g. normal, beta, binomial, etc. Since my language will allow the user to combine these basic distributions into larger models, I will need to use these functions to allow sampling from and the ability to perform inference on these models. In particular, it is important to be able to find the probability density function (pdf) and cumulative density function (cdf) of these distributions as well as sample from them. Another important feature of owl is it's plotting functionality which enabled me to write functions which let me visualise output distributions, as well as visualising performance statistics, all directly from OCaml.
 
 % Should these parts be here? Do I explain the methods here or in the implementation section?
 \section{Probability Monad}
@@ -95,31 +95,32 @@ Monads are a design pattern commonly used in functional programming languages.
 The key data structure I use to model probability distributions is a monad. This allows me to compose distributions easily, by using the output from one distribution in another using the bind operator. In OCaml, I can also use the new (let*) operators to make this more ergonomic, and make code look more natural (as opposed to using the \texttt{>>=} operator everywhere).
 
 \section{Approaches to probabilistic programming}
-Existing PPLs take several different forms, both as standalone and embedded languages. The main tradeoff that is made in the design of PPLs is the number of models that can be expressed in the language compared to how efficient inference is. One approach is graph-based, where a \textit{factor graph} is generated from the program, over which efficient inference can take place. This approach can be seen in languages such as infer.NET or JAGS, and has the benefit of very fast inference, particularly since efficient computation graph frameworks can be leveraged - an example is edward \cite{}, which uses tensorflow. However, these languages usually cannot represent infinite models or unbounded recursion. Another approach, taken by the likes of webppl or anglican, is trace-based. This approach considers execution traces, with a `trace' being one run of a program, with all the intermediate variables taking a particular value. Inference algorithms can reason about these traces in order to produce a posterior distribution, as will be seen in the next section. A trace-based approach often leads to clearer programs, since we are not working with a computation graph. It also leads to more models being able to be expressed, since we are not limited by the constraints of a graph. However inference is often slower, particularly when dealing with data in high dimensions, since the algorithms need to be more general purpose, and often converge slower.
+Existing PPLs take several different forms, both as standalone and embedded languages. The main trade-off that is made in the design of PPLs is the number of models that can be expressed in the language compared to how efficient inference is. One approach is graph-based, where a \textit{factor graph} is generated from the program, over which efficient inference can take place. This approach can be seen in languages such as infer.NET or JAGS, and has the benefit of very fast inference, particularly since efficient computation graph frameworks can be leveraged - an example is Edward \cite{edward}, which uses TensorFlow as a backend. However, these languages usually cannot represent infinite models or unbounded recursion. Another approach, taken by the likes of WebPPL or Anglican, is trace-based. This approach considers execution traces, with a `trace' being one run of a program, with all the intermediate variables taking a particular value. Inference algorithms can reason about these traces in order to produce a posterior distribution, as will be seen in the next section. A trace-based approach often leads to clearer programs, since we are not working with a computation graph. It also leads to more models being able to be expressed, since we are not limited by the constraints of a graph. However inference is often slower, particularly when dealing with data in high dimensions, since the algorithms need to be more general purpose, and often converge slower.
 
 \section{Bayesian Inference}
-Inference is the key motivating feature of probabilistic programming, and is a way to infer a distribution over the parameters based on the data we observe. The main feature of bayesian inference is that we assign every model some prior belief. Often this prior is chosen based on our knowledge of the problem, but the prior can also be uninformative. The goal of bayesian inference is to calculate the posterior distribution, which can be represented by bayes formula,
+Inference is the key motivating feature of probabilistic programming, and is a way to infer a distribution over the parameters based on the data we observe. The main feature of Bayesian inference is that we assign every model some prior belief. Often this prior is chosen based on our knowledge of the problem, but the prior can also be uninformative. The goal of Bayesian inference is to calculate the posterior distribution, which can be represented by Bayes' formula,
 
 
 $$P(A\mid B)={\frac {P(B\mid A)P(A)}{P(B)}}$$
 
-with $P(A)$ being the prior, and $P(B\mid A)$ being the likelihood model we define (which is a program in the PPL setting).
+with $P(A)$ being the prior, and $P(B\mid A)$ being the likelihood model we define. In the PPL setting, the prior is the generative model we define, with condition statements defining the likelihood. Running inference on the program then produces a sampler for the posterior.
 
 This formula hold for the continuous case too, using probability density functions ($f_X$),
 
 $$ f_{X\mid Y=y}(x)={\frac {f_{Y\mid X=x}(y)f_{X}(x)}{f_{Y}(y)}} $$
 
-Unfortunately, exact bayesian inference is usually computationally infeasible, especially when the number of random variables we consider is large. For example, consider a set of discrete random variables ${X_i}$, with p the joint probability distribution of all $X_i$. The marginal distribution of any individual $X_i$ is:
+Unfortunately, exact Bayesian inference is usually computationally infeasible, especially when the number of random variables we consider is large. For example, consider a set of discrete random variables ${X_i}$, with p the joint probability distribution of all $X_i$. The marginal distribution of any individual $X_i$ is:
 
-$$P(X_i=x_i) = \Sigma_{} $$
+% How does this relate to the inference problem?
+$$P(X_i=x) = \sum_{j=0}^{50} $$
 
-If we have 50 variables which can take one of two values, then we have to sum over $2^{50}$ values. There do exist some algorithms which operate on bayesian networks (DAGs which represent random variables and their interdependence), and reduce the number of calculations needed. These include methods such as \textit{Variable Elimination} or \textit{Message Passing}.
+If we have 50 variables which can take one of two values, then we have to sum over $2^{50}$ values. There do exist some algorithms which operate on Bayesian networks (DAGs which represent random variables and their interdependence), and reduce the number of calculations needed. These include methods such as \textit{Variable Elimination} or \textit{Message Passing} \cite{belief-prop} \cite{}.
 
-Alternatively, in the continuous case the formula 
+Alternatively, in the continuous case the formula is
 
-$$P(\theta|x)=P(x|\theta)P(\theta)\over{P(x)}$$
+$$P(\theta\mid x)=\frac{P(x\mid\theta)P(\theta)}{P(x)}$$
 with 
-$$ P(x)=\int_{\Theta}P(x,\theta)d\theta $$
+$$P(x)=\int_{\Theta}P(x,\theta)~d\theta $$
 
 The normalizing constant here is an integral that often does not have an analytic solution, and so must be approximated. Another issue is that directly sampling from a distribution requires that we also invert this formula.
 
@@ -129,10 +130,10 @@ The normalizing constant here is an integral that often does not have an analyti
 
 % https://www.cs.ubc.ca/~fwood/teaching/OXWASP_CDT/probabilistic_programming.pdf
 % http://www.robots.ox.ac.uk/~fwood/anglican/assets/pdf/Wood-AISTATS-2014.pdf
-Inference algorithms are ways to systematically generate samples from posterior distributions given a generative model and a prior. In probabilistic programming, a model consists of latent variables and observed variables, and a single execution of a model (a program) can be thought of as an assignment to each of these variables, known as an \textit{execution trace}. This can be defined mathematically as below, by bayes rule:
-
-$$p(x_{1:N}|y_{1:N})\propto ̃\tilde{p}(y_{1:N},x_{1:N})$$ 
-
+Inference algorithms are ways to systematically generate samples from posterior distributions given a likelihood function and a prior distribution. In probabilistic programming, a model consists of latent variables and observed variables, and a single execution of a model (a program) can be thought of as an assignment to each of these variables, known as an \textit{execution trace}. This can be defined mathematically as below, by Bayes' rule:
+% 
+$$p(x_{1:N}|y_{1:N})\propto \tilde{p}(y_{1:N},x_{1:N})$$ 
+% 
 Here, $p$ is the posterior distribution of a particular trace $x$, given the observed variables $y$
 The aim then is to find the posterior over the latent variables we are interested in, which we can specify within the program, either as part of the model, or outside it in a query to the model.
 
@@ -140,7 +141,7 @@ The aim then is to find the posterior over the latent variables we are intereste
 % probably in implementation
 \subsection{Exact Inference}
 
-Exact Inference is the simplest method of calculating the posterior, but is usually computationally intractable. It involves calculating bayes formula exactly, of which calculating the normalising constant is usually the problem. To sample directly, we would also need to find the inverse cumulative distribution to be able to use the inversion sampling method.
+Exact Inference is the simplest method of calculating the posterior, but is usually computationally intractable. It involves calculating Bayes formula exactly, of which calculating the normalising constant is usually the problem. To sample directly, we would also need to find the inverse cumulative distribution to be able to use the inversion sampling method.
 
 For discrete posterior distributions it can be thought of as calculating the probability of every possible value of the variable of interest. Since a random variable will be dependent on several others, this involves finding every possible combination of these variables and their outcomes.
 
@@ -159,11 +160,11 @@ Importance sampling is another simple method, improving on rejection sampling, t
 
 \subsection{Monte Carlo Markov Chains (MCMC)}
 
-MCMC methods involve constructing a Markov chain with a stationary distribution equal to the posterior distribution. A markov chain is a statistical model consisting of a sequence of events, where the probability of any event depends only on the previous event. The stationary distribution is the distribution over successive states that the chain converges to.
+MCMC methods involve constructing a Markov chain with a stationary distribution equal to the posterior distribution. A Markov chain is a statistical model consisting of a sequence of events, where the probability of any event depends only on the previous event. The stationary distribution is the distribution over successive states that the chain converges to.
 
-There exists several algorithms for finding this markov chain, for example metropolis-hastings. This algorithm requires that we have a function, $f(x)$, which is proportional to the density of the distribution. This function is easy to compute for the posterior, since it is simply the prior multiplied by the posterior - the normalising constant can be ignored since we only need a proportional function.
+There exists several algorithms for finding this Markov chain, for example metropolis-hastings. This algorithm requires that we have a function, $f(x)$, which is proportional to the density of the distribution. This function is easy to compute for the posterior, since it is simply the prior multiplied by the posterior - the normalising constant can be ignored since we only need a proportional function.
 
 \subsection{Sequential Monte Carlo (SMC)}
 
-SMC methods are algorithms which are based on using large numbers of weighted samples (`particles') to represent a posterior distribution. These particles are updated and resampled from in order to converge the set of particles to the posterior.
+SMC methods are algorithms which are based on using large numbers of weighted samples (`particles') to represent a posterior distribution. These particles are updated and re-sampled from in order to converge the set of particles to the posterior.
 

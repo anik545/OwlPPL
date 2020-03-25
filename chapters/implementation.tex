@@ -11,7 +11,7 @@ The Primitives module contains an type for representing primitive distributions.
 
 The Plot module contains helper functions which wrap around Owl\_plplot, allowing users to easily create visualisations from distributions defined in my ppl.
 
-The \texttt{evaluation} directory contains code to compare my ppl to both hand-written inference procedures, as well as equivalent programs in other ppls. There are several directories, which each correspond to a particular problem/model, for example the \texttt{hmm} folder for an example of a hidden markov model.
+The \texttt{evaluation} directory contains code to compare my ppl to both hand-written inference procedures, as well as equivalent programs in other PPLs. There are several directories, which each correspond to a particular problem/model, for example the \texttt{hmm} folder for an example of a hidden Markov model.
 
 All code is written in OCaml 4.08, with the main dependencies being Jane Street's \texttt{Core} and \texttt{Owl} \cite{owl}.
 
@@ -27,7 +27,7 @@ The type signature of bind is \texttt{'a m -> ('a -> 'b m) -> 'b m}, and return 
 
 % explain monads here?
 
-However, there are many different underlying data structures which can be used to represent distributions. The simplest is a list of pairs representing a set of values and corresponding probabilities, \texttt{('a * float) list}. This is a very convenient and natural way to represent discrete distributions, with return and bind defined as in listing \ref{lst:monad_plist}. Here, \texttt{return} gives us the distribution with just one value, and bind combines a distribution with a function that takes every element from the initial distribution and applies a function that creates a set of new distributions. The new distributions are then 'flattened' and normalised. This approach has been used to create functional probabilistic languages \cite{erwig}, but has several drawbacks, primarily the fact that it cannot be used to represent continuous distributions, and that inference is not efficient - there is no information from the model, encoded in this representation, such as how random variables are combined or from what distributions they came from.
+However, there are many different underlying data structures which can be used to represent distributions. The simplest is a list of pairs representing a set of values and corresponding probabilities, \texttt{('a * float) list}. This is a very convenient and natural way to represent discrete distributions, with return and bind defined as in listing \ref{lst:monad_plist}. Here, \texttt{return} gives us the distribution with just one value, and bind combines a distribution with a function that takes every element from the initial distribution and applies a function that creates a set of new distributions. The new distributions are then `flattened' and normalised. This approach has been used to create functional probabilistic languages \cite{erwig}, but has several drawbacks, primarily the fact that it cannot be used to represent continuous distributions, and that inference is not efficient - there is no information from the model encoded in this representation, such as how random variables are combined or from what distributions they came from.
 
 % TODO: finish the snippet, write unduplicate properly
 \lstinputlisting[language={Caml},caption={Simple Probability Monad},label={lst:monad_plist}]{code_snippets/probmonad_list.ml}
@@ -70,7 +70,7 @@ Inference can be thought of as a program transformation \cite{scibior2015practic
 
 Since I have used a trace-based approach, we can characterise the posterior probability of a trace as (from the previous chapter):
 % https://www.robots.ox.ac.uk/~twgr/assets/pdf/rainforth2017thesis.pdf - pg.52
-$$p(x_{1:N}|y_{1:N})\propto ̃\tilde{p}(y_{1:N},x_{1:N})$$
+$$p(x_{1:N}|y_{1:N})\propto\tilde{p}(y_{1:N},x_{1:N})$$
 
 We can now see how this formula corresponds to a program in my ppl. The example below is a very simple model, which adds two numbers drawn from discrete distributions, and observes a value.
 
@@ -81,7 +81,7 @@ Enumeration is the simplest way to perform exact inference on probabilistic prog
 
 \lstinputlisting[language={Caml},caption={Enumerating all paths through a model},label={lst:enum}]{code_snippets/enumerate.ml}
 
-This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions. Exact inference of this kind only works on models that can be represented as finite networks, and exact inference for bayesian networks is in fact NP-hard\cite{cooper1990computational}. So instead, most of my project focuses on approximate inference.
+This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions. Exact inference of this kind only works on models that can be represented as finite networks, and exact inference for Bayesian networks is in fact NP-hard\cite{cooper1990computational}. So instead, most of my project focuses on approximate inference.
 
 \subsection{Rejection Sampling} \label{sec:rej}
 \subsection{Importance Sampling} \label{sec:imp}
@@ -94,7 +94,7 @@ This method is very naive, and therefore inefficient. Since we essentially take 
 
 \subsection{Sprinkler}
 % to show exact inference on discrete model
-The Sprinkler model is a commonly used example in bayesian inference due to it's simplicity. It is an example of a \textit{bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}
+The sprinkler model is a commonly used example in Bayesian inference due to it's simplicity. It is an example of a \textit{Bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}
 
 \begin{figure}[!htb]
     \centering
@@ -108,7 +108,7 @@ The Sprinkler model is a commonly used example in bayesian inference due to it's
 % include graph of beta compared to computed posterior
 
 \subsection{HMM}
-Hidden markov models are slightly more involved models, where we have a sequence of hidden states, which emit observed states. There are two distributions involved here, the transition distribution, which defines how likely the next state is given the current state, and the emmission distribution, which is the 
+Hidden Markov models are slightly more involved models, where we have a sequence of hidden states, which emit observed states. There are two distributions involved here, the transition distribution, which defines how likely the next state is given the current state, and the emission distribution, which is the 
 % use forward-backward to get exact posterior
 
 \subsection{Linear Regression}

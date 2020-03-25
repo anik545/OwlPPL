@@ -1,5 +1,0 @@
-(executables
- (names coin)
- (libraries ppl landmarks)
- (preprocess (pps landmarks.ppx --auto))
- )
