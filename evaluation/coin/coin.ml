@@ -1,17 +1,12 @@
 open Ppl
-
-let f () = 
-  (* let coin heads = 
-     let* coinweight = continuous_uniform 0. 1. in
-     observe heads Primitives.(binomial 10 coinweight)
-      (return coinweight)
-     in *)
+open Core
+let coin_mean inf () = 
   let coin heads = 
     let posterior = condition' (fun p -> Primitives.(pdf @@ binomial 10 p) heads) (continuous_uniform 0. 1.) in
     posterior
   in
 
-  let post_single_coin = smcStandard' 100 @@ coin 9 in
+  let post_single_coin = infer (coin 9) inf in
   let mn  = sample_mean ~n:10000 (post_single_coin) (* 0.833 *) in
   mn
 
@@ -19,17 +14,21 @@ let time f =
   let t = Unix.gettimeofday () in
   let res = f () in
   let t1 = Unix.gettimeofday () in
-  Printf.printf "Execution time: %f seconds\n"
-    (t1 -. t);
-  res
+  let exec_time = (t1 -. t) in
+  Printf.printf "Execution time: %f seconds\n" exec_time;
+  res, exec_time*.1000.
 
-let f' () =
-  let x = ref 0. in
-  for _ = 0 to 10000 do
-    x := !x +. Owl_stats_dist.beta_rvs ~a:10. ~b:2.
-  done;
-  !x /. 10000.
+let model = 
+  try (Sys.get_argv ()).(1)
+  with Invalid_argument _ -> "mh"
 
-let mn = time f
+let i = match model with
+    "mh" -> MH(100)
+  | "smc" -> SMC(100)
+  | "rej" -> Rejection(100,Hard)
+  | _ -> raise @@ Invalid_argument model
 
-let () = Printf.printf "%f" mn
+let mn,t = time (coin_mean i)
+(* let times = Array.init 10 ~f:(fun _ -> snd @@ time coin_mean) *)
+let () = Printf.printf "%f\n%f\n" mn t
+(* let () = Array.iter ~f:(printf "%f,") times *)

@@ -48,11 +48,13 @@ This test statistic is compared against the critical value (at the significance 
 	\label{tab:chi-pvals}
 \end{table}
 
+Table \ref{tab:chi-pvals} shows the results of carrying out the test on several inference procedures for different discrete models. None of the values are below 0.05, so we cannot reject the null hypothesis, so we conclude that, at the 5\% significance level, the distributions are not significantly different.
+
 \subsection{Kolmogorov-Smirnov}
 
 The Kolmogorov-Smirnov test is a non parametric test which is used to compare a set of samples with a distribution - this is the one-sample K-S test. There is also a two-sample K-S test, which compares two sets of samples against each other. I use the one-sample test here to compare samples taken from the inferred posteriors to their exact analytic solutions.
 
-The test statistic is as follows, with $F_n(x)$ being the empirical cumulative distribution of n samples, and $F(x)$ being the exact cumulative distribution
+The test statistic is as follows, with $F_n(x)$ being the empirical cumulative distribution of n samples, and $F(x)$ being the exact cumulative distribution.
 
 $$F_{n}(x)=\frac{1}{n}\sum_{i=1}^{n}I_{[-\infty ,x]}(X_{i})$$\\
 $$D_{n}=\sup_{x}|F_{n}(x)-F(x)|$$
@@ -78,7 +80,7 @@ Table \ref{tab:ks-pvals} shows that for all the continuous models considered, th
 
 
 \section{Convergence of sampling}
-
+% TODO: add a few lines to show difference between 
 I also used the KL-divergence metric to determine the (dis)similarity of two distributions. The formula for KL Divergence of discrete distributions $P$ and $Q$ is
 
 $${D_{\text{KL}}(P\parallel Q)=\sum _{x\in {\mathcal {X}}}P(x)\log \left({\frac {P(x)}{Q(x)}}\right)}$$
@@ -94,6 +96,9 @@ The idea behind conducting this test is ensuring that the KL divergence decrease
 \begin{figure}[!ht]
 	\centering
 	\begin{tikzpicture}
+		\pgfplotstableread[col sep = comma]{data/kl_coin_all.csv}\datatable
+		\pgfplotstablegetcolsof{\datatable}
+		\pgfmathtruncatemacro\numberofcols{\pgfplotsretval-1}
 		\begin{loglogaxis}[
 				title={Coin model}, 
 				xlabel={number of samples}, 
@@ -107,11 +112,16 @@ The idea behind conducting this test is ensuring that the KL divergence decrease
 			\addlegendentry{importance}
 			% 
 			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_rej.csv};
-			\addlegendentry{rejection}			
+			\addlegendentry{rejection}
 			% 
 			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_smc.csv};
 			\addlegendentry{smc}
-			% 
+			% % 
+			% \pgfplotsinvokeforeach{1,...,\numberofcols}{
+			% 	\addplot table [x index=0,y index=#1, col sep=comma] {data/kl_coin_all.csv};
+			% 	\pgfplotstablegetcolumnnamebyindex{#1}\of{\datatable}\to{\colname}
+			% 	\addlegendentryexpanded{\colname}
+			% }
 		\end{loglogaxis}
 	\end{tikzpicture}
 	\begin{tikzpicture}
@@ -135,7 +145,48 @@ The idea behind conducting this test is ensuring that the KL divergence decrease
 
 
 \section{Performance}
-I evaluated the performance of my ppl against Anglican, WebPPL, and Edward.
+% probabilistic c (paige14) makes the same comparison
+% TODO: measure performance with varying no. particles (measure KL with difference no. particles)
+
+I evaluated the performance of my ppl against Anglican, WebPPL, and Pyro. All of these languages are universal PPLs embedded in different host languages, just like my PPL.
+
+Figure \ref{fig:perf} shows how my PPL compares against these languages for a range of models and inference procedures. All the models have been introduced previously, and have been shown to produce correct results in my PPL when using the given inference procedures.
+
+\newcommand{\perfgraph}[2]{
+	\begin{tikzpicture}
+		\pgfplotstableread[col sep = comma]{#1}\datatable
+		\pgfplotstablegetcolsof{\datatable}
+		\pgfmathtruncatemacro\numberofcols{\pgfplotsretval-1}
+		\begin{axis}[
+				ylabel={time (ms)},
+				ymin=0,
+				legend style={at={(0.5,-0.15)},
+					anchor=north,legend columns=-1},
+				ybar,
+				xtick=data,
+				xticklabels from table={\datatable}{model},
+				title={#2},
+				width=0.45\textwidth
+			]
+			\pgfplotsinvokeforeach{1,...,\numberofcols}{
+				\pgfplotstablegetcolumnnamebyindex{##1}\of{\datatable}\to{\colname}
+				\addplot table [x expr=\coordindex,y index=##1, col sep=comma] {#1};
+				\addlegendentryexpanded{\colname}
+			}
+		\end{axis}
+	\end{tikzpicture}%
+}
+
+\begin{figure}[!ht]
+	\centering
+	\perfgraph{data/times_mh.csv}{Metropolis-Hastings}
+	\perfgraph{data/times_smc.csv}{Particle Filter}
+	\perfgraph{data/times_rej.csv}{Rejection}
+	\caption{Performance of my ppl against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 100 runs}
+	\label{fig:perf}
+\end{figure}
+
+
 % explain why i chose these languages to compare against?
 For sequential Monte Carlo algorithms, I compared running times with regards to the number of particles used.
 				

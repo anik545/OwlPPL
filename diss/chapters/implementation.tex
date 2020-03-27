@@ -97,15 +97,40 @@ This method is very naive, and therefore inefficient. Since we essentially take 
 The sprinkler model is a commonly used example in Bayesian inference due to it's simplicity. It is an example of a \textit{Bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}
 
 \begin{figure}[!htb]
-    \centering
-    \includegraphics[width=\textwidth]{figs/sprinkler-network.png}
-    \caption{Bayesian Network example}
-    \label{fig:sprinkler-network}
+	\centering
+	\includegraphics[width=\textwidth]{figs/sprinkler-network.png}
+	\caption{Bayesian Network example}
+	\label{fig:sprinkler-network}
 \end{figure}
 
 \subsection{Biased Coin}
 % to show analytically solvable continuous distribution
 % include graph of beta compared to computed posterior
+Modelling a biased coin shows an example of a very simple model with a continuous posterior that can be calculated analytically\cite{datasci}. 
+
+The model is of a coin that is tossed $n$ times to give $x$ heads. We do not know if the coin is biased or not, and would like to find out the bias, $p$ of the coin, where $p$ is the probability of heads, with $p=0.5$ being an unbiased coin.
+
+To find the posterior, we use an uninformative prior, the uniform. The likelihood model is a binomial.
+
+\begin{align*}
+	\Theta\sim Uniform(0,1)\\
+	X &\sim Binom(n,\theta)
+\end{align}
+
+We then use Bayes' rule to calculate the posterior.
+			    
+\begin{align*}						
+	Pr_{\Theta}(\theta \mid X=x) & = \frac{1}{\kappa}Pr_{\Theta}(\theta)Pr_X(x\mid\theta)    \\ 
+	                             & = \frac{1}{\kappa}{{n}\choose{x}}\theta^x(10\theta)^{n-x} \\
+	                             & = \frac{1}{\kappa'}\theta^x(1-\theta)^{n-x}               
+\end{align}
+$$\kappa'=\int_{\phi=0}^1\phi^x(1-\phi)^{n-x}~d\phi$$                        
+
+This results in the posterior, the beta distribution, specifically Beta$(x+1,n-x+1)$. 
+
+The program in my PPL is shown in listing \ref{lst:coin}, and demonstrates setting up the model, performing inference as well as finding the mean of the posterior. The application is to find the chance of the next coin flip landing heads. This example uses $n=10$ and $x=9$, so the mean produced is roughly 0.83, the mean of Beta$(10,2)$.
+
+\lstinputlisting[language={Caml},caption={Coin model},label={lst:coin}]{code_snippets/coin.ml}
 
 \subsection{HMM}
 Hidden Markov models are slightly more involved models, where we have a sequence of hidden states, which emit observed states. There are two distributions involved here, the transition distribution, which defines how likely the next state is given the current state, and the emission distribution, which is the 
@@ -117,6 +142,9 @@ Hidden Markov models are slightly more involved models, where we have a sequence
 
 % Need to show examples which can't be done in graph based thing
 % Need to explain why these examples are actually difficult.
+% http://www.cs.cmu.edu/~epxing/Class/10708-16/slide/lecture18-DP.pdf
+% This is a non-parametric bayesian model - 
+% no. of params is infinite, grows with size of dataset
 
 \section{Statistical tests}
 I had to implement a number of statistical tests in order to test the correctness of the output distribution. These tests are known as goodness-of-fit tests, and 

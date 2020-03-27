@@ -7,6 +7,9 @@ let x_vals = Owl.Arr.to_array (Owl.Arr.logspace ~base:10. 2. 4. 5)
 let x_vals = Array.map x_vals ~f:(fun x -> int_of_float x)
 
 let root_dir = "/home/anik/Files/work/project/diss/data"
+
+
+
 (* For generating csv to be plotted *)
 (* create array of x,y pairs *)
 let gen_csv ?fname model exact infer_strat 
@@ -22,16 +25,42 @@ let gen_csv ?fname model exact infer_strat
     arr
   | None -> arr
 
+let gen_csv' ?fname model exact infer_strats
+    (kl_method:?n:int -> 'a Primitives.primitive -> 'a dist -> likelihood) = 
+  let inferreds = Array.map ~f:(fun i -> infer model i) infer_strats in
+  let arr = Array.transpose @@
+    Array.map inferreds ~f:(fun inf -> 
+        Array.map x_vals ~f:(fun n -> kl_method ~n exact inf))
+  in
+  let arr = Option.value_exn arr in
+  match fname with
+  | Some name -> 
+    let name = sprintf "%s/%s" root_dir name in
+    let oc = Out_channel.create name in
+    let s = String.concat ~sep:"," (List.map ~f:(print_infer_strat_short) @@ Array.to_list infer_strats) in
+    fprintf oc "samples,%s\n" s;
+
+    Array.iteri arr ~f:(fun i a -> fprintf oc "%d,%s\n" x_vals.(i) (String.concat ~sep:"," (Array.to_list @@ Array.map ~f:(string_of_float) a)));
+
+    let () = Out_channel.close oc in  
+    arr
+  | None -> arr
+
 open Models
 (* coin *)
-(* let _ = gen_csv ~fname:"coin_mh.csv" single_coin single_coin_exact (MH 500) KL.kl_continuous
-   let _ = gen_csv ~fname:"coin_rej.csv" single_coin single_coin_exact (Rejection(300,Soft)) KL.kl_continuous
-   let _ = gen_csv ~fname:"coin_imp.csv" single_coin single_coin_exact (Importance 500) KL.kl_continuous
-   let _ = gen_csv ~fname:"coin_smc.csv" single_coin single_coin_exact (SMC 500) KL.kl_continuous *)
+(* let _ = gen_csv ~fname:"coin_mh.csv" single_coin single_coin_exact (MH 500) KL.kl_continuous *)
+(* let _ = gen_csv ~fname:"coin_rej.csv" single_coin single_coin_exact (Rejection(300,Soft)) KL.kl_continuous *)
+(* let _ = gen_csv ~fname:"coin_imp.csv" single_coin single_coin_exact (Importance 500) KL.kl_continuous *)
+(* let _ = gen_csv ~fname:"coin_smc.csv" single_coin single_coin_exact (SMC 500) KL.kl_continuous *)
+
+let is = [|MH 500;Rejection(300,Soft);Importance 500;SMC 500|]
+let _ = gen_csv' ~fname:"kl_coin_all.csv" single_coin single_coin_exact is KL.kl_continuous
 
 (* sprinkler *)
-let _ = gen_csv ~fname:"sprinkler_mh.csv" grass_model grass_model_exact (MH 500) KL.kl_discrete
-let _ = gen_csv ~fname:"sprinkler_rej.csv" grass_model grass_model_exact (Rejection(300,Soft)) KL.kl_discrete
+(* let _ = gen_csv ~fname:"sprinkler_mh.csv" grass_model grass_model_exact (MH 500) KL.kl_discrete *)
+(* let _ = gen_csv ~fname:"sprinkler_rej.csv" grass_model grass_model_exact (Rejection(300,Soft)) KL.kl_discrete *)
+let is = [|MH 500;Rejection(300,Soft);Importance 500;SMC 500|]
+let _ = gen_csv' ~fname:"kl_sprinkler_all.csv" single_coin single_coin_exact is KL.kl_continuous
 
 (* This stuff tests that the kl divergence function works *)
 let test_kl_function ()  =

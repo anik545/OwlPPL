@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@babel/preset-env": "^7.9.0",
+    "timeit": "^0.1.1",
+    "viz": "^1.2.0"
+  }
+}

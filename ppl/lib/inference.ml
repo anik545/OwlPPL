@@ -33,6 +33,17 @@ let print_infer_strat = function
   | Enum -> "enumeration"
   | Forward -> "forward"
 
+let print_infer_strat_short = function
+    MH _ -> "mh"
+  | SMC _ -> "smc"
+  | PC _ -> "pc"
+  | PIMH _ -> "pimh"
+  | Importance _ -> "importance"
+  | Rejection _ -> "rejection"
+  | RejectionTrans _ -> "rejection"
+  | Prior -> "prior"
+  | Enum -> "enumeration"
+  | Forward -> "forward"
 
 let infer dist = function
   | MH(n) -> mh' n dist

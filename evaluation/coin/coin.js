@@ -1,23 +1,39 @@
-var t0 = console.time("coin");
-
-var coin = function() {
-  var theta = uniform(0.0, 1.0);
-  observe(Binomial({ n: 10, p: theta }), 9);
-  return theta;
+var n = 1000;
+var coin_model = function(method) {
+  return function() {
+    var coin = function() {
+      var theta = uniform(0.0, 1.0);
+      observe(Binomial({ n: 10, p: theta }), 9);
+      return theta;
+    };
+    var inferred = Infer(method, coin);
+    let samples = repeat(n, function() {
+      return sample(inferred);
+    });
+    return listMean(samples);
+  };
 };
 
-var inferred = Infer(
-  { method: "MCMC", kernel: "MH", samples: 100000, burn: 100 },
-  coin
-);
+// repeat(10, function() {
+//   return timeit(coin_model(10000));
+// });
+var get_method = function() {
+  var method_arg = argv._[2];
+  if (method_arg === undefined || method_arg === "mh") {
+    return {
+      method: "MCMC",
+      kernel: "MH",
+      samples: n,
+      burn: 1000,
+      lag: 100
+    };
+  } else if (method_arg === "smc") {
+    return { method: "SMC", samples: n, particles: 100 };
+  } else if (method_arg === "rej") {
+    return { method: "rejection", samples: n };
+  }
+};
 
-var m = 0;
-var n = 10000;
-for (let x = 0; x < n; x++) {
-  m = m + sample(inferred);
-}
-var mean = m / n;
-console.log(mean);
-var t1 = console.timeEnd("coin");
-var x = sample(inferred);
-console.log(x);
+var method = get_method();
+var t = timeit(coin_model(method));
+t.runtimeInMilliseconds;
