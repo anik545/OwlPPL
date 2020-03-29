@@ -4,8 +4,6 @@ open Core
 type point_t  = float * float
 type param  = float * float
 
-
-
 let linreg_model i () = 
   (* observe exactly y=2x+0 *)
   (* let obs = List.init 10 ~f:(fun x -> let x = float_of_int x in (x,x*.2.)) in *)

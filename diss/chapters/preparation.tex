@@ -87,12 +87,11 @@ Owl is a scientific computing library written for OCaml \cite{owl}. Importantly 
 % Should these parts be here? Do I explain the methods here or in the implementation section?
 \section{Probability Monad}
 % how in-depth should my explanation of a monad be?
-
-\subsection{Monads}
-
 Monads are a design pattern commonly used in functional programming languages.
 
-The key data structure I use to model probability distributions is a monad. This allows me to compose distributions easily, by using the output from one distribution in another using the bind operator. In OCaml, I can also use the new (let*) operators to make this more ergonomic, and make code look more natural (as opposed to using the \texttt{>>=} operator everywhere).
+The key data structure I use to model probability distributions is a monad. This allows me to compose distributions easily, by using the output from one distribution in another using the bind operator. In OCaml, I can also use the new (let*) operators to make this more ergonomic, and make code look more natural (as opposed to using the \texttt{>>=} operator).
+
+It has been shown that probability distributions form a monad, \cite{giry1982categorical} \cite{jones1989probabilistic}, and that they can be used to create composed distributions \cite{ramsey2002stochastic}
 
 \section{Approaches to probabilistic programming}
 Existing PPLs take several different forms, both as standalone and embedded languages. The main trade-off that is made in the design of PPLs is the number of models that can be expressed in the language compared to how efficient inference is. One approach is graph-based, where a \textit{factor graph} is generated from the program, over which efficient inference can take place. This approach can be seen in languages such as infer.NET or JAGS, and has the benefit of very fast inference, particularly since efficient computation graph frameworks can be leveraged - an example is Edward \cite{edward}, which uses TensorFlow as a backend. However, these languages usually cannot represent infinite models or unbounded recursion. Another approach, taken by the likes of WebPPL or Anglican, is trace-based. This approach considers execution traces, with a `trace' being one run of a program, with all the intermediate variables taking a particular value. Inference algorithms can reason about these traces in order to produce a posterior distribution, as will be seen in the next section. A trace-based approach often leads to clearer programs, since we are not working with a computation graph. It also leads to more models being able to be expressed, since we are not limited by the constraints of a graph. However inference is often slower, particularly when dealing with data in high dimensions, since the algorithms need to be more general purpose, and often converge slower.

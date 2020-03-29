@@ -35,3 +35,40 @@ let time f =
     (t1 -. t);
   res
 ;;
+
+let memo f = 
+  let m = Hashtbl.create 10 in
+  let f' x = 
+    match Hashtbl.find_opt m x with
+    | Some n -> n
+    | None -> 
+      let el = f x in 
+      Hashtbl.add m x el;
+      el
+  in f'
+
+(* let x = memo (fun _ -> sample @@ beta 1. 1.) 
+   let y = x 5 *)
+exception Not_discrete
+exception Not_primitive
+
+let print_exact_exn (type a) (module S:Base.Stringable.S with type t = a) (d:a dist) = 
+  let open Core in
+  match d with
+    Primitive xs ->
+    let p = P.pdf xs in
+    let s = P.support xs in
+    let supp = (match s with 
+        | Discrete s -> s
+        | Continuous -> raise Not_discrete)
+    in
+    let ps = List.map ~f:(fun x -> x,p x) supp in
+    List.iter
+      ~f:(fun (el,p) -> Printf.printf "%s: %f\n" (S.to_string el) p)
+      ps;
+  | _ -> raise Not_primitive
+
+
+let print_exact_bool = print_exact_exn (module Base.Bool)
+let print_exact_int = print_exact_exn (module Base.Int)
+let print_exact_float = print_exact_exn (module Base.Float)
