@@ -291,7 +291,7 @@ Each sample counts as 0.01 seconds.
   0.00      0.07     0.00        1     0.00     0.00  camlPpl__Common__unduplicate_939
   0.00      0.07     0.00        1     0.00     0.00  camlPpl__Dist__continuous_uniform_501
   0.00      0.07     0.00        1     0.00     0.00  camlPpl__Dist__entry
-  0.00      0.07     0.00        1     0.00     0.00  camlPpl__Dist__prior1_613
+  0.00      0.07     0.00        1     0.00     0.00  camlPpl__Dist__prior_with_score_613
   0.00      0.07     0.00        1     0.00     0.00  camlPpl__Enum__entry
   0.00      0.07     0.00        1     0.00     0.00  camlPpl__Enum__exact_inference_3795
   0.00      0.07     0.00        1     0.00     0.00  camlPpl__Helpers__entry
@@ -1122,7 +1122,7 @@ index % time    self  children    called     name
 -----------------------------------------------
                 0.00    0.00       1/540422      camlDune__exe__Single_coin__entry [9]
                 0.00    0.00       1/540422      camlPpl__Dist__continuous_uniform_501 [340]
-                0.00    0.00       1/540422      camlPpl__Dist__prior1_613 [342]
+                0.00    0.00       1/540422      camlPpl__Dist__prior_with_scorewith_score_613 [342]
                 0.00    0.00       1/540422      camlPpl__Enum__entry [343]
                 0.00    0.00       1/540422      camlPpl__Mh__mh$27_3700 [349]
                 0.00    0.00       1/540422      camlCore_kernel__Quickcheck__entry [10252]
@@ -1185,7 +1185,7 @@ index % time    self  children    called     name
 [97]     0.0    0.00    0.00  210310         caml_next_frame_descriptor [97]
 -----------------------------------------------
                 0.00    0.00       1/210008      camlDune__exe__Single_coin__entry [9]
-                0.00    0.00       1/210008      camlPpl__Dist__prior1_613 [342]
+                0.00    0.00       1/210008      camlPpl__Dist__prior_with_score_613 [342]
                 0.00    0.00       1/210008      camlPpl__Enum__entry [343]
                 0.00    0.00       1/210008      camlPpl__Mh__mh$27_3700 [349]
                 0.00    0.00       2/210008      camlPpl__Enum__fun_3873 [238]
@@ -2691,12 +2691,12 @@ index % time    self  children    called     name
                 0.00    0.00       2/144793      caml_modify [100]
                 0.00    0.00       2/2           camlPpl__Dist__Dist_383 [289]
 -----------------------------------------------
-                                   1             camlPpl__Dist__prior1_613 [342]
+                                   1             camlPpl__Dist__prior_with_score_613 [342]
                 0.00    0.00       1/1           camlPpl__Mh__mh_937 [350]
-[342]    0.0    0.00    0.00       1+1       camlPpl__Dist__prior1_613 [342]
+[342]    0.0    0.00    0.00       1+1       camlPpl__Dist__prior_with_score_613 [342]
                 0.00    0.00       1/210008      camlPpl__Dist__bind_415 [98]
                 0.00    0.00       1/540422      caml_apply2 [93]
-                                   1             camlPpl__Dist__prior1_613 [342]
+                                   1             camlPpl__Dist__prior_with_score_613 [342]
 -----------------------------------------------
                 0.00    0.00       1/1           caml_program [6]
 [343]    0.0    0.00    0.00       1         camlPpl__Enum__entry [343]
@@ -2747,7 +2747,7 @@ index % time    self  children    called     name
 [350]    0.0    0.00    0.00       1         camlPpl__Mh__mh_937 [350]
                 0.00    0.00       2/210008      camlPpl__Dist__bind_415 [98]
                 0.00    0.00       2/540422      caml_apply2 [93]
-                0.00    0.00       1/1           camlPpl__Dist__prior1_613 [342]
+                0.00    0.00       1/1           camlPpl__Dist__prior_with_score_613 [342]
 -----------------------------------------------
                 0.00    0.00       1/1           caml_program [6]
 [351]    0.0    0.00    0.00       1         camlPpl__Monad__entry [351]
@@ -3336,7 +3336,7 @@ Index by function name
  [252] camlPpl__Dist__fun_2416 [394] camlStdlib__obj__entry [310] caml_int_compare
   [30] camlPpl__Dist__fun_2539 [185] camlStdlib__obj__raise_if_invalid_offset_271 [311] caml_int_of_string
   [31] camlPpl__Dist__fun_2542 [186] camlStdlib__obj__set_key_284 [242] caml_leave_blocking_section
- [342] camlPpl__Dist__prior1_613 [395] camlStdlib__output_string_224 [282] caml_leave_blocking_section_default (signals.c)
+ [342] camlPpl__Dist__prior_with_score_613 [395] camlStdlib__output_string_224 [282] caml_leave_blocking_section_default (signals.c)
   [96] camlPpl__Dist__return_413 [59] camlStdlib__parsing__entry [439] caml_lessequal
    [8] camlPpl__Dist__sample_504 [396] camlStdlib__pervasives__entry [14] caml_major_collection_slice
  [343] camlPpl__Enum__entry  [397] camlStdlib__printexc__entry [440] caml_make_free_blocks

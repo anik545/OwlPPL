@@ -1,6 +1,8 @@
 (env
  (debug
   (flags (:standard -g -w A-48)))
+  (noerr (flags (:standard )))
+
  (profile
   (ocamlopt_flags (:standard -p -w A-48))
   (flags (:standard -w A-48)))

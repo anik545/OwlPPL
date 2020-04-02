@@ -90,9 +90,18 @@ let cdf (type a) (d:a prim_dist) = let (module D) = d in D.cdf
 let sample (type a) (d:a prim_dist) = let (module D) = d in D.sample ()
 let support (type a) (d:a prim_dist) = let (module D) = d in D.support
 
+let new_primitive (type a) ~sample ~pdf ~cdf ~support = 
+  let module D = struct
+    type t=a
+    let sample=sample 
+    let pdf=pdf
+    let cdf=cdf
+    let support=support
+  end in
+  (module D:PRIM_DIST with type t=a)
 
 open Owl.Maths
-let possion l = 
+let poisson l = 
   (module struct 
     type t = int
     let sample () = 
@@ -113,7 +122,8 @@ let possion l =
     let support = Continuous
   end: PRIM_DIST with type t=int)
 
-open Owl.Maths
-let pdf k l = 
-  let open Float in
-  (l ** (float_of_int k)*exp(-l))/ fact k 
+
+(* open Owl.Maths
+   let pdf k l = 
+   let open Float in
+   (l ** (float_of_int k)*exp(-l))/ fact k  *)

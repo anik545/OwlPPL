@@ -29,11 +29,12 @@ I adopted several best practices in order to ensure the project was successful. 
 
 \subsection{Testing}
 
-Testing systems which are linked to randomness can be quite tricky, as it is difficult to test behaviour that is expected to change from one execution to the next. One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. Even with a fixed random seed, a change in code may cause new outputs even though the fundamental statistical property desired hasn't changed. Another approach is to perform some statistical test such as kolmogorov-smirnov \cite{}, to ensure distributions produced by my library are equal to what is expected. A problem with tests of this kind is that they are expected to fail sometimes, meaning unit tests will provide limited utility due to their inherent flakiness with random programs. In fact, since we expect these tests to fail a certain percentage of the time, if they do not fail they show a problem with our program.
+Testing systems which are linked to randomness can be quite tricky, as it is difficult to test behaviour that is expected to change from one execution to the next. One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. Even with a fixed random seed, a change in code may cause new outputs even though the fundamental statistical property desired hasn't changed. Another approach is to perform some statistical test such as kolmogorov-smirnov \cite{massey1951kolmogorov}, to ensure distributions produced by my library are equal to what is expected. A problem with tests of this kind is that they are expected to fail sometimes, meaning unit tests will provide limited utility due to their inherent flakiness with random programs. In fact, since we expect these tests to fail a certain percentage of the time, if they do not sometimes fail there is a problem with our program.
 
-As such, most of the unit tests I wrote are fairly simple and only catch very basic bugs. Unit tests were possible to write for the exact inference procedure when working with discrete distributions, since we always expect the same output distribution. However, all the other inference algorithms are approximate, so tests suffer from the problems described above.
+As such, most of the unit tests I wrote are fairly simple and only catch very basic bugs. Unit tests were possible to write for the exact inference procedure when working with discrete distributions, since we always expect the same output distribution. However, all the other inference algorithms are approximate, so tests suffer from the problems described above. I was still able to carry out a full evaluation, performing hypothesis tests such as the kolmogorov-smirnov or chi-squared tests.
 
-Despite this, I will still be able to carry out a full evaluation, performing hypothesis tests such as the kolmogorov-smirnov or chi-squared tests.
+However, there are several auxiliary functions that can be tested effectively using conventional methods, so I was able to test them as normal. I also used the \texttt{Quickcheck} library to perform tests using randomised data, which allows me to ensure certain invariants are preserved by functions.
+
 
 % talk about using very basic unit tests
 % unit testing ppl is 
@@ -67,31 +68,34 @@ The main tools I used are listed here:
 
 Using OCaml 4.08 allows me to use new features of OCaml, in particular the ability to define custom let operators as syntax sugar for monads. The dune build system also allows me to more easily manage building and testing my code, as well as automatically creating documentation from comments and function signatures in my code. The profilers I used allowed me to work out the causes of performance issues and remedy them. 
 
-% This feels like it should be in implementation.
-\section{Language Design}
-I chose to implement my language as a domain specific language (DSL) shallowly embedded into the main OCaml language. This allows models built in the ppl to be easily composed with other standard OCaml programs.
-
-Using a shallow embedding means we can use all of the features of OCaml as normal, including branching (if/then/else), loops, references, functions, and importantly, recursion. This can allow us to define models that do not terminate and are therefore invalid. However, we can write functions which are \textit{stochastic recursive}, that is, functions which have a probability of termination that tends to 1 as the number of successive calls tends to infinity. This leads to functions which terminate their recursion non-deterministically.
-
-I use a set of primitive distributions which can be combined (using arbitrarily complex deterministic OCaml code) to produce new more complex distribution. For example, one can take the sum of two discrete uniform distributions to simulate the addition of two dice rolls. 
-
-PPLs in general are similar to normal programming languages, but need to support two extra operations - \texttt{sample} and \texttt{condition} \cite{}. The sample function is for sampling from some distribution - either a primitive distribution or a user defined distribution.
-
 \section{OCaml}
 I have chosen to use the OCaml language to implement my PPL. There are many features of OCaml which make it suitable for writing a DSL. Using OCaml, I can make sure that expressions in the DSL are well-typed, so that programs don't fail to run. OCaml's algebraic datatypes also make it easy to represent probabilistic programs as trees, and pattern matching makes it easy to 'interpret' and transform these trees. The module system also makes sure that certain types are hidden from the user, which can ensure only valid structures are created by the user.
+
+\subsection{GADTs}
+The main data structure I use to represent distributions is GADT - a generalised algebraic data type. GADTs are similar to ADTs (sum types), in that they have a set of constructors, but the main difference is that these constructors can have their output types annotated. The fact that the return types of constructors can vary is what makes GADTs more general than normal ADTs, whose return types are all the same. In OCaml, the syntax for this is \texttt{type \_ t = Constructor : type' -> type' t | ...}. Since we can now know which constructors produce which types of t (e.g. an \texttt{int t} or a \texttt{float t}, etc.), functions can be defined to only accept certain constructors, and we can make sure the whole structure is well typed.
+
+\subsection{Monads}
+% how in-depth should my explanation of a monad be?
+Monads are a design pattern commonly used in functional programming languages.
+
+The key data structure I use to model probability distributions is a monad. A data type is a monad if it defines two operations, \texttt{return} and \texttt{bind}, and can be thought of as datatypes which `wrap' values. The return function takes a value and returns a monad wrapping that value. The bind function takes a monad and a function, and applies the function to the value wrapped inside the monad, and rewraps this value. The type must also satisfy a set of laws, which I omit here\cite{wadler1990comprehending}. Monads can be used to structure programs in a general way, and allow side effects to be described in a pure way.
+
+\subsubsection{Probability Monad}
+It has been shown that probability distributions form a monad, \cite{giry1982categorical} \cite{jones1989probabilistic}, and that they can be used to create composed distributions \cite{ramsey2002stochastic}. In this case, \texttt{return x} represents a distribution with only one value, x (technically a Dirac distribution), and \texttt{bind d f} is the main operator for composing distributions. Binding distributions together represents taking the output of one distribution and using it in the body of the function.
+
+\subsubsection{Custom let operators}
+Ocaml 4.08 allows me to define definitions for custom let operators. This is used to provide syntactic sugar for working with monads, and is similar to do-notation in Haskell. The reference documentation \footnote{\url{http://caml.inria.fr/pub/distrib/ocaml-4.08/ocaml-4.08-refman.html}} outlines this, and a monad should provide a module which implements the (let*) and (and*) operators. The (let*) operator is the standard bind function - here it takes the identifier bound to as the first argument to the function in bind. The (and*) operator is the product operation, it takes two monads and returns the monad pair - it has signature \texttt{'a m -> 'b m -> ('a*'b) m}, where m is the monad type. An example, using the Option monad is given below to show the transformation that takes place. This syntax allows the user to not have to use the bind (or the alias >>=) explicitly, and offers a more intuitive syntax.
+
+\ocamlcode{code_snippets/let_syntax.ml}
+
+\subsection{Modules}
+The module system is a key feature of the OCaml language. Every function in OCaml is in a module, by default the name of the file it resides in. Modules can also have signatures, which define what code is visible to a user, and constrain the module. This allows modules to hide types and implementations to provide a clean API. Modules are often used to wrap a particular type, for example a list or map. This means that to create or manipulate that type, the user must go through the modules API, ensuring only permitted operations are carried out. This is a feature I've used in designing distribution types. Modules can also be dynamically created from other modules, using functors, which are functions from modules to modules. This technique is used extensively in the Core library, and it allows modules to be customised and extended.
+
+In OCaml, the module language (functors, modules, signatures, etc.) and the core language (functions, values, types, etc.) are considered separate, and values can't contain modules. First class modules provide a way around this constraint, and allows modules to be used in much the same way as ordinary values. This allows us to simplify the creation of modules from the users point of view, and means a library can define functions to create modules which can then be used by other functions.
 
 \section{Owl}
 
 Owl is a scientific computing library written for OCaml \cite{owl}. Importantly for my PPL, it contains functions for working with multi-dimensional arrays, as well as a wide variety of statistical functions. In particular, it contains functionality relating to many common distributions, e.g. normal, beta, binomial, etc. Since my language will allow the user to combine these basic distributions into larger models, I will need to use these functions to allow sampling from and the ability to perform inference on these models. In particular, it is important to be able to find the probability density function (pdf) and cumulative density function (cdf) of these distributions as well as sample from them. Another important feature of owl is it's plotting functionality which enabled me to write functions which let me visualise output distributions, as well as visualising performance statistics, all directly from OCaml.
-
-% Should these parts be here? Do I explain the methods here or in the implementation section?
-\section{Probability Monad}
-% how in-depth should my explanation of a monad be?
-Monads are a design pattern commonly used in functional programming languages.
-
-The key data structure I use to model probability distributions is a monad. This allows me to compose distributions easily, by using the output from one distribution in another using the bind operator. In OCaml, I can also use the new (let*) operators to make this more ergonomic, and make code look more natural (as opposed to using the \texttt{>>=} operator).
-
-It has been shown that probability distributions form a monad, \cite{giry1982categorical} \cite{jones1989probabilistic}, and that they can be used to create composed distributions \cite{ramsey2002stochastic}
 
 \section{Approaches to probabilistic programming}
 Existing PPLs take several different forms, both as standalone and embedded languages. The main trade-off that is made in the design of PPLs is the number of models that can be expressed in the language compared to how efficient inference is. One approach is graph-based, where a \textit{factor graph} is generated from the program, over which efficient inference can take place. This approach can be seen in languages such as infer.NET or JAGS, and has the benefit of very fast inference, particularly since efficient computation graph frameworks can be leveraged - an example is Edward \cite{edward}, which uses TensorFlow as a backend. However, these languages usually cannot represent infinite models or unbounded recursion. Another approach, taken by the likes of WebPPL or Anglican, is trace-based. This approach considers execution traces, with a `trace' being one run of a program, with all the intermediate variables taking a particular value. Inference algorithms can reason about these traces in order to produce a posterior distribution, as will be seen in the next section. A trace-based approach often leads to clearer programs, since we are not working with a computation graph. It also leads to more models being able to be expressed, since we are not limited by the constraints of a graph. However inference is often slower, particularly when dealing with data in high dimensions, since the algorithms need to be more general purpose, and often converge slower.
@@ -133,11 +137,10 @@ Inference algorithms are ways to systematically generate samples from posterior 
 % 
 $$p(x_{1:N}|y_{1:N})\propto \tilde{p}(y_{1:N},x_{1:N})$$ 
 % 
-Here, $p$ is the posterior distribution of a particular trace $x$, given the observed variables $y$
-The aim then is to find the posterior over the latent variables we are interested in, which we can specify within the program, either as part of the model, or outside it in a query to the model.
+Note that the trace may have a different number of variables each time a model is run, due to the fact that we allow general models which allow for unbounded recursion. 
 
-% TODO: Show how this relates to a program here or in implementation?
-% probably in implementation
+Here, $p$ is the posterior distribution of a particular trace $x$, given the observed variables $y$. This is proportional to the joint distribution of all the variables ($\hat{p}$). The aim is then to find the posterior over the latent variables we are interested in (by marginalising the other variables). We can specify which variables we care about within the program, either as part of the model, or outside it in a query to the model.
+
 \subsection{Exact Inference}
 
 Exact Inference is the simplest method of calculating the posterior, but is usually computationally intractable. It involves calculating Bayes formula exactly, of which calculating the normalising constant is usually the problem. To sample directly, we would also need to find the inverse cumulative distribution to be able to use the inversion sampling method.
@@ -148,7 +151,7 @@ For discrete posterior distributions it can be thought of as calculating the pro
 
 Since exact inference is too difficult in practice, we usually have to resort to \textit{Monte Carlo} \cite{monte-carlo} methods.
 
-One such method, rejection sampling, is a very simple inference method which uses another distribution which can be sampled from.
+One such method, rejection sampling, is a very simple inference method which uses another distribution which \textit{can} be sampled from. We take samples from this distribution, and either accept or reject them based on whether
 
 \subsection{Importance Sampling}
 
@@ -161,9 +164,14 @@ Importance sampling is another simple method, improving on rejection sampling, t
 
 MCMC methods involve constructing a Markov chain with a stationary distribution equal to the posterior distribution. A Markov chain is a statistical model consisting of a sequence of events, where the probability of any event depends only on the previous event. The stationary distribution is the distribution over successive states that the chain converges to.
 
-There exists several algorithms for finding this Markov chain, for example metropolis-hastings. This algorithm requires that we have a function, $f(x)$, which is proportional to the density of the distribution. This function is easy to compute for the posterior, since it is simply the prior multiplied by the posterior - the normalising constant can be ignored since we only need a proportional function.
+There exists several algorithms for finding this Markov chain, for example metropolis-hastings. This algorithm requires that we have a function, $f(x)$, which is proportional to the density of the distribution. The function is easy to compute for the posterior, since it is simply the prior multiplied by the posterior - the normalising constant can be ignored since we only need a proportional function.
+
+MCMC algorithms have the same basic structure - to first `run' the chain for a burn-in period, taking samples and discarding them. Then, running the chain and collecting the states visited as samples. This set of samples is then a set of samples from the posterior, since the posterior should be equal to the stationary distribution. An important trade-off is made in the length of the burn-in period - too long and time is wasted discarding states, but too short and the chain will not converge to the correct distribution.
 
 \subsection{Sequential Monte Carlo (SMC)}
 
-SMC methods are algorithms which are based on using large numbers of weighted samples (`particles') to represent a posterior distribution. These particles are updated and re-sampled from in order to converge the set of particles to the posterior.
+SMC methods are algorithms which are based on using large numbers of weighted samples (`particles') to represent a posterior distribution. SMC methods are also known as particle filters. A particle is a value paired with an unnormalised weight which represents the likelihood of that value in the distribution. These particles are updated when data is observed and re-sampled from in order to converge the set of particles to the posterior.
 
+The simplest SMC algorithm is the bootstrap filter\cite{particlefilter}, which simply resamples once on encountering new data, updating the weights of the particles based on how likely this data is deemed to be. However, many variations exist - the resampling method, updating the weights and the initial particles can all be varied. The main feature of SMC is that they sequentially create sets of particles which converge to the desired distribution.
+
+SMC methods can also be combined with MCMC methods to create new algorithms. These algorithms are known as particle Monte Carlo Markov chain (PMCMC) algorithms, and were first introduced for probabilistic programming in the Anglican language \cite{anglican-smc}.

@@ -24,14 +24,14 @@ type rejection_type = Hard | Soft
 
 let reject_transform_hard ?(threshold=0.) d = 
   let rec repeat () =
-    let* (x,s) = prior1 d in
+    let* (x,s) = prior_with_score d in
     if Float.(s > threshold) then return (x,s) else repeat ()
   in
   repeat ()
 
 let reject_transform_soft d = 
   let rec repeat () =
-    let* (x,s) = prior1 d in
+    let* (x,s) = prior_with_score d in
     let* accept = bernoulli s in
     if accept then return (x,s) else repeat ()
   in
@@ -45,12 +45,12 @@ let rejection_transform ?(n=10000) s d =
   (sequence @@ List.init n ~f:(fun _ -> (reject_dist d))) >>= categorical
 
 let rejection_soft d = 
-  let* (x,s) = prior1 d in
+  let* (x,s) = prior_with_score d in
   let* accept = bernoulli s in
   if accept then return (Some (x,s)) else return None
 
 let rejection_hard ?(threshold=0.) d = 
-  let* (x,s) = prior1 d in
+  let* (x,s) = prior_with_score d in
   if Float.(s > threshold) then return (Some (x,s)) else return None
 
 let rejection ?(n=10000) s d = 

@@ -1,6 +1,6 @@
-% TC:ignore
 \documentclass[12pt,notitlepage,twoside,a4paper]{report}
 
+\usepackage[outputdir=out]{minted}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 
@@ -18,9 +18,7 @@
 \usepackage{subfig}
 \usepackage{amsmath}
 \usepackage{xcolor}
-\usepackage{minted}
 \usepackage[margin=1in,headheight=13.6pt]{geometry}
-\usepackage{filecontents}
 \pgfplotsset{compat=1.13}
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -28,7 +26,8 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
 \newmintedfile[ocamlcode]{ocaml}{frame=single,framesep=10pt}
-\newminted[ocaml1]{ocaml}{frame=single,framesep=10pt}
+% \newcommand{\ocamlcode}[1]{}
+\newminted[ocamlcode-in]{ocaml}{frame=single,framesep=10pt}
 
 \raggedbottom                           % try to avoid widows and orphans
 \sloppy
@@ -41,6 +40,7 @@
 \renewcommand{\baselinestretch}{1.1}    % adjust line spacing to make
                                         % more readable
 
+%TC:ignore
 \begin{document}
 
 \bibliographystyle{plain}
@@ -109,7 +109,7 @@ I, Anik Roy of Christ's College, am content for my dissertation to be made avail
 \pagestyle{headings}
 
 
-% TC:endignore
+%TC:endignore
 
 \chapter{Introduction}
 \input{chapters/introduction.tex}
