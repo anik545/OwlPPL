@@ -102,10 +102,7 @@ Existing PPLs take several different forms, both as standalone and embedded lang
 
 \section{Bayesian Inference}
 Inference is the key motivating feature of probabilistic programming, and is a way to infer a distribution over the parameters based on the data we observe. The main feature of Bayesian inference is that we assign every model some prior belief. Often this prior is chosen based on our knowledge of the problem, but the prior can also be uninformative. The goal of Bayesian inference is to calculate the posterior distribution, which can be represented by Bayes' formula,
-
-
 $$P(A\mid B)={\frac {P(B\mid A)P(A)}{P(B)}}$$
-
 with $P(A)$ being the prior, and $P(B\mid A)$ being the likelihood model we define. In the PPL setting, the prior is the generative model we define, with condition statements defining the likelihood. Running inference on the program then produces a sampler for the posterior.
 
 This formula hold for the continuous case too, using probability density functions ($f_X$),
@@ -117,7 +114,7 @@ Unfortunately, exact Bayesian inference is usually computationally infeasible, e
 % How does this relate to the inference problem?
 $$P(X_i=x) = \sum_{j=0}^{50} $$
 
-If we have 50 variables which can take one of two values, then we have to sum over $2^{50}$ values. There do exist some algorithms which operate on Bayesian networks (DAGs which represent random variables and their interdependence), and reduce the number of calculations needed. These include methods such as \textit{Variable Elimination} or \textit{Message Passing} \cite{belief-prop} \cite{}.
+If we have 50 variables which can take one of two values, then we have to sum over $2^{50}$ values. There do exist some algorithms which operate on Bayesian networks (DAGs which represent random variables and their interdependence), and reduce the number of calculations needed. These include static methods such as \textit{Variable Elimination} or \textit{Message Passing} \cite{belief-prop}.
 
 Alternatively, in the continuous case the formula is
 
@@ -141,6 +138,8 @@ Note that the trace may have a different number of variables each time a model i
 
 Here, $p$ is the posterior distribution of a particular trace $x$, given the observed variables $y$. This is proportional to the joint distribution of all the variables ($\hat{p}$). The aim is then to find the posterior over the latent variables we are interested in (by marginalising the other variables). We can specify which variables we care about within the program, either as part of the model, or outside it in a query to the model.
 
+In general, there are two classes of inference algorithms - static and dynamic\cite{gordon2014probabilistic}. In static methods, the program is compiled to a particular model (e.g. a Bayesian network), which is analysed for inference to be performed. These methods generally constrain the models that can be represented (often to finite graphical models). Since my PPL aims to be universal, I focus instead on dynamic methods, which use sampling to run programs and use conditioning statements that occur on these runs to perform inference.
+
 \subsection{Exact Inference}
 
 Exact Inference is the simplest method of calculating the posterior, but is usually computationally intractable. It involves calculating Bayes formula exactly, of which calculating the normalising constant is usually the problem. To sample directly, we would also need to find the inverse cumulative distribution to be able to use the inversion sampling method.
@@ -151,7 +150,7 @@ For discrete posterior distributions it can be thought of as calculating the pro
 
 Since exact inference is too difficult in practice, we usually have to resort to \textit{Monte Carlo} \cite{monte-carlo} methods.
 
-One such method, rejection sampling, is a very simple inference method which uses another distribution which \textit{can} be sampled from. We take samples from this distribution, and either accept or reject them based on whether
+One such method, rejection sampling, is a very simple inference method which uses another distribution which \textit{can} be sampled from. We take samples from this proposal distribution, and either accept or reject them. How likely we are to accept or reject a sample depends on the pdf of this proposal distribution. It can be shown that samples taken using this method converge to the required distribution \cite{}.
 
 \subsection{Importance Sampling}
 

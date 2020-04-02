@@ -1,0 +1,4 @@
+model,OwlPPL,WebPPL,Pyro
+coin,5750.0,899.0,10.0
+hmm,494.0,994.0,10.0
+linreg,6380.0,4393.0,10.0
