@@ -13,16 +13,17 @@
 
 % explain WHY in evaluation, how just what - e.g. explain why plot looks how it does, don't just describe
 
-% show some output from merlin to show the fact that type inference works and is good?s
+% show some output from merlin to show the fact that type inference works and is good?
+So far, I have developed a PPL that can be used to define arbitrary probabilistic models and perform Bayesian inference on them. To evaluate the performance of my PPL, I will present some examples to show programs written in my PPL translated into equivalent programs in other PPLs, and then measure time and memory consumption of inference\footnote{All tests are carried out on a single core of an Intel\textsuperscript{(R)} Core\textsuperscript{(TM)} i5-7200U CPU @ 2.50GHz}. I will also determine the correctness of inference procedures by using hypothesis tests which use drawn samples to determine whether two distributions are the same or not. For all these tests, I will use simple models with analytic solutions to compare to.
+
 
 \section{Statistical tests}
-To evaluate the correctness of my PPL, I used statistical tests which measure goodness-of-fit, i.e. how similar two distributions are to each other. I compare the empirical distribution of 10,000 samples from an approximated distribution to an exact distribution which is calculated analytically. 
+To evaluate the correctness of my PPL, I used statistical tests which measure goodness-of-fit, i.e. how similar two distributions are to each other. I compare the empirical distribution of 10,000 samples from an approximated distribution to an exact distribution which is calculated analytically. Test statistic distributions (e.g. the $\chi^2$ distribution) were calculated using \texttt{Owl}, and empirical distributions generated using the \texttt{EmpiricalDist} modules.
 
 For all tests described below, I set the significance level, $\alpha = 0.05$ and use null and alternative hypotheses as follows:
 
 $H_0:$ The sample data follow the exact distribution\\
 $H_1:$ The sample data do not follow the exact distribution
-
 
 \subsection{Chi-squared}
 
@@ -89,7 +90,7 @@ The continuous version is similar, with $p$ and $q$ now being density functions:
 
 $${D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx$$
 
-Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins, and then used the discrete formula.
+Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins, and then used the discrete formula. Both the metrics (discrete and continuous) were computed with code written using the \texttt{EmpiricalDist} modules.s
 
 The idea behind conducting this test is ensuring that the KL divergence decreases as we take more samples from the posterior. This ensures that the solution converges to the correct distribution. I also investigate the rate of convergence using this method.
 
@@ -148,9 +149,9 @@ The idea behind conducting this test is ensuring that the KL divergence decrease
 % probabilistic c (paige14) makes the same comparison
 % TODO: measure performance with varying no. particles (measure KL with difference no. particles)
 
-I evaluated the performance of my ppl against Anglican, WebPPL, and Pyro. All of these languages are universal PPLs embedded in different host languages, just like my PPL.
+I evaluated the performance of my ppl against Anglican, WebPPL, and Pyro. All of these languages are universal PPLs embedded in different host languages, so are comparable to my PPL.
 
-Figure \ref{fig:perf} shows how my PPL compares against these languages for a range of models and inference procedures. All the models have been introduced previously, and have been shown to produce correct results in my PPL when using the given inference procedures.
+Figure \ref{fig:perf} shows how my PPL compares against these languages for a range of models and inference procedures. All the models have been introduced previously, and have been shown to produce correct results in my PPL when using the given inference procedures. I measure both running time and peak memory usage.
 
 \newcommand{\perfgraph}[2]{
 	\begin{tikzpicture}
@@ -187,16 +188,27 @@ Figure \ref{fig:perf} shows how my PPL compares against these languages for a ra
 	\label{fig:perf}
 \end{figure}
 
+\begin{figure}[!ht]
+	\centering
+	% TODO: ADD ERROR BARS for maybe 95% confidence interval - use ppl to generate confidence interval 
+	\perfgraph{data/times_mh.csv}{Metropolis-Hastings}
+	\perfgraph{data/times_smc.csv}{Particle Filter}
+	\perfgraph{data/times_rej.csv}{Rejection}
+	\caption{Performance of my ppl against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 100 runs}
+	\label{fig:perf}
+\end{figure}
+
 
 % explain why i chose these languages to compare against?
 For sequential Monte Carlo algorithms, I compared running times with regards to the number of particles used.
 				
 % don't have just one subsection
-\subsection{Profiling}
-\subsubsection{Spacetime}
-\subsubsection{GProf}
-				
+% do i need to talk about profiling at all - what does it show?
+% \subsection{Profiling}
+% \subsubsection{Spacetime}
+% \subsubsection{GProf}
+
 \section{Comparison to other PPLs}
-				
+
 \subsection{A simple model}
 \subsection{A more complex model}

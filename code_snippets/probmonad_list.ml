@@ -1,3 +1,4 @@
+open Ppl
 type 'a dist = ('a * float) list
 
 let unduplicate = _
