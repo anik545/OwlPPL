@@ -8,8 +8,6 @@ let x_vals = Array.map x_vals ~f:(fun x -> int_of_float x)
 
 let root_dir = "/home/anik/Files/work/project/diss/data"
 
-
-
 (* For generating csv to be plotted *)
 (* create array of x,y pairs *)
 let gen_csv ?fname model exact infer_strat 
@@ -40,9 +38,18 @@ let gen_csv' ?fname model exact infer_strats
     let s = String.concat ~sep:"," (List.map ~f:(print_infer_strat_short) @@ Array.to_list infer_strats) in
     fprintf oc "samples,%s\n" s;
 
-    Array.iteri arr ~f:(fun i a -> fprintf oc "%d,%s\n" x_vals.(i) (String.concat ~sep:"," (Array.to_list @@ Array.map ~f:(string_of_float) a)));
+    Array.iteri arr ~f:(fun i a ->
+        fprintf oc "%d,%s\n"
+          x_vals.(i)
+          (String.concat
+             ~sep:","
+             (Array.to_list @@
+              Array.map a
+                ~f:(fun x-> string_of_float (Float.abs x)))
+          )
+      );
 
-    let () = Out_channel.close oc in  
+    let () = Out_channel.close oc in
     arr
   | None -> arr
 
@@ -53,14 +60,17 @@ open Models
 (* let _ = gen_csv ~fname:"coin_imp.csv" single_coin single_coin_exact (Importance 500) KL.kl_continuous *)
 (* let _ = gen_csv ~fname:"coin_smc.csv" single_coin single_coin_exact (SMC 500) KL.kl_continuous *)
 
-let is = [|MH 500;Rejection(300,Soft);Importance 500;SMC 500|]
-let _ = gen_csv' ~fname:"kl_coin_all.csv" single_coin single_coin_exact is KL.kl_continuous
+(* let is = [|MH 500;Rejection(300,Soft);Importance 500;SMC 500|] *)
+(* let _ = gen_csv' ~fname:"kl_coin_all.csv" single_coin single_coin_exact is KL.kl_continuous *)
 
 (* sprinkler *)
 (* let _ = gen_csv ~fname:"sprinkler_mh.csv" grass_model grass_model_exact (MH 500) KL.kl_discrete *)
 (* let _ = gen_csv ~fname:"sprinkler_rej.csv" grass_model grass_model_exact (Rejection(300,Soft)) KL.kl_discrete *)
-let is = [|MH 500;Rejection(300,Soft);Importance 500;SMC 500|]
-let _ = gen_csv' ~fname:"kl_sprinkler_all.csv" single_coin single_coin_exact is KL.kl_continuous
+let _ = gen_csv ~fname:"sprinkler_imp.csv" grass_model grass_model_exact (Importance 500) KL.kl_discrete
+let _ = gen_csv ~fname:"sprinkler_smc.csv" grass_model grass_model_exact (SMC 500) KL.kl_discrete
+
+(* let is = [|MH 500;Rejection(300,Soft);Importance 500;SMC 500|] *)
+(* let _ = gen_csv' ~fname:"kl_sprinkler_all.csv" grass_model grass_model_exact is KL.kl_discrete *)
 
 (* This stuff tests that the kl divergence function works *)
 let test_kl_function ()  =

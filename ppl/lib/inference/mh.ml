@@ -98,30 +98,3 @@ let mh_transform ~burn d =
     r:=tl; 
     return x
   | None -> raise Undefined
-
-let x = 5 
-let s = 
-  let n = ref x in
-  let* y = return n in
-  n := !n + 1;
-  return y
-
-let s = 
-  let n = ref 0 in
-  Bind(
-    return n,
-    fun y -> 
-      n:=!n+1;
-      return y
-  )
-let s = fmap (!) s
-
-let s = 
-  let x = 0 in
-  let sample () = 
-    let n = ref x in
-    n := !n+1;
-    n
-  in
-  let* a = return (sample ())
-  in (return a)

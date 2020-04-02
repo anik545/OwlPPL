@@ -38,6 +38,37 @@ struct
     in
     List.sum (module Float) ~f support_q
 
+  let kl_cum_discrete ns p q = 
+    (* ns is increasing array of sample numbers to storer *)
+    let q_emp = ref D.empty in
+    let pdf_p = P.pdf p in
+
+    let total_n = Array.get ns (Array.length ns - 1) in
+    let i = ref 0  in
+    let arr = Array.create ~len:(Array.length ns) (0,0.) in
+    let j = ref 0 in
+    while !i < total_n do
+      q_emp := D.add_sample !q_emp (sample q);
+      if Array.mem ns !i ~equal:(Int.equal) then 
+        let kl = 
+          let support_q = D.support !q_emp in
+          let pdf_q = D.to_pdf !q_emp in
+          let f x = 
+            let p_x = pdf_p x in
+            match pdf_q x with
+            | 0. -> raise Undefined
+            | q_x -> p_x *. log (p_x /. q_x)
+          in
+          List.sum (module Float) ~f support_q
+        in
+        arr.((!j))<-(!i,kl);
+        j:=!j+1;
+      else ()
+      ;
+      i:= !i + 1
+    done;
+    arr
+
   let kl_continuous ?(n=10000) p q = 
     (* convert to owl histogram, 
        then treat as a discrete with midpoint of each bin as the value *)

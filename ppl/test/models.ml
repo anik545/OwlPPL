@@ -15,18 +15,18 @@ let single_coin =
 let single_coin_exact = Primitives.beta 10. 2.
 
 let flip = bernoulli
-let grass_model' = fun () ->
-  let* cloudy    = flip 0.5 in
-  let* rain      = flip (if cloudy then 0.8 else 0.2) in
-  let* sprinkler = flip (if cloudy then 0.1 else 0.5) in
-  (* let* a = flip 0.7 in *)
-  let* b = flip 0.9 in
-  let* c = flip 0.9 in
-  (* let wet_roof  = a && rain in *)
-  let wet_grass = b && rain || c && sprinkler in
-  condition wet_grass 
+(* let grass_model' = fun () ->
+   let* cloudy    = flip 0.5 in
+   let* rain      = flip (if cloudy then 0.8 else 0.2) in
+   let* sprinkler = flip (if cloudy then 0.1 else 0.5) in
+   (* let* a = flip 0.7 in *)
+   let* b = flip 0.9 in
+   let* c = flip 0.9 in
+   (* let wet_roof  = a && rain in *)
+   let wet_grass = b && rain || c && sprinkler in
+   condition wet_grass 
     (return rain)
-let grass_model = grass_model' ()
+   let grass_model = grass_model' () *)
 
 let grass_model' = fun () ->
   let d = condition' (fun (w,_) -> if w then 1. else 0.)

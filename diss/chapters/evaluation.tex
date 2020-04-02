@@ -1,6 +1,5 @@
 % !TeX root = ../diss.tex
 
-
 % sketch out what plots to include here
 % - plot of kl divergence w.r.t. number of samples taken
 % - plot of running time w.r.t. amount of data conditioned on
@@ -90,7 +89,9 @@ The continuous version is similar, with $p$ and $q$ now being density functions:
 
 $${D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx$$
 
-Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins, and then used the discrete formula. Both the metrics (discrete and continuous) were computed with code written using the \texttt{EmpiricalDist} modules.s
+Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins to approximate $q(x)$. I then used Monte Carlo integration to compute the integral.
+
+Both the metrics (discrete and continuous) were computed with code written using the \texttt{EmpiricalDist} modules. 
 
 The idea behind conducting this test is ensuring that the KL divergence decreases as we take more samples from the posterior. This ensures that the solution converges to the correct distribution. I also investigate the rate of convergence using this method.
 
@@ -109,15 +110,15 @@ The idea behind conducting this test is ensuring that the KL divergence decrease
 			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_mh.csv};
 			\addlegendentry{mh}
 			% 
-			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_imp.csv};
-			\addlegendentry{importance}
-			% 
 			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_rej.csv};
 			\addlegendentry{rejection}
 			% 
+			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_imp.csv};
+			\addlegendentry{importance}
+			% 
 			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_smc.csv};
 			\addlegendentry{smc}
-			% % 
+			% 
 			% \pgfplotsinvokeforeach{1,...,\numberofcols}{
 			% 	\addplot table [x index=0,y index=#1, col sep=comma] {data/kl_coin_all.csv};
 			% 	\pgfplotstablegetcolumnnamebyindex{#1}\of{\datatable}\to{\colname}
@@ -126,6 +127,9 @@ The idea behind conducting this test is ensuring that the KL divergence decrease
 		\end{loglogaxis}
 	\end{tikzpicture}
 	\begin{tikzpicture}
+		\pgfplotstableread[col sep = comma]{data/kl_sprinkler_all.csv}\datatable
+		\pgfplotstablegetcolsof{\datatable}
+		\pgfmathtruncatemacro\numberofcols{\pgfplotsretval-1}
 		\begin{loglogaxis}[
 				title={Sprinkler model}, 
 				xlabel={number of samples}, 
@@ -137,7 +141,12 @@ The idea behind conducting this test is ensuring that the KL divergence decrease
 			% 
 			\addplot table [x index=0, y index=1, col sep=comma] {data/sprinkler_rej.csv};
 			\addlegendentry{rejection}
-			% 
+			% % 
+			% \pgfplotsinvokeforeach{1,...,\numberofcols}{
+			% 	\addplot table [x index=0,y index=#1, col sep=comma] {data/kl_sprinkler_all.csv};
+			% 	\pgfplotstablegetcolumnnamebyindex{#1}\of{\datatable}\to{\colname}
+			% 	\addlegendentryexpanded{\colname}
+			% }
 		\end{loglogaxis}
 	\end{tikzpicture}
 	\caption{Plot of KL-divergence with increasing number of samples for different models and inference procedures}
@@ -151,15 +160,15 @@ The idea behind conducting this test is ensuring that the KL divergence decrease
 
 I evaluated the performance of my ppl against Anglican, WebPPL, and Pyro. All of these languages are universal PPLs embedded in different host languages, so are comparable to my PPL.
 
-Figure \ref{fig:perf} shows how my PPL compares against these languages for a range of models and inference procedures. All the models have been introduced previously, and have been shown to produce correct results in my PPL when using the given inference procedures. I measure both running time and peak memory usage.
+Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares against these languages for a range of models and inference procedures. All the models have been introduced previously, and have been shown to produce correct results in my PPL when using the given inference procedures. I measure both running time and peak memory usage.
 
-\newcommand{\perfgraph}[2]{
+\newcommand{\perfgraph}[3]{
 	\begin{tikzpicture}
 		\pgfplotstableread[col sep = comma]{#1}\datatable
 		\pgfplotstablegetcolsof{\datatable}
 		\pgfmathtruncatemacro\numberofcols{\pgfplotsretval-1}
 		\begin{axis}[
-				ylabel={time (ms)},
+				ylabel={#3},
 				ymin=0,
 				legend style={at={(0.5,-0.15)},
 					anchor=north,legend columns=-1},
@@ -181,21 +190,21 @@ Figure \ref{fig:perf} shows how my PPL compares against these languages for a ra
 \begin{figure}[!ht]
 	\centering
 	% TODO: ADD ERROR BARS for maybe 95% confidence interval - use ppl to generate confidence interval 
-	\perfgraph{data/times_mh.csv}{Metropolis-Hastings}
-	\perfgraph{data/times_smc.csv}{Particle Filter}
-	\perfgraph{data/times_rej.csv}{Rejection}
-	\caption{Performance of my ppl against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 100 runs}
-	\label{fig:perf}
+	\perfgraph{data/times_mh.csv}{Metropolis-Hastings}{time (ms)}
+	\perfgraph{data/times_smc.csv}{Particle Filter}{time (ms)}
+	\perfgraph{data/times_rej.csv}{Rejection}{time (ms)}
+	\caption{Performance of my ppl against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs.Error bars show the 95\% confidence interval}
+	\label{fig:time-perf}
 \end{figure}
 
 \begin{figure}[!ht]
 	\centering
 	% TODO: ADD ERROR BARS for maybe 95% confidence interval - use ppl to generate confidence interval 
-	\perfgraph{data/times_mh.csv}{Metropolis-Hastings}
-	\perfgraph{data/times_smc.csv}{Particle Filter}
-	\perfgraph{data/times_rej.csv}{Rejection}
-	\caption{Performance of my ppl against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 100 runs}
-	\label{fig:perf}
+	\perfgraph{data/mems_mh.csv}{Metropolis-Hastings}{memory usage (bytes)}
+	\perfgraph{data/mems_smc.csv}{Particle Filter}{memory usage (bytes)}
+	\perfgraph{data/mems_rej.csv}{Rejection}{memory usage (bytes)}
+	\caption{Memory Usage of my ppl, compared against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
+	\label{fig:mem-perf}
 \end{figure}
 
 

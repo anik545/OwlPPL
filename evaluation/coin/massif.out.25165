@@ -1,0 +1,899 @@
+desc: (none)
+cmd: ../_build/default/coin/coin.exe
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=10908359
+mem_heap_B=8981479
+mem_heap_extra_B=4761
+mem_stacks_B=0
+heap_tree=peak
+n5: 8981479 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 3936288 0xE9C948: caml_alloc_for_heap (memory.c:792)
+  n1: 3936288 0xE9B500: caml_init_major_heap (major_gc.c:887)
+   n1: 3936288 0xEAA258: caml_init_gc (gc_ctrl.c:647)
+    n1: 3936288 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 3936288 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 3936288 0x66BE3A: main (main.c:44)
+ n1: 2101248 0xE9C8A5: caml_stat_alloc_aligned_noexc (memory.c:792)
+  n1: 2101248 0xE9C06A: caml_set_minor_heap_size (minor_gc.c:150)
+   n1: 2101248 0xEAA225: caml_init_gc (gc_ctrl.c:643)
+    n1: 2101248 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 2101248 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 2101248 0x66BE3A: main (main.c:44)
+ n3: 1585152 0xE9B7AD: alloc_generic_table (minor_gc.c:90)
+  n1: 792576 0xEAFE60: alloc_custom_gen (minor_gc.h:112)
+   n1: 792576 0xEA2A56: caml_ml_open_descriptor_in (io.c:464)
+    n1: 792576 0xAB6C53: camlStdlib__entry (stdlib.ml:307)
+     n1: 792576 0x66BF67: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 792576 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 792576 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 792576 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 792576 0x66BE3A: main (main.c:44)
+  n1: 528384 0xEACBE8: do_set (minor_gc.h:98)
+   n1: 528384 0xEAD16A: caml_ephe_set_key (weak.c:211)
+    n1: 528384 0xAC0516: camlStdlib__obj__set_key_284 (obj.ml:131)
+     n1: 528384 0xAB0A28: camlSexplib0__Sexp_conv__loop_3011 (ephemeron.ml:437)
+      n1: 528384 0xAB8BAF: camlStdlib__list__iter_236 (list.ml:110)
+       n1: 528384 0xAB3213: camlSexplib0__Sexp_conv__entry (sexp_conv.ml:347)
+        n1: 528384 0x66C2A7: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+         n1: 528384 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+          n1: 528384 0xE974A3: caml_startup_common (startup_nat.c:160)
+           n1: 528384 0xE974F9: caml_startup (startup_nat.c:165)
+            n0: 528384 0x66BE3A: main (main.c:44)
+  n1: 264192 0xE9C7B0: caml_modify (minor_gc.h:87)
+   n1: 264192 0xA0FE72: camlExpect_test_collector__set_324 (expect_test_collector.ml:34)
+    n1: 264192 0x87F2A4: camlCore__Core_unix__entry (core_unix.ml:7)
+     n1: 264192 0x66D547: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 264192 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 264192 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 264192 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 264192 0x66BE3A: main (main.c:44)
+ n3: 1254432 0xE9C9E7: caml_stat_alloc (memory.c:850)
+  n1: 1048576 0xE97AE2: init_frame_descriptors (roots_nat.c:142)
+   n1: 1048576 0xE972C3: caml_startup_common (startup_nat.c:128)
+    n1: 1048576 0xE974F9: caml_startup (startup_nat.c:165)
+     n0: 1048576 0x66BE3A: main (main.c:44)
+  n2: 196872 0xEA2250: caml_open_descriptor_in (io.c:76)
+   n1: 131248 0xEA2A67: caml_ml_open_descriptor_out (io.c:101)
+    n0: 131248 in 2 places, all below massif's threshold (1.00%)
+   n0: 65624 in 1 place, below massif's threshold (1.00%)
+  n0: 8984 in 14 places, all below massif's threshold (1.00%)
+ n0: 104359 in 16 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=2
+#-----------
+time=86621687
+mem_heap_B=9019195
+mem_heap_extra_B=26045
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=178679033
+mem_heap_B=9015123
+mem_heap_extra_B=21981
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=261767705
+mem_heap_B=9022187
+mem_heap_extra_B=29053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=303863352
+mem_heap_B=9013123
+mem_heap_extra_B=19997
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=374870188
+mem_heap_B=9027267
+mem_heap_extra_B=34149
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=482521347
+mem_heap_B=9011939
+mem_heap_extra_B=18813
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=541512186
+mem_heap_B=9001603
+mem_heap_extra_B=8485
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=594514128
+mem_heap_B=9019251
+mem_heap_extra_B=26157
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=671075580
+mem_heap_B=9014427
+mem_heap_extra_B=21333
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=741747094
+mem_heap_B=9007851
+mem_heap_extra_B=14741
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=810251258
+mem_heap_B=9021491
+mem_heap_extra_B=28405
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=900121190
+mem_heap_B=9004051
+mem_heap_extra_B=10957
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=981008041
+mem_heap_B=9027227
+mem_heap_extra_B=34117
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=1070881704
+mem_heap_B=9010755
+mem_heap_extra_B=17645
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=1124817041
+mem_heap_B=9006339
+mem_heap_extra_B=13229
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=1187726753
+mem_heap_B=9022835
+mem_heap_extra_B=29749
+mem_stacks_B=0
+heap_tree=detailed
+n5: 9022835 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 3936288 0xE9C948: caml_alloc_for_heap (memory.c:792)
+  n1: 3936288 0xE9B500: caml_init_major_heap (major_gc.c:887)
+   n1: 3936288 0xEAA258: caml_init_gc (gc_ctrl.c:647)
+    n1: 3936288 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 3936288 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 3936288 0x66BE3A: main (main.c:44)
+ n1: 2101248 0xE9C8A5: caml_stat_alloc_aligned_noexc (memory.c:792)
+  n1: 2101248 0xE9C06A: caml_set_minor_heap_size (minor_gc.c:150)
+   n1: 2101248 0xEAA225: caml_init_gc (gc_ctrl.c:643)
+    n1: 2101248 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 2101248 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 2101248 0x66BE3A: main (main.c:44)
+ n3: 1585152 0xE9B7AD: alloc_generic_table (minor_gc.c:90)
+  n1: 792576 0xEAFE60: alloc_custom_gen (minor_gc.h:112)
+   n1: 792576 0xEA2A56: caml_ml_open_descriptor_in (io.c:464)
+    n1: 792576 0xAB6C53: camlStdlib__entry (stdlib.ml:307)
+     n1: 792576 0x66BF67: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 792576 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 792576 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 792576 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 792576 0x66BE3A: main (main.c:44)
+  n1: 528384 0xEACBE8: do_set (minor_gc.h:98)
+   n1: 528384 0xEAD16A: caml_ephe_set_key (weak.c:211)
+    n1: 528384 0xAC0516: camlStdlib__obj__set_key_284 (obj.ml:131)
+     n1: 528384 0xAB0A28: camlSexplib0__Sexp_conv__loop_3011 (ephemeron.ml:437)
+      n1: 528384 0xAB8BAF: camlStdlib__list__iter_236 (list.ml:110)
+       n1: 528384 0xAB3213: camlSexplib0__Sexp_conv__entry (sexp_conv.ml:347)
+        n1: 528384 0x66C2A7: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+         n1: 528384 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+          n1: 528384 0xE974A3: caml_startup_common (startup_nat.c:160)
+           n1: 528384 0xE974F9: caml_startup (startup_nat.c:165)
+            n0: 528384 0x66BE3A: main (main.c:44)
+  n1: 264192 0xE9C7B0: caml_modify (minor_gc.h:87)
+   n1: 264192 0xA0FE72: camlExpect_test_collector__set_324 (expect_test_collector.ml:34)
+    n1: 264192 0x87F2A4: camlCore__Core_unix__entry (core_unix.ml:7)
+     n1: 264192 0x66D547: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 264192 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 264192 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 264192 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 264192 0x66BE3A: main (main.c:44)
+ n3: 1254554 0xE9C9E7: caml_stat_alloc (memory.c:850)
+  n1: 1048576 0xE97AE2: init_frame_descriptors (roots_nat.c:142)
+   n1: 1048576 0xE972C3: caml_startup_common (startup_nat.c:128)
+    n1: 1048576 0xE974F9: caml_startup (startup_nat.c:165)
+     n0: 1048576 0x66BE3A: main (main.c:44)
+  n2: 196872 0xEA2250: caml_open_descriptor_in (io.c:76)
+   n1: 131248 0xEA2A67: caml_ml_open_descriptor_out (io.c:101)
+    n0: 131248 in 2 places, all below massif's threshold (1.00%)
+   n0: 65624 in 1 place, below massif's threshold (1.00%)
+  n0: 9106 in 15 places, all below massif's threshold (1.00%)
+ n0: 145593 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=18
+#-----------
+time=1241636662
+mem_heap_B=9018931
+mem_heap_extra_B=25853
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=1322485287
+mem_heap_B=9024675
+mem_heap_extra_B=31605
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=1376385707
+mem_heap_B=9017211
+mem_heap_extra_B=24141
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=1430276988
+mem_heap_B=9010643
+mem_heap_extra_B=17565
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=1497651045
+mem_heap_B=9016771
+mem_heap_extra_B=23717
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=1565021648
+mem_heap_B=9022939
+mem_heap_extra_B=29885
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=1632389479
+mem_heap_B=9028603
+mem_heap_extra_B=35549
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=1726708745
+mem_heap_B=8999771
+mem_heap_extra_B=6717
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=1794083777
+mem_heap_B=9009547
+mem_heap_extra_B=16501
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=1888399073
+mem_heap_B=9016331
+mem_heap_extra_B=23293
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=1942299526
+mem_heap_B=9008979
+mem_heap_extra_B=15893
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=1996197684
+mem_heap_B=9000755
+mem_heap_extra_B=7653
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=2050095390
+mem_heap_B=9028411
+mem_heap_extra_B=35333
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=2103995817
+mem_heap_B=9024763
+mem_heap_extra_B=31685
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=2157895860
+mem_heap_B=9020203
+mem_heap_extra_B=27125
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=2211797922
+mem_heap_B=9016203
+mem_heap_extra_B=23133
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=2265699962
+mem_heap_B=9012467
+mem_heap_extra_B=19389
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=2346550279
+mem_heap_B=9022003
+mem_heap_extra_B=28949
+mem_stacks_B=0
+heap_tree=detailed
+n5: 9022003 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 3936288 0xE9C948: caml_alloc_for_heap (memory.c:792)
+  n1: 3936288 0xE9B500: caml_init_major_heap (major_gc.c:887)
+   n1: 3936288 0xEAA258: caml_init_gc (gc_ctrl.c:647)
+    n1: 3936288 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 3936288 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 3936288 0x66BE3A: main (main.c:44)
+ n1: 2101248 0xE9C8A5: caml_stat_alloc_aligned_noexc (memory.c:792)
+  n1: 2101248 0xE9C06A: caml_set_minor_heap_size (minor_gc.c:150)
+   n1: 2101248 0xEAA225: caml_init_gc (gc_ctrl.c:643)
+    n1: 2101248 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 2101248 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 2101248 0x66BE3A: main (main.c:44)
+ n3: 1585152 0xE9B7AD: alloc_generic_table (minor_gc.c:90)
+  n1: 792576 0xEAFE60: alloc_custom_gen (minor_gc.h:112)
+   n1: 792576 0xEA2A56: caml_ml_open_descriptor_in (io.c:464)
+    n1: 792576 0xAB6C53: camlStdlib__entry (stdlib.ml:307)
+     n1: 792576 0x66BF67: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 792576 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 792576 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 792576 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 792576 0x66BE3A: main (main.c:44)
+  n1: 528384 0xEACBE8: do_set (minor_gc.h:98)
+   n1: 528384 0xEAD16A: caml_ephe_set_key (weak.c:211)
+    n1: 528384 0xAC0516: camlStdlib__obj__set_key_284 (obj.ml:131)
+     n1: 528384 0xAB0A28: camlSexplib0__Sexp_conv__loop_3011 (ephemeron.ml:437)
+      n1: 528384 0xAB8BAF: camlStdlib__list__iter_236 (list.ml:110)
+       n1: 528384 0xAB3213: camlSexplib0__Sexp_conv__entry (sexp_conv.ml:347)
+        n1: 528384 0x66C2A7: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+         n1: 528384 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+          n1: 528384 0xE974A3: caml_startup_common (startup_nat.c:160)
+           n1: 528384 0xE974F9: caml_startup (startup_nat.c:165)
+            n0: 528384 0x66BE3A: main (main.c:44)
+  n1: 264192 0xE9C7B0: caml_modify (minor_gc.h:87)
+   n1: 264192 0xA0FE72: camlExpect_test_collector__set_324 (expect_test_collector.ml:34)
+    n1: 264192 0x87F2A4: camlCore__Core_unix__entry (core_unix.ml:7)
+     n1: 264192 0x66D547: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 264192 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 264192 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 264192 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 264192 0x66BE3A: main (main.c:44)
+ n3: 1254554 0xE9C9E7: caml_stat_alloc (memory.c:850)
+  n1: 1048576 0xE97AE2: init_frame_descriptors (roots_nat.c:142)
+   n1: 1048576 0xE972C3: caml_startup_common (startup_nat.c:128)
+    n1: 1048576 0xE974F9: caml_startup (startup_nat.c:165)
+     n0: 1048576 0x66BE3A: main (main.c:44)
+  n2: 196872 0xEA2250: caml_open_descriptor_in (io.c:76)
+   n1: 131248 0xEA2A67: caml_ml_open_descriptor_out (io.c:101)
+    n0: 131248 in 2 places, all below massif's threshold (1.00%)
+   n0: 65624 in 1 place, below massif's threshold (1.00%)
+  n0: 9106 in 15 places, all below massif's threshold (1.00%)
+ n0: 144761 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=36
+#-----------
+time=2400450486
+mem_heap_B=9014659
+mem_heap_extra_B=21589
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=2454362442
+mem_heap_B=9008187
+mem_heap_extra_B=15125
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=2508262756
+mem_heap_B=8999275
+mem_heap_extra_B=6229
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=2562162759
+mem_heap_B=9023251
+mem_heap_extra_B=30221
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=2643012541
+mem_heap_B=9012491
+mem_heap_extra_B=19461
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=2696911636
+mem_heap_B=9006035
+mem_heap_extra_B=13005
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=2777761053
+mem_heap_B=9026731
+mem_heap_extra_B=33725
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=43
+#-----------
+time=2858608213
+mem_heap_B=9017283
+mem_heap_extra_B=24285
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=2912506043
+mem_heap_B=9013187
+mem_heap_extra_B=20181
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=2966407326
+mem_heap_B=9005787
+mem_heap_extra_B=12749
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=3047256169
+mem_heap_B=9027235
+mem_heap_extra_B=34181
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=3101158308
+mem_heap_B=9019507
+mem_heap_extra_B=26429
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=3155066336
+mem_heap_B=9016011
+mem_heap_extra_B=22941
+mem_stacks_B=0
+heap_tree=detailed
+n5: 9016011 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 3936288 0xE9C948: caml_alloc_for_heap (memory.c:792)
+  n1: 3936288 0xE9B500: caml_init_major_heap (major_gc.c:887)
+   n1: 3936288 0xEAA258: caml_init_gc (gc_ctrl.c:647)
+    n1: 3936288 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 3936288 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 3936288 0x66BE3A: main (main.c:44)
+ n1: 2101248 0xE9C8A5: caml_stat_alloc_aligned_noexc (memory.c:792)
+  n1: 2101248 0xE9C06A: caml_set_minor_heap_size (minor_gc.c:150)
+   n1: 2101248 0xEAA225: caml_init_gc (gc_ctrl.c:643)
+    n1: 2101248 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 2101248 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 2101248 0x66BE3A: main (main.c:44)
+ n3: 1585152 0xE9B7AD: alloc_generic_table (minor_gc.c:90)
+  n1: 792576 0xEAFE60: alloc_custom_gen (minor_gc.h:112)
+   n1: 792576 0xEA2A56: caml_ml_open_descriptor_in (io.c:464)
+    n1: 792576 0xAB6C53: camlStdlib__entry (stdlib.ml:307)
+     n1: 792576 0x66BF67: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 792576 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 792576 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 792576 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 792576 0x66BE3A: main (main.c:44)
+  n1: 528384 0xEACBE8: do_set (minor_gc.h:98)
+   n1: 528384 0xEAD16A: caml_ephe_set_key (weak.c:211)
+    n1: 528384 0xAC0516: camlStdlib__obj__set_key_284 (obj.ml:131)
+     n1: 528384 0xAB0A28: camlSexplib0__Sexp_conv__loop_3011 (ephemeron.ml:437)
+      n1: 528384 0xAB8BAF: camlStdlib__list__iter_236 (list.ml:110)
+       n1: 528384 0xAB3213: camlSexplib0__Sexp_conv__entry (sexp_conv.ml:347)
+        n1: 528384 0x66C2A7: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+         n1: 528384 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+          n1: 528384 0xE974A3: caml_startup_common (startup_nat.c:160)
+           n1: 528384 0xE974F9: caml_startup (startup_nat.c:165)
+            n0: 528384 0x66BE3A: main (main.c:44)
+  n1: 264192 0xE9C7B0: caml_modify (minor_gc.h:87)
+   n1: 264192 0xA0FE72: camlExpect_test_collector__set_324 (expect_test_collector.ml:34)
+    n1: 264192 0x87F2A4: camlCore__Core_unix__entry (core_unix.ml:7)
+     n1: 264192 0x66D547: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 264192 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 264192 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 264192 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 264192 0x66BE3A: main (main.c:44)
+ n3: 1254554 0xE9C9E7: caml_stat_alloc (memory.c:850)
+  n1: 1048576 0xE97AE2: init_frame_descriptors (roots_nat.c:142)
+   n1: 1048576 0xE972C3: caml_startup_common (startup_nat.c:128)
+    n1: 1048576 0xE974F9: caml_startup (startup_nat.c:165)
+     n0: 1048576 0x66BE3A: main (main.c:44)
+  n2: 196872 0xEA2250: caml_open_descriptor_in (io.c:76)
+   n1: 131248 0xEA2A67: caml_ml_open_descriptor_out (io.c:101)
+    n0: 131248 in 2 places, all below massif's threshold (1.00%)
+   n0: 65624 in 1 place, below massif's threshold (1.00%)
+  n0: 9106 in 15 places, all below massif's threshold (1.00%)
+ n0: 138769 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=49
+#-----------
+time=3235918673
+mem_heap_B=9010243
+mem_heap_extra_B=17173
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=50
+#-----------
+time=3278014976
+mem_heap_B=9000979
+mem_heap_extra_B=7909
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=3320113392
+mem_heap_B=9023587
+mem_heap_extra_B=30533
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=3362209706
+mem_heap_B=9014859
+mem_heap_extra_B=21813
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=3404305534
+mem_heap_B=9005075
+mem_heap_extra_B=12021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=3446402313
+mem_heap_B=9008099
+mem_heap_extra_B=15045
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=3488500054
+mem_heap_B=9029459
+mem_heap_extra_B=36421
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=3530598892
+mem_heap_B=9016579
+mem_heap_extra_B=23549
+mem_stacks_B=0
+heap_tree=detailed
+n5: 9016579 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 3936288 0xE9C948: caml_alloc_for_heap (memory.c:792)
+  n1: 3936288 0xE9B500: caml_init_major_heap (major_gc.c:887)
+   n1: 3936288 0xEAA258: caml_init_gc (gc_ctrl.c:647)
+    n1: 3936288 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 3936288 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 3936288 0x66BE3A: main (main.c:44)
+ n1: 2101248 0xE9C8A5: caml_stat_alloc_aligned_noexc (memory.c:792)
+  n1: 2101248 0xE9C06A: caml_set_minor_heap_size (minor_gc.c:150)
+   n1: 2101248 0xEAA225: caml_init_gc (gc_ctrl.c:643)
+    n1: 2101248 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 2101248 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 2101248 0x66BE3A: main (main.c:44)
+ n3: 1585152 0xE9B7AD: alloc_generic_table (minor_gc.c:90)
+  n1: 792576 0xEAFE60: alloc_custom_gen (minor_gc.h:112)
+   n1: 792576 0xEA2A56: caml_ml_open_descriptor_in (io.c:464)
+    n1: 792576 0xAB6C53: camlStdlib__entry (stdlib.ml:307)
+     n1: 792576 0x66BF67: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 792576 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 792576 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 792576 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 792576 0x66BE3A: main (main.c:44)
+  n1: 528384 0xEACBE8: do_set (minor_gc.h:98)
+   n1: 528384 0xEAD16A: caml_ephe_set_key (weak.c:211)
+    n1: 528384 0xAC0516: camlStdlib__obj__set_key_284 (obj.ml:131)
+     n1: 528384 0xAB0A28: camlSexplib0__Sexp_conv__loop_3011 (ephemeron.ml:437)
+      n1: 528384 0xAB8BAF: camlStdlib__list__iter_236 (list.ml:110)
+       n1: 528384 0xAB3213: camlSexplib0__Sexp_conv__entry (sexp_conv.ml:347)
+        n1: 528384 0x66C2A7: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+         n1: 528384 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+          n1: 528384 0xE974A3: caml_startup_common (startup_nat.c:160)
+           n1: 528384 0xE974F9: caml_startup (startup_nat.c:165)
+            n0: 528384 0x66BE3A: main (main.c:44)
+  n1: 264192 0xE9C7B0: caml_modify (minor_gc.h:87)
+   n1: 264192 0xA0FE72: camlExpect_test_collector__set_324 (expect_test_collector.ml:34)
+    n1: 264192 0x87F2A4: camlCore__Core_unix__entry (core_unix.ml:7)
+     n1: 264192 0x66D547: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 264192 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 264192 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 264192 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 264192 0x66BE3A: main (main.c:44)
+ n3: 1254554 0xE9C9E7: caml_stat_alloc (memory.c:850)
+  n1: 1048576 0xE97AE2: init_frame_descriptors (roots_nat.c:142)
+   n1: 1048576 0xE972C3: caml_startup_common (startup_nat.c:128)
+    n1: 1048576 0xE974F9: caml_startup (startup_nat.c:165)
+     n0: 1048576 0x66BE3A: main (main.c:44)
+  n2: 196872 0xEA2250: caml_open_descriptor_in (io.c:76)
+   n1: 131248 0xEA2A67: caml_ml_open_descriptor_out (io.c:101)
+    n0: 131248 in 2 places, all below massif's threshold (1.00%)
+   n0: 65624 in 1 place, below massif's threshold (1.00%)
+  n0: 9106 in 15 places, all below massif's threshold (1.00%)
+ n0: 139337 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=57
+#-----------
+time=3572696463
+mem_heap_B=9005835
+mem_heap_extra_B=12797
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=3614793075
+mem_heap_B=9025419
+mem_heap_extra_B=32397
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=3656890677
+mem_heap_B=9013715
+mem_heap_extra_B=20685
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=3698986868
+mem_heap_B=9001699
+mem_heap_extra_B=8677
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=3741084765
+mem_heap_B=9020779
+mem_heap_extra_B=27773
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=62
+#-----------
+time=3783184090
+mem_heap_B=9010123
+mem_heap_extra_B=17101
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=63
+#-----------
+time=3825282076
+mem_heap_B=9028587
+mem_heap_extra_B=35589
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=64
+#-----------
+time=3867380695
+mem_heap_B=9017739
+mem_heap_extra_B=24741
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=65
+#-----------
+time=3909476520
+mem_heap_B=9006731
+mem_heap_extra_B=13725
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=66
+#-----------
+time=3951574730
+mem_heap_B=9029963
+mem_heap_extra_B=36973
+mem_stacks_B=0
+heap_tree=detailed
+n5: 9029963 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 3936288 0xE9C948: caml_alloc_for_heap (memory.c:792)
+  n1: 3936288 0xE9B500: caml_init_major_heap (major_gc.c:887)
+   n1: 3936288 0xEAA258: caml_init_gc (gc_ctrl.c:647)
+    n1: 3936288 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 3936288 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 3936288 0x66BE3A: main (main.c:44)
+ n1: 2101248 0xE9C8A5: caml_stat_alloc_aligned_noexc (memory.c:792)
+  n1: 2101248 0xE9C06A: caml_set_minor_heap_size (minor_gc.c:150)
+   n1: 2101248 0xEAA225: caml_init_gc (gc_ctrl.c:643)
+    n1: 2101248 0xE97325: caml_startup_common (startup_nat.c:136)
+     n1: 2101248 0xE974F9: caml_startup (startup_nat.c:165)
+      n0: 2101248 0x66BE3A: main (main.c:44)
+ n3: 1585152 0xE9B7AD: alloc_generic_table (minor_gc.c:90)
+  n1: 792576 0xEAFE60: alloc_custom_gen (minor_gc.h:112)
+   n1: 792576 0xEA2A56: caml_ml_open_descriptor_in (io.c:464)
+    n1: 792576 0xAB6C53: camlStdlib__entry (stdlib.ml:307)
+     n1: 792576 0x66BF67: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 792576 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 792576 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 792576 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 792576 0x66BE3A: main (main.c:44)
+  n1: 528384 0xEACBE8: do_set (minor_gc.h:98)
+   n1: 528384 0xEAD16A: caml_ephe_set_key (weak.c:211)
+    n1: 528384 0xAC0516: camlStdlib__obj__set_key_284 (obj.ml:131)
+     n1: 528384 0xAB0A28: camlSexplib0__Sexp_conv__loop_3011 (ephemeron.ml:437)
+      n1: 528384 0xAB8BAF: camlStdlib__list__iter_236 (list.ml:110)
+       n1: 528384 0xAB3213: camlSexplib0__Sexp_conv__entry (sexp_conv.ml:347)
+        n1: 528384 0x66C2A7: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+         n1: 528384 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+          n1: 528384 0xE974A3: caml_startup_common (startup_nat.c:160)
+           n1: 528384 0xE974F9: caml_startup (startup_nat.c:165)
+            n0: 528384 0x66BE3A: main (main.c:44)
+  n1: 264192 0xE9C7B0: caml_modify (minor_gc.h:87)
+   n1: 264192 0xA0FE72: camlExpect_test_collector__set_324 (expect_test_collector.ml:34)
+    n1: 264192 0x87F2A4: camlCore__Core_unix__entry (core_unix.ml:7)
+     n1: 264192 0x66D547: caml_program (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+      n1: 264192 0xEB4020: ??? (in /home/anik/Files/work/project/evaluation/_build/default/coin/coin.exe)
+       n1: 264192 0xE974A3: caml_startup_common (startup_nat.c:160)
+        n1: 264192 0xE974F9: caml_startup (startup_nat.c:165)
+         n0: 264192 0x66BE3A: main (main.c:44)
+ n3: 1254554 0xE9C9E7: caml_stat_alloc (memory.c:850)
+  n1: 1048576 0xE97AE2: init_frame_descriptors (roots_nat.c:142)
+   n1: 1048576 0xE972C3: caml_startup_common (startup_nat.c:128)
+    n1: 1048576 0xE974F9: caml_startup (startup_nat.c:165)
+     n0: 1048576 0x66BE3A: main (main.c:44)
+  n2: 196872 0xEA2250: caml_open_descriptor_in (io.c:76)
+   n1: 131248 0xEA2A67: caml_ml_open_descriptor_out (io.c:101)
+    n0: 131248 in 2 places, all below massif's threshold (1.00%)
+   n0: 65624 in 1 place, below massif's threshold (1.00%)
+  n0: 9106 in 15 places, all below massif's threshold (1.00%)
+ n0: 152721 in 17 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=67
+#-----------
+time=3993671516
+mem_heap_B=9019667
+mem_heap_extra_B=26677
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=4035767802
+mem_heap_B=9008651
+mem_heap_extra_B=15621
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=4077866013
+mem_heap_B=9028883
+mem_heap_extra_B=35845
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=70
+#-----------
+time=4119971020
+mem_heap_B=9016699
+mem_heap_extra_B=23645
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=71
+#-----------
+time=4162067869
+mem_heap_B=9006235
+mem_heap_extra_B=13141
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=72
+#-----------
+time=4204163662
+mem_heap_B=9027131
+mem_heap_extra_B=34045
+mem_stacks_B=0
+heap_tree=empty

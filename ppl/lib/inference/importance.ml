@@ -10,6 +10,12 @@ let importance' n d =
   categorical l
 
 
+let importance' n d = 
+  let particles_dist = sequence @@ List.init n ~f:(fun _ -> prior d) in
+  let* particles = particles_dist in 
+  categorical particles
+
+
 let rec create' n d sofar =
   if n = 0 then sofar
   else 

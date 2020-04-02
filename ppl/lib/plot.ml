@@ -1,4 +1,5 @@
 open Helpers
+
 let hist_dist_continuous ?h ?(n=5000) ?(fname="fig.jpg") d = 
   let open Owl_plplot in 
   let samples = take_k_samples n d in

@@ -24,7 +24,7 @@ Using a shallow embedding means we can use all of the features of OCaml as norma
 
 I use a set of primitive distributions which can be combined (using arbitrarily complex deterministic OCaml code) to produce new more complex distribution. For example, one can take the sum of two discrete uniform distributions to simulate the addition of two dice rolls. 
 
-PPLs in general are similar to normal programming languages, but need to support two extra operations - \texttt{sample} and \texttt{condition} \cite{idkwhattocitehere}. The sample operator allows models to be built up .The condition operator has a few variants, which are covered in section \ref{sec:condition}.
+PPLs in general are similar to normal programming languages, but need to support two extra operations - \texttt{sample} and \texttt{condition} \cite{gordon2014probabilistic}. The sample operator allows models to be built up .The condition operator has a few variants, which are covered in section \ref{sec:condition}.
 
 \section{Representing Distributions}
 In order to define my DSL, I needed data structures to represent probabilistic models as well as distributions that are used as both input and output. Input distributions are the primitive distributions that are used to build models and constrain observations. We have more information about these distributions, such as how to sample from them exactly or exact pdf functions, and this information is used in inference. The output of inference is usually a function which can sample from the posterior, but we generally want to also collate statistics about the posterior distribution. Since we only have an approximate sampler, we can output empirical distributions from which many statistics, e.g. mean, variance, cdf etc.,  can be approximated.
@@ -171,7 +171,7 @@ Enumeration is the simplest way to perform exact inference on probabilistic prog
 	\label{lst:enum}
 \end{listing}
 	
-This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions. Exact inference of this kind only works on models that can be represented as finite networks, and exact inference for Bayesian networks is in fact NP-hard\cite{cooper1990computational}. So instead, most of my project focuses on approximate inference.
+This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions (and are not compatible with the way I represent models). Exact inference of this kind only works on models that can be represented as finite networks, and exact inference for Bayesian networks is in fact NP-hard\cite{cooper1990computational}. So instead, most of my project focuses on approximate inference.
 	
 \subsection{Rejection Sampling} \label{sec:rej}
 % https://www.cs.ubc.ca/~schmidtm/Courses/540-W18/wood.pdf pg30
@@ -179,11 +179,12 @@ This method is very naive, and therefore inefficient. Since we essentially take 
 % Why rejection doesn't work for continuous, so must use importance instead -->
 % http://www.cs.tut.fi/~elomaa/teach/AI-2013-9.pdf
 % Hard rejection
-With rejection sampling, we take samples from the prior, with accumulated scores. If the score is above some constant threshold, then we accept the sample, and if not, we reject the sample. The specific case of the general rejection sampling algorithm we use here sets the proposal distribution as the prior, and we use the scores to approximate the density function of the posterior.
-	
+In my implementation of rejection sampling, we take samples from the prior, with accumulated scores. If the score is above some constant threshold, then we accept the sample, and if not, we reject the sample. The specific case of the general rejection sampling algorithm we use here sets the proposal distribution as the prior, and we use the scores to approximate the density function of the posterior. The implementation is shown in listing \ref{lst:rej}
 % todo: code of rejection sampling
-	
-A problem with rejection sampling is if conditions make most execution traces very unlikely. This means it will take a very large number of samples to have enough (or any) accepted samples. An example is given in listing \ref{lst:bad-reject}, where the condition only has a 1\% chance of being true. This means that, on average, for every 1000 samples, we will only accept one. Another issue is with continuous distributions - under rejection sampling, no observations 
+
+This particular function is hard rejection, since samples with a lower score are always rejected. I have also implemented functionality to perform `soft' rejection. This method instead accepts or rejects using a bernoulli distribution with the probability of acceptance being the score attached to the sample.
+
+A problem with rejection sampling is if conditions make most execution traces very unlikely. This means it will take a very large number of samples to have enough (or any) accepted samples. An example is given in listing \ref{lst:bad-reject}, where the condition only has a 1\% chance of being true. This means that, on average, for every 1000 samples, we will only accept one.
 
 % \begin{noindent}
 \begin{listing}[!htb]
@@ -198,44 +199,57 @@ condition (x=0)
 	\label{lst:bad-reject}
 \end{listing}
 % \end{noindent}
-	
-	
+% 
 \subsection{Likelihood Weighting} \label{sec:likelihood-wighting}
 % http://www.cs.tut.fi/~elomaa/teach/AI-2013-9.pdf
 	
 Likelihood weighting is an importance sampling method, when the proposal distribution we use is the prior. We want any algorithm we use to be as general as possible, and not need to be tuned using auxiliary distributions chosen by hand. Since for any model we can find the prior distribution easily, it is natural to use this as a proposal distribution here - this can be seen in several of the implementations of inference. 
-	
+
 The implementation of likelihood weighting is simple - we simply take a set of samples (with weights) from the prior, remove duplicates and normalise, and use this set of particles as a the categorical distribution representing the posterior. 
+% \begin{noindent}	
+\begin{listing}[!htb]
+	\centering
 	
+	\begin{ocamlcode-in}
+let importance n d = 
+  let particles_dist = sequence @@ List.init n ~f:(fun _ -> prior d) in
+  let* particles = particles_dist in 
+  categorical particles
+
+	\end{ocamlcode-in}
+	\caption{Metropolis hastings}
+	\label{lst:mh}
+\end{listing}
+% \end{noindent}
+
+The sequence function is a monad function that takes a list of distributions and fold them together so that they act as a single distribution returning entire lists. This allows The use of \texttt{(let*)} to sample a set of particles at once, and use them directly as the distribution.
 % code of importance sampling.
 	
 \subsection{Metropolis Hastings} \label{sec:mh}
-Metropolis Hastings is an MCMC algorithm, and so is used to find a Markov chain with the stationary distribution equal to the target distribution, here the posterior. There are many variants of this algorithm, and the one I implement here is the independent metropolis hastings algorithm. I use the prior as a proposal distribution, using scores as an approximation to a density function. The algorithm is outlined below.
+Metropolis Hastings is an MCMC algorithm, and so is used to find a Markov chain with the stationary distribution equal to the target distribution, here the posterior. There are many variants of this algorithm, and the one I implement here is the independent metropolis hastings (IMH) algorithm. I use the prior as a proposal distribution, using scores as an approximation to a density function. The algorithm is outlined below.
+\begin{itemize}
+	\item Let $\pi$ be the target distribution that we want to sample from.
+	\item Let $q$ be the density function of the prior, approximated by the scores.
+	\item Initialise by taking a sample from the prior as the first state in the chain.
+	\item Let x be a sample from the prior.
+	\item Let y be the last state in the chain.
+	\item Calculate the acceptance probability, $\alpha(x,y)$ by \eqref{eq:accept}
+	      \begin{equation}
+	      	\label{eq:accept}
+	      	\alpha(x,y) = 
+	      	\begin{cases}	
+	      		\min{\left( \frac{\pi(y)q(x)}{\pi{x}q(y)},1 \right) } & \pi(x)q(x) > 0 \\
+	      		1                                                     & \pi(x)q(x) = 0 \\
+	      	\end{cases}
+	      \end{equation}	      	      	      	      
+	\item The state x is then accepted with probability $\alpha(x,y)$. If accepted, we use x as the next state, or if rejected, we re-use y as the next state. 
+\end{itemize}
 
-Let $\pi$ be the target distribution that we want to sample from.\\
-Let $q$ be the density function of the prior, approximated by the scores.\\
-Initialise by taking a sample from the prior as the first state in the chain.\\
-Let x be a sample from the prior.\\
-Let y be the last state in the chain.\\
-Calculate the acceptance probability, $\alpha(x,y)$ by \eqref{eq:accept}
-\begin{equation}
-	\label{eq:accept}
-	\alpha(x,y) = 
-	\begin{cases}	
-		\min{\left( \frac{\pi(y)q(x)}{\pi{x}q(y)},1 \right) } & \pi(x)q(x) > 0 \\
-		1                                                     & \pi(x)q(x) = 0 \\
-	\end{cases}
-\end{equation}
-
-The state x is then accepted with probability $\alpha(x,y)$. If accepted, we use x as the next state, or if rejected, we re-use y as the next state. This produces a Markov chain with transition probability:
-
-$$p(x, y) = q(y)\alpha(x, y) \quad\quad y\neq x$$
-
-This is known as `independent' metropolis hastings since subsequent candidate states ($x$) are independent on previous values of states.
+This produces a Markov chain with transition probability: \[p(x, y) = q(y)\alpha(x, y) \quad\quad y\neq x\]. It is known as `independent' metropolis hastings since subsequent candidate states ($x$) are independent on previous values of states.
 
 % https://probmods.org/chapters/inference-algorithms.html
 % MCMC section
-I have implemented this metropolis hastings as a function transforming \texttt{'a dist}s (\texttt{'a dist -> 'a dist}). This allows it to be composed with other inference algorithms, as well as allowing the standard sample function to be used on the output. To model a Markov chain, I use a \texttt{Core.Sequence}, which is a data structure for a lazy list. The creator function uses a function that takes a previous state to produce a new state and output a value - analogous to the transition function. In this case, the output is the same as the state.
+I have implemented IMH as a function transforming \texttt{'a dist}s (\texttt{'a dist -> 'a dist}). This allows it to be composed with other inference algorithms, as well as allowing the standard sample function to be used on the output. To model a Markov chain, I use a \texttt{Core.Sequence}, which is a data structure for a lazy list. The creator function uses a function that takes a previous state to produce a new state and output a value - analogous to the transition function. In this case, the output is the same as the state.
 
 One important property of the return distribution is that consecutive sample statements will need to return different values (to simulate running the chain). In order to achieve this, I create some mutable state - the sequence, which will take a step every time sample is called on the output distribution. In order to make sure this sequence is persistent, I use a reference and put it after a bind (let*) statement, incrementing the chain every time the function is called (which is only on sampling). Since the bind statement contains a function, the reference is closed over and is persistent to the output distribution.
 
@@ -249,8 +263,7 @@ One important property of the return distribution is that consecutive sample sta
 \subsection{Bootstrap Particle Filter} \label{sec:pf}
 % https://probmods.org/chapters/inference-algorithms.html
 % particle filter section
-Particle Filters are a class of algorithms which use particles to approximate a posterior. This is similar to the technique I used in importance sampling (\ref{sec:likelihood-wighting}), but the difference here is that the particles are sequentially updated as we observe condition statements (i.e. as we observe data). In fact, an example of a particle filtering algorithm is sequential importance sampling, but here I use an algorithm called a bootstrap filter\cite{particlefilter} as the 
-\cite{anglican-smc}
+Particle Filters are a class of algorithms which use particles to approximate a posterior. This is similar to the technique I used in importance sampling (\ref{sec:likelihood-wighting}), but the difference here is that the particles are sequentially updated as we observe condition statements (i.e. as we observe data). In fact, an example of a particle filtering algorithm is sequential importance sampling, but here I use an algorithm called the bootstrap filter\cite{particlefilter}.
 
 \subsection{Particle Cascade} \label{sec:pc}
 The particle cascade algorithm (also Asynchronous Sequential Monte-Carlo) is an algorithm that extends the particle filter, introduced in (Paige et al. 2014)\cite{paige2014asynchronous}. It uses a lazily generated infinite set of particles, which allows it to be `anytime', that is, it can generate more particles without having to start regenerate a large particle set from scratch. It also features a parallelisable re-sample step, although I will not make use of this feature, since I am not using multi-core OCaml.
@@ -271,7 +284,8 @@ In addition, the reason this works is because the \texttt{smc} function produces
 
 % These examples should really be in evaluation
 \section{Examples}
-	
+To show how my PPL would be used on real problems, I now outline a set of example problems. Several examples here will be simple, and have analytic solutions - this is so that I can then test the correctness of applying inference on them. Full derivations of the solutions are given in appendix \ref{app:examples}
+
 \subsection{Sprinkler}
 % to show exact inference on discrete model
 The sprinkler model is a commonly used example in Bayesian inference due to it's simplicity. It is an example of a \textit{Bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}. The code in listing \ref{lst:sprinkler} shows the model in the diagram encoded as a program. This particular program can be used (by applying an inference function) to find the probability of rain given that the grass is wet.
@@ -308,7 +322,7 @@ To find the posterior, we use an uninformative prior ($\Theta$), the uniform. Th
 We then use Bayes' rule to calculate the posterior.
 				    
 \begin{align*}						
-	P(\Theta=\theta \mid X=x) & = \frac{1}{\kappa}P(\Theta=\theta)Pr(X=x\mid\theta)    \\ 
+	P(\Theta=\theta \mid X=x) & = \frac{1}{\kappa}P(\Theta=\theta)P(X=x\mid\theta)     \\ 
 	                          & = \frac{1}{\kappa}\binom{n}{x}\theta^x(1-\theta)^{n-x} \\
 	                          & = \frac{1}{\kappa'}\theta^x(1-\theta)^{n-x}            
 \end{align*}
@@ -341,4 +355,16 @@ This example demonstrates a model which cannot be expressed in some PPLs such as
 % no. of params is infinite, grows with size of dataset
 
 \section{Visualisations}
-Visualising the output distributions from inference can be done using the \texttt{Owl\_plplot} module, which allows plotting directly from OCaml, rather than having to interface with other programs manually.
+Visualising the output distributions from inference can be done using the \texttt{Owl\_plplot} module, which allows plotting directly from OCaml, rather than having to interface with other programs manually. I have implemented several helper functions which simplify visualising distributions created by my PPL.
+
+Empirical distributions are approximated by histograms displayed as bar charts using \texttt{Owl\_plplot}. 
+
+For discrete distributions, this conversion is simple - each bar is simply the pmf (probability mass function) of the distribution at each value in the support. This is calculated by drawing $N$ samples, then for each value $x_i$, finding $\frac{n}{N}$, where $n$ is the number of samples that equal $x_i$, to find the approximate probability of that value in the distribution, $P(X = x_i)$. 
+
+Where there is an ordering on the type, discrete distributions can also have their cdf visualised. The cdf of a discrete distribution is a step function. The ordering is given by a first class module representing the type. There are cases where there is no natural ordering - for example a distribution over an arbitrary ADT, so this also allows a user to custom define the ordering. 
+
+Continuous distributions are also displayed as histograms, with a set of samples being put into $n$ equal width bins. The height of each bar is the the pdf (continuous analogue to the pmf), which is calculated by finding the number of samples in each bin, then dividing by the total number of samples. To display the cdf, we can display the empirical cdf directly as a scatter plot, or join points to draw a step function.
+
+Other important visualisations for continuous distributions are the Q-Q and P-P plots. These provides a way to qualitatively compare distributions. Q-Q plots plot the quantiles of two distributions against each other as a scatter plot - if all the points lie on the the line $y=x$, the distributions are identical. P-P plots plot the cdfs of two distributions against each other, that is, for two cdfs $F$ and $G$, the points (F(z), G(z)) are plotted for some values of z in the range $(-\infty,+\infty)$. Both these plots are often used to find the differences between some theoretical expected distribution and the distribution given by some data. This can be used in the PPL context to find whether a distribution given by a model matches what was expected in the theory.
+
+For primitive continuous distributions, a smooth line can also be drawn since we have a function that can calculate the exact pdf or cdf. This can also be overlaid onto a histogram, to again compare two distributions.

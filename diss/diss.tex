@@ -1,4 +1,4 @@
-\documentclass[12pt,notitlepage,twoside,a4paper]{report}
+\documentclass[12pt,notitlepage,a4paper]{report}
 
 \usepackage[outputdir=out]{minted}
 \usepackage[T1]{fontenc}
@@ -18,7 +18,7 @@
 \usepackage{subfig}
 \usepackage{amsmath}
 \usepackage{xcolor}
-\usepackage[margin=1in,headheight=13.6pt]{geometry}
+\usepackage[margin=2cm,headheight=13.6pt]{geometry}
 \pgfplotsset{compat=1.13}
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -141,8 +141,17 @@ I, Anik Roy of Christ's College, am content for my dissertation to be made avail
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the appendices
 \appendix
-\chapter{Project Proposal}
 
+\chapter{Example Programs} \label{app:examples}
+\section{Sprinkler} \label{app:sprinkler}
+\section{Coin} \label{app:coin}
+\section{Linear Regression} \label{app:linreg}
+\section{Hidden Markov Model} \label{app:hmm}
+\section{Dirichlet Process} \label{app:dp}
+
+\chapter{Full Documentation}
+
+\chapter{Project Proposal}
 \input{propbody}
 
 \end{document}
