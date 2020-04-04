@@ -84,7 +84,7 @@ let mh_transform ~burn d =
     Yield (return next,next)
   in
   let seq = Sequence.unfold_step ~init:(sample proposal) ~f:iterate in
-  let seq = Sequence.drop_eagerly seq burn in (* burn initial *)
+  let seq = Sequence.drop_eagerly seq burn in (* burn initial states *)
 
   let r = ref seq in
   (* could also return a sample function here instead *)

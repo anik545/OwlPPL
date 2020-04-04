@@ -10,13 +10,13 @@ let model_with_soln_continuous = [("coin",coin,coin_soln)]
 
 (* TODO: get these working with the models *)
 let infs = [
-  Rejection(100,Soft);
-  (* Importance(100); *)
+  Rejection(300,Soft);
+  Importance(100);
   MH(500);
-  (* SMC(100) *)
+  SMC(100)
 ]
 let infs_ks = [
-  Rejection(100,Soft);
+  Rejection(300,Soft);
   Importance(100);
   MH(500);
   SMC(100)
@@ -34,7 +34,7 @@ let do_chi () =
   let pvals = 
     List.map 
       inferreds
-      ~f:(fun (n,ds,exact) -> n,List.map ds ~f:(fun d -> chi_sq d exact))
+      ~f:(fun (n,ds,exact) -> n,List.map ds ~f:(fun d -> chi_sq ~n:100000 d exact))
   in
   pvals
 
@@ -67,21 +67,24 @@ let print_line oc (line: string * (Owl_stats.hypothesis list)) =
 
 let args = Sys.get_argv ()
 let root_dir = "/home/anik/Files/work/project/diss/data"
+
 (* chi *)
-let fname = if Array.length args >= 2 then (Sys.get_argv ()).(1) else sprintf "%s/hypothesis-chi.csv" root_dir
-let oc = Out_channel.create fname
+let chi () =
+  let fname = if Array.length args >= 2 then (Sys.get_argv ()).(1) else sprintf "%s/hypothesis-chi.csv" root_dir in
+  let oc = Out_channel.create fname in
 
-let ks = do_chi ()
-let () = print_headers oc infs
-let () = List.iter ks ~f:(fun line -> print_line oc line)
+  let ks = do_chi () in
+  print_headers oc infs;
+  List.iter ks ~f:(fun line -> print_line oc line);
+  Out_channel.close oc
 
-let () = Out_channel.close oc
 (* ks *)
-let fname = if Array.length args >= 3 then (Sys.get_argv ()).(2) else sprintf "%s/hypothesis-ks.csv" root_dir
-let oc = Out_channel.create fname
+let ks () = 
+  let fname = if Array.length args >= 3 then (Sys.get_argv ()).(2) else sprintf "%s/hypothesis-ks.csv" root_dir in
+  let oc = Out_channel.create fname in
+  let ks = do_ks () in
+  print_headers oc infs_ks;
+  List.iter ks ~f:(fun line -> print_line oc line);
+  Out_channel.close oc
 
-let ks = do_ks ()
-let () = print_headers oc infs_ks
-let () = List.iter ks ~f:(fun line -> print_line oc line)
-
-let () = Out_channel.close oc
+let () = chi ()

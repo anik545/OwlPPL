@@ -1,14 +1,8 @@
-open Common
-open Core
-open Dist.GADT_Dist
-
-(* sequential monte carlo - particle filter *)
-let rec smc: 'a.int -> 'a dist -> 'a samples dist =
-  fun n ->
-  function
-  (* at each piece of evidence/data, update each particle by the weight given by c *)
+let rec smc: 'a.int -> 'a dist -> 'a samples dist = fun n d ->
+  match d with
+  (* resample at each piece of evidence/data, *)
   | Conditional(c,d) ->
-    let updated = fmap normalise @@ 
+    let updated = fmap normalise @@
       condition' (List.sum (module Float) ~f:snd) @@
       let* last_particles = smc n d in
       let new_particles =
@@ -18,29 +12,21 @@ let rec smc: 'a.int -> 'a dist -> 'a samples dist =
           last_particles in
       return new_particles
     in
-    updated >>= resample
+    let ps* = updated in
+    resample ps
   (* apply function to each particle, no resampling *)
   | Bind(d,f) ->
     let* particles = smc n d in
-    mapM (fun (x,weight) -> 
+    mapM (fun (x,weight) ->
         let* y = f x in
-        return (y, weight)) 
+        return (y, weight))
       particles
   (* initialise n particles wih weights from the pdf *)
-  | Primitive d -> 
+  | Primitive d ->
     List.init n
       ~f:(fun _ -> (fmap (fun x-> (x, P.pdf d x)) (Primitive d)))
-    |> sequence 
+    |> sequence
   (* initialise n particles with the same value and weight *)
-  | Return x -> 
+  | Return x ->
     List.init n ~f:(fun _ -> return (x,1.))
     |> sequence
-
-let smc' n d = (smc n d) >>= categorical
-
-let smcStandard n d = prior' (smc n d)
-let smcStandard' n d = prior' (smc' n d)
-
-open Importance
-let smcMultiple k n d = (fmap flatten (importance k (smc n d)))
-let smcMultiple' k n d = (importance' k (smc' n d))

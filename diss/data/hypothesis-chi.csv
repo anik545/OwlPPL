@@ -1,2 +1,2 @@
-,rejection,metropolis hastings
-sprinkler,1.,1.
+,rejection,importance,metropolis hastings,particle filter
+sprinkler,1.,0.999527,1.,0.999863

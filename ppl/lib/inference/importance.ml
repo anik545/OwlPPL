@@ -10,10 +10,10 @@ let importance' n d =
   categorical l
 
 
-let importance' n d = 
-  let particles_dist = sequence @@ List.init n ~f:(fun _ -> prior d) in
-  let* particles = particles_dist in 
-  categorical particles
+(* let importance' n d = 
+   let particles_dist = sequence @@ List.init n ~f:(fun _ -> prior d) in
+   let* particles = particles_dist in 
+   categorical particles *)
 
 
 let rec create' n d sofar =
@@ -34,6 +34,21 @@ let reject_transform_hard ?(threshold=0.) d =
     if Float.(s > threshold) then return (x,s) else repeat ()
   in
   repeat ()
+
+let rec reject'': 'a. 'a dist -> 'a option dist = function
+  | Conditional(c,d') ->
+    let* x = reject'' d' in
+    (match x with
+       Some y ->
+       if Float.(c y = 0.) then return None
+       else return (Some(y))
+     | None -> return None)
+  | Bind(d,f) ->
+    let* x = reject'' d in
+    (match x with
+       Some y -> let* z = reject'' (f y) in return (z)
+     | None -> return None)
+  | x -> let* y = x in return (Some y)
 
 let reject_transform_soft d = 
   let rec repeat () =

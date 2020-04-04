@@ -73,11 +73,11 @@ module Dist(P: Primitives) = struct
     | Primitive: 'a P.primitive -> 'a dist
     | Conditional: ('a -> float) * 'a dist -> 'a dist
     (* | Conditional: ('a -> float) * 'a var_dist -> 'a dist *)
-
+  (* | Observe: 'a P.primitive * 'a * 'a dist -> 'a dist *)
   (* TODO: uncomment + fix *)
   (* | Independent: 'a dist * 'b dist -> ('a * 'b) dist
      let (and+) d1 d2 = Independent(d1,d2) *)
-
+  (* let observe x dst d = Observe(dst,x,d) *)
   let condition' (c: 'a -> likelihood) d = Conditional (c,d)
   let condition b d = Conditional((fun _ -> if b then 1. else 0.), d)
   let score s d = Conditional((fun _ -> s),d)

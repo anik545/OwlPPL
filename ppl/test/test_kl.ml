@@ -64,8 +64,8 @@ open Models
 (* let _ = gen_csv' ~fname:"kl_coin_all.csv" single_coin single_coin_exact is KL.kl_continuous *)
 
 (* sprinkler *)
-(* let _ = gen_csv ~fname:"sprinkler_mh.csv" grass_model grass_model_exact (MH 500) KL.kl_discrete *)
-(* let _ = gen_csv ~fname:"sprinkler_rej.csv" grass_model grass_model_exact (Rejection(300,Soft)) KL.kl_discrete *)
+let _ = gen_csv ~fname:"sprinkler_mh.csv" grass_model grass_model_exact (MH 500) KL.kl_discrete
+let _ = gen_csv ~fname:"sprinkler_rej.csv" grass_model grass_model_exact (Rejection(300,Soft)) KL.kl_discrete
 let _ = gen_csv ~fname:"sprinkler_imp.csv" grass_model grass_model_exact (Importance 500) KL.kl_discrete
 let _ = gen_csv ~fname:"sprinkler_smc.csv" grass_model grass_model_exact (SMC 500) KL.kl_discrete
 

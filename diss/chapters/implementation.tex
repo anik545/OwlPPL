@@ -1,6 +1,8 @@
 % !TeX root = ../diss.tex
-\section{Repository Overview}
+In this chapter I describe how the DSL is implemented. Documentation for all publicly exposed functions can be found in appendix \ref{app:docs}.
 
+\section{Repository Overview}
+% TODO: include a file tree?
 The majority of my code is in the \texttt{ppl} directory, which contains the core library, unit tests, statistical testing code and some example programs written using the library.
 
 I have implemented my ppl as a library residing in the \texttt{lib} subdirectory, contained within the module \texttt{Ppl}. Opening this module in a script allows a user to use my library. Ppl includes several submodules, most importantly the \texttt{Dist} and \texttt{Inference} modules, which contains the code for representing, creating and combining distributions, and performing inference, respectively. These functions can be found in separate files in the inference folder, and are all exported in the inference module. The other modules exported in Ppl are plot, prim\_dist, and samples.
@@ -20,14 +22,14 @@ All code is written in OCaml 4.08, with the main dependencies being Jane Street'
 \section{Language Design}
 I chose to implement my language as a domain specific language (DSL) shallowly embedded into the main OCaml language. This allows models built in the ppl to be easily composed with other standard OCaml programs.
 
-Using a shallow embedding means we can use all of the features of OCaml as normal, including branching (if/then/else), loops, references, (higher-order) functions, and importantly, recursion. This can allow us to define models that do not terminate and are therefore invalid. However, we can write functions which are \textit{stochastic recursive} \cite{siegmund}, that is, functions which have a probability of termination that tends to 1 as the number of successive calls tends to infinity. This leads to functions which terminate their recursion non-deterministically. Any model which does not satisfy this will be considered an invalid model - unfortunately as it is not possible to determine whether or not a program will halt, this property cannot be enforced. 
+Using a shallow embedding means we can use all of the features of OCaml as normal, including branching (if/then/else), loops, references, let bindings, (higher-order) functions, and importantly, recursion. This can allow us to define models that do not terminate and are therefore invalid. However, we can write functions which are \textit{stochastic recursive} \cite{siegmund}, that is, functions which have a probability of termination that tends to 1 as the number of successive calls tends to infinity. This leads to functions which terminate their recursion non-deterministically. Any model which does not satisfy this will be considered an invalid model - unfortunately as it is not possible to determine whether or not a program will halt, this property cannot be enforced. 
 
 I use a set of primitive distributions which can be combined (using arbitrarily complex deterministic OCaml code) to produce new more complex distribution. For example, one can take the sum of two discrete uniform distributions to simulate the addition of two dice rolls. 
 
 PPLs in general are similar to normal programming languages, but need to support two extra operations - \texttt{sample} and \texttt{condition} \cite{gordon2014probabilistic}. The sample operator allows models to be built up .The condition operator has a few variants, which are covered in section \ref{sec:condition}.
 
 \section{Representing Distributions}
-In order to define my DSL, I needed data structures to represent probabilistic models as well as distributions that are used as both input and output. Input distributions are the primitive distributions that are used to build models and constrain observations. We have more information about these distributions, such as how to sample from them exactly or exact pdf functions, and this information is used in inference. The output of inference is usually a function which can sample from the posterior, but we generally want to also collate statistics about the posterior distribution. Since we only have an approximate sampler, we can output empirical distributions from which many statistics, e.g. mean, variance, cdf etc.,  can be approximated.
+In order to define my DSL, I needed data structures to represent probabilistic models as well as distributions that are used as both input and output. Input distributions are the primitive distributions that are used to build models and constrain observations. We have more information about these distributions, such as how to sample from them exactly and exact pdf functions, and this information is used in inference. The output of inference is usually a distribution which can be sampled from to obtain the posterior, but we generally want to also collate statistics about the posterior distribution. Since we only have an approximate sampler, we can output empirical distributions from which many statistics, e.g. mean, variance, cdf etc., can be approximated.
 
 \subsection{Probability Monad}
 
@@ -37,7 +39,23 @@ Using monads also allows us to define several helper functions which can be used
 
 Using monads also allows the use of the extended let operators introduced in OCaml 4.08. These allow the definition of custom let operators, which mimic do-notation in Haskell. This means that sampling from a distribution (within a model) can be done using the \texttt{let*} operator, and the variable that is bound to can be used as if it were a normal value. The one caveat is that the user must remember to \texttt{return} at the end of the model with whatever variable(s) they want to find the posterior over. The \texttt{and*} operator can also be used when we use several independent distributions in a row. This can make for more efficient sampling (and inference) since we have more information about the structure of the program. It is also a common pattern to set up a model by first independently drawing from several distributions. An example of let* and and* is given below.
 
-\ocamlcode{code_snippets/let_and.ml}
+% \begin{noindent}
+\begin{ocamlcode-in}
+let* x = normal 0. 1.
+and* y = normal 0. 1. in
+return (x + y)
+\end{ocamlcode-in}
+% \end{noindent}
+		
+I define my own functor for monads in order to define several helper functions. This functor takes a module wrapping any monad type and extends it with helper functions. The full module documentation for this can be found in appendix \ref{app:docs} (\texttt{Monad.Make\_extended}). An example if the liftM2 function, which allows normal operations to be lifted to distributions, e.g. an addition operator for the output for two distributions can be simply created by lifting the normal addition operator.
+
+% \begin{noindent}
+\begin{ocamlcode-in}
+let ( +~ ) = liftM2 ( +. )
+(* the distribution created by adding two normals *)
+let d = (normal 0. 1.) +~ (normal 0. 1.)
+\end{ocamlcode-in}
+% \end{noindent}
 
 However, there are many different underlying data structures which can be used to represent distributions. The simplest is a list of pairs representing a set of values and corresponding probabilities, \texttt{('a * float) list}. This is a very convenient and natural way to represent discrete distributions, with return and bind defined as in listing \ref{lst:monad_plist}. Here, \texttt{return} gives us the distribution with just one value, and bind combines a distribution with a function that takes every element from the initial distribution and applies a function that creates a set of new distributions. The new distributions are then `flattened' and normalised. This approach has been used to create functional probabilistic languages \cite{erwig}, but has several drawbacks, primarily the fact that it cannot be used to represent continuous distributions, and that inference is not efficient - there is no information from the model encoded in this representation, such as how random variables are combined or from what distributions they came from.
 
@@ -59,15 +77,16 @@ A major problem with this approach is that in flattening distributions, we must 
 Although this is not the final data structure I chose for general probabilistic models, it is the one I used for discrete distributions. I also used a \texttt{Map} for the data structure that produced approximations to discrete posterior distributions.
 
 \subsection{GADT} \label{sec:gadt}
-
 % TODO: check this
-The structure that I landed on to represent general models is a generalised algebraic data type. GADTs have been used to represent probabilistic models \cite{scibior2015practical} and are often used to implement interpreters in functional languages. The GADT represents a model in a very general way, and can then be `interpreted' by a sampler or an inference algorithm. For sampling, I traverse the model, ignoring conditionals to enable forward sampling. For inference, I provide some inference functions as transforming the conditional distributions to distributions without any conditional statements, allowing sampling to be performed as normal. Some inference functions are implemented by generating an empirical distribution that can be sampled from similarly. Primitive distributions also have a special variant (which takes a different \texttt{primitive} type). We can find exact the exact pdf/cdf of these distributions, unlike the \texttt{dist} type, which can only be sampled from. The implementation can be seen in listing \ref{lst:gadt1}. The monad functions are also provided, which construct the corresponding variant in the GADT. \texttt{Return} represents a distribution with only one value, and \texttt{Bind} contains a distribution and a function, which represents that function being applied to the output from that distribution.
+The structure that I landed on to represent general models is a generalised algebraic data type. GADTs are often used to implement interpreters in functional languages, and have been used to represent probabilistic models. The GADT I implement here (and some inference algorithms) is based on (Scibior et al. 2015)\cite{scibior2015practical}. The GADT represents a model in a very general way, and can then be `interpreted' by a sampler or an inference algorithm. For sampling, I traverse the model, ignoring conditionals to enable forward sampling. For inference, I provide some inference functions as transforming the conditional distributions to distributions without any conditional statements, allowing sampling to be performed as normal. Some inference functions are also implemented by generating an empirical distribution that can be sampled from similarly. Primitive distributions also have a special variant (which takes a different \texttt{primitive} type). We can find the exact pdf/cdf of these distributions, unlike the \texttt{dist} type, which can only be sampled from. Listing \ref{lst:gadt1} shows each of the variants. The monad functions are also provided, which construct the corresponding variant in the GADT. \texttt{Return} represents a distribution with only one value, and \texttt{Bind} contains a distribution and a function, which represents that function being applied to the output from that distribution.
 
 \begin{listing}[!ht]
 	\ocamlcode{code_snippets/gadt.ml}	
 	\caption{Representing a probabilistic model using a GADT}
 	\label{lst:gadt1}
 \end{listing}
+
+An important feature of this type is that it is polymorphic - this allows distributions to be defined over any type. Usually, this type is floats or ints, but polymorphism allows us to define distributions over anything, including distributions over distributions - a feature used in certain models such as a Dirichlet process.
 
 \subsection{Primitive Distributions}
 In PPLs, users build complex models by composing more simple elementary primitive distributions (ERP) \cite{pmlr-v15-wingate11a}. These primitive distributions need to have a few operations defined on them, namely \texttt{sample, pdf, cdf} and \texttt{support}.
@@ -95,8 +114,7 @@ An example of this being used to add a new primitive distribution is given in li
 
 The output of Bayesian inference is a probability distribution over the variable we are concerned with. Ideally, we would be able to produce an exact posterior distribution, and be able to extract exact statistics from it. However, approximate inference only allows us to create functions to sample from this posterior. Since my inference procedures all produce an object of type \texttt{'a dist}, we can define a signature for a type of an empirical distribution. The type is abstract since there are different implementations for discrete and continuous distributions. For discrete distributions, we use a \texttt{Core.Map}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/core_kernel/Core_kernel/Map/index.html}}, whereas continuous distributions use a \texttt{Core.Set}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/core_kernel/Core_kernel/Set/index.html}}. Creating values with these types required passing a first class module representing the type of the keys - this is so that an appropriate compare function can be used in the internal tree data structure.
 	
-I also provide modules which are backed by the polymorphic versions of these data structures (\texttt{Core.Map.Poly}). These types don't require the use of first class modules to create objects, since the keys are compared using the polymorphic compare function. While this makes using the module more ergonomic (don't need to pass the first class module), it also makes them more inefficient.
-
+I also provide modules which are backed by the polymorphic versions of these data structures (\texttt{Core.Map.Poly}). These types don't require the use of first class modules to create objects, since the keys are compared using the polymorphic compare function. While this makes using the module simpler to use (no need to pass the first class module), it also makes them more inefficient due to the use of polymorphic comparison.
 
 \begin{listing}[ht]
 	\ocamlcode{code_snippets/empirical_sig.ml}
@@ -136,15 +154,33 @@ This function is mostly useful for discrete models when using equality in this m
 
 For soft conditioning, for example an observation that we know comes from a certain distribution, there is an \texttt{observe} function. This function is essential for continuous distributions, since the probability of observing any one value is 0, making hard conditioning since it will just reject every trace. Instead, we can use the pdf function of the distribution to determine how likely that observation is in the model.
 	
-The \texttt{score} function is similar to the condition operator, except instead of 0, it assigns a particular constant score (any float) to the trace. An example is %todo.
-		
+The \texttt{score} function is similar to the condition operator, except instead of 0, it assigns a particular constant score (any float) to the trace. This is generally used in a branch, where a constant score will be assigned depending on some (deterministic) condition.
+
+% \begin{noindent}
+\begin{listing}[!htb]
+	\centering
+\begin{ocamlcode-in}
+let condition b d = Conditional((fun _ -> if b then 1. else 0.), d)
+let score s d = Conditional((fun _ -> s),d)
+let observe x dst d = Conditional((fun _ -> P.pdf dst x),d) 
+\end{ocamlcode-in}	
+	\caption{The definitions of the different conditioning operators}
+	\label{lst:cond}
+\end{listing}
+% \end{noindent}
+
 \section{Forward Sampling}
 % https://www.robots.ox.ac.uk/~twgr/assets/pdf/rainforth2017thesis.pdf - sec 7.1, pg 135
 The simplest operation to define on models is to sample from them. Sampling from conditional distributions required inference, and is discussed in section \ref{sec:inference}. Here, we run a probabilistic program 'forwards', that is, running a generative model and seeing the outputs without conditioning on observed data.
 	
 In PPLs, a complete program can be thought of as a posterior, $P(\theta\mid x)$, the distribution of a parameter given some observed data. The generative model, i.e. the program without condition statements, can be thought of as the prior distribution, $P(\theta)$. The condition statements then define the likelihood model, that is, $P(x\mid \theta)$, the probability of the observations in the current model (the prior). So finding the prior is the same as disregarding the conditionals (essentially ignoring the data). Sampling is only difficult in the presence of conditionals (as this requires inference), so this allows us to sample from the prior using the same sample function defined before. We can also transform any \texttt{'a dist} into a different \texttt{'a dist} that is the prior by ignoring conditional statements.
 	
-We can also take into account the conditionals, and produce weighted samples, with the weight being the score assigned by each conditional branch, accumulated by multiplying all the scores. This gives us a set of values with corresponding weights which represent how likely those values are. An important property of these weights is that they are not normalised, so we cannot use this to find the posterior directly. 
+We can also take into account the conditionals, and produce weighted samples, with the weight being the score assigned by each conditional branch, accumulated by multiplying all the scores. This gives us a set of values with corresponding weights which represent how likely those values are. An important property of these weights is that they are not normalised, so we cannot use this to find the posterior directly. I have implemented several variants of functions for finding the prior and sampling, all with the same concept as below.
+
+% TODO split into two panes
+\ocamlcode{code_snippets/prior_sample.ml}
+
+The function for generating a prior does not directly take samples, but manipulates the structure of the dist GADT. For example, in the \texttt{Bind} branch, it actually introduces 2 new bind variants (via \texttt{let*}) which produces a new distribution lazily. This makes it easier to use the prior within inference algorithms, and allows it to be composed with other distribution modifying functions.
 
 \section{Inference} \label{sec:inference}
 
@@ -179,10 +215,19 @@ This method is very naive, and therefore inefficient. Since we essentially take 
 % Why rejection doesn't work for continuous, so must use importance instead -->
 % http://www.cs.tut.fi/~elomaa/teach/AI-2013-9.pdf
 % Hard rejection
-In my implementation of rejection sampling, we take samples from the prior, with accumulated scores. If the score is above some constant threshold, then we accept the sample, and if not, we reject the sample. The specific case of the general rejection sampling algorithm we use here sets the proposal distribution as the prior, and we use the scores to approximate the density function of the posterior. The implementation is shown in listing \ref{lst:rej}
+In my implementation of rejection sampling, we take samples from the prior, with accumulated scores. If the score is above some constant threshold, then we accept the sample, and if not, we reject the sample. The specific case of the general rejection sampling algorithm we use here sets the proposal distribution as the prior, and we use the scores to approximate the density function of the posterior. The implementation is shown in listing \ref{lst:rej}.
 % todo: code of rejection sampling
 
-This particular function is hard rejection, since samples with a lower score are always rejected. I have also implemented functionality to perform `soft' rejection. This method instead accepts or rejects using a bernoulli distribution with the probability of acceptance being the score attached to the sample.
+\begin{listing}[!htb]
+	\centering
+	\ocamlcode{code_snippets/rej.ml}
+	\caption{Simplest rejection sampling method}
+	\label{lst:rej}
+\end{listing}
+
+This method is naive, since it runs an entire trace even if the first condition dropped the score below the threshold. An optimisation I implemented is to short-circuit this, and reject as soon as the trace goes below the threshold. This does slightly increase the time taken for small models, and so is not the default. It is also implemented as a dist transformation, so can again be used with the same sample methods.
+
+This particular function is hard rejection, since samples with a lower score are always rejected. I have also implemented functionality to perform `soft' rejection. This method instead sets the probability of acceptance being the score attached to the sample.
 
 A problem with rejection sampling is if conditions make most execution traces very unlikely. This means it will take a very large number of samples to have enough (or any) accepted samples. An example is given in listing \ref{lst:bad-reject}, where the condition only has a 1\% chance of being true. This means that, on average, for every 1000 samples, we will only accept one.
 
@@ -205,26 +250,24 @@ condition (x=0)
 	
 Likelihood weighting is an importance sampling method, when the proposal distribution we use is the prior. We want any algorithm we use to be as general as possible, and not need to be tuned using auxiliary distributions chosen by hand. Since for any model we can find the prior distribution easily, it is natural to use this as a proposal distribution here - this can be seen in several of the implementations of inference. 
 
-The implementation of likelihood weighting is simple - we simply take a set of samples (with weights) from the prior, remove duplicates and normalise, and use this set of particles as a the categorical distribution representing the posterior. 
+The implementation of likelihood weighting is simple - we simply take a set of samples (with weights) from the prior, remove duplicates and normalise, and use this set of particles as a the categorical distribution representing the posterior.
 % \begin{noindent}	
 \begin{listing}[!htb]
 	\centering
-	
 	\begin{ocamlcode-in}
 let importance n d = 
   let particles_dist = sequence @@ List.init n ~f:(fun _ -> prior d) in
   let* particles = particles_dist in 
   categorical particles
-
 	\end{ocamlcode-in}
-	\caption{Metropolis hastings}
+	\caption{Likelihood weighting}
 	\label{lst:mh}
 \end{listing}
 % \end{noindent}
 
 The sequence function is a monad function that takes a list of distributions and fold them together so that they act as a single distribution returning entire lists. This allows The use of \texttt{(let*)} to sample a set of particles at once, and use them directly as the distribution.
 % code of importance sampling.
-	
+
 \subsection{Metropolis Hastings} \label{sec:mh}
 Metropolis Hastings is an MCMC algorithm, and so is used to find a Markov chain with the stationary distribution equal to the target distribution, here the posterior. There are many variants of this algorithm, and the one I implement here is the independent metropolis hastings (IMH) algorithm. I use the prior as a proposal distribution, using scores as an approximation to a density function. The algorithm is outlined below.
 \begin{itemize}
@@ -245,7 +288,8 @@ Metropolis Hastings is an MCMC algorithm, and so is used to find a Markov chain 
 	\item The state x is then accepted with probability $\alpha(x,y)$. If accepted, we use x as the next state, or if rejected, we re-use y as the next state. 
 \end{itemize}
 
-This produces a Markov chain with transition probability: \[p(x, y) = q(y)\alpha(x, y) \quad\quad y\neq x\]. It is known as `independent' metropolis hastings since subsequent candidate states ($x$) are independent on previous values of states.
+This produces a Markov chain with transition probability: \[p(x, y) = q(y)\alpha(x, y) \quad\quad y\neq x\].
+It is known as `independent' metropolis hastings since subsequent candidate states ($x$) are independent on previous values of states.
 
 % https://probmods.org/chapters/inference-algorithms.html
 % MCMC section
@@ -265,8 +309,23 @@ One important property of the return distribution is that consecutive sample sta
 % particle filter section
 Particle Filters are a class of algorithms which use particles to approximate a posterior. This is similar to the technique I used in importance sampling (\ref{sec:likelihood-wighting}), but the difference here is that the particles are sequentially updated as we observe condition statements (i.e. as we observe data). In fact, an example of a particle filtering algorithm is sequential importance sampling, but here I use an algorithm called the bootstrap filter\cite{particlefilter}.
 
+The code given in listing \ref{lst:smc} transforms a conditional distribution to a new conditional distribution. In order to find the posterior, we simply ignore the conditional by finding the prior after using the smc method.
+
+\begin{listing}[!htb]
+	\centering
+	\ocamlcode{code_snippets/smc.ml}
+	\caption{Particle Filter}
+	\label{lst:smc}
+\end{listing}
+
+The GADT is traversed top down, with particles being initialised at a `leaf' - primitives or returns. From this root, bind functions apply functions to the particles, and conditional statements updates the weights and resamples. The \texttt{resample} function takes a set of particles and takes samples from this set with replacement - this is the `bootstrap' resampling method. The output distribution is conditioned by the total weight of all particles.
+
+Increasing the number of particles finds a more accurate distribution, but also increases the amount of time and memory required.
+
 \subsection{Particle Cascade} \label{sec:pc}
 The particle cascade algorithm (also Asynchronous Sequential Monte-Carlo) is an algorithm that extends the particle filter, introduced in (Paige et al. 2014)\cite{paige2014asynchronous}. It uses a lazily generated infinite set of particles, which allows it to be `anytime', that is, it can generate more particles without having to start regenerate a large particle set from scratch. It also features a parallelisable re-sample step, although I will not make use of this feature, since I am not using multi-core OCaml.
+
+The main implementation difference is that instead of resampling, a particle `branching' operation is used, which produces a lazily generated set of particles at each resample step. Each particle produces 0 or more children to be used in the next iteration.
 
 \subsection{Particle-Independent Metropolis-Hastings} \label{sec:pimh}
 
@@ -274,97 +333,66 @@ SMC and MCMC algorithms are two distinct classes of algorithms, but can be combi
 
 % TODO: describe maths using https://www.maths.lancs.ac.uk/~sherlocc/CompStats/Dawn_of_Time/PseudoMarg/compstats_PIMH_BT.pdf
 
-Thanks to the fact that my PPL allows composition of inference algorithms, a basic implementation is very simple.
-\begin{ocamlcode-in}
-	let pimh k n d = mh k (Smc.smc n d)
-\end{ocamlcode-in}
+Due to the fact that my PPL allows composition of inference algorithms, a basic implementation is very simple.
 
-However, there are flaws in this implementation, since any sampler produced is show and can be made more inefficient.
-In addition, the reason this works is because the \texttt{smc} function produces a dist with conditionals, which no other inference method does. 
+% \begin{noindent}
+\begin{ocamlcode-in}
+let pimh k n d = mh k (Smc.smc n d)
+\end{ocamlcode-in}
+% \end{noindent}
+However, there are flaws in this implementation, since any sampler produced is slow and can be made more efficient.
+In addition, the reason this works is because the \texttt{smc} function produces a dist with conditionals, which no other inference method does.
 
 % These examples should really be in evaluation
-\section{Examples}
-To show how my PPL would be used on real problems, I now outline a set of example problems. Several examples here will be simple, and have analytic solutions - this is so that I can then test the correctness of applying inference on them. Full derivations of the solutions are given in appendix \ref{app:examples}
-
-\subsection{Sprinkler}
-% to show exact inference on discrete model
-The sprinkler model is a commonly used example in Bayesian inference due to it's simplicity. It is an example of a \textit{Bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}. The code in listing \ref{lst:sprinkler} shows the model in the diagram encoded as a program. This particular program can be used (by applying an inference function) to find the probability of rain given that the grass is wet.
-	
-\ocamlcode{code_snippets/sprinkler.ml}	
-	
-\begin{listing}[!ht]
-	\caption{Sprinkler model}
-	\label{lst:sprinkler}
-\end{listing}
-	
-	
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=\textwidth]{figs/sprinkler-network.png}
-	\caption{Bayesian Network example}
-	\label{fig:sprinkler-network}
-\end{figure}
-	
-\subsection{Biased Coin}
-% to show analytically solvable continuous distribution
-% include graph of beta compared to computed posterior
-Modelling a biased coin shows an example of a very simple model with a continuous posterior that can be calculated analytically\cite{datasci}. 
-% 
-The model is of a coin that is tossed $n$ times to give $x$ heads. We do not know if the coin is biased or not, and would like to find out the bias, $p$ of the coin, where $p$ is the probability of heads, with $p=0.5$ being an unbiased coin.
-% 
-To find the posterior, we use an uninformative prior ($\Theta$), the uniform. The likelihood model ($X$) is a binomial.
-% 
-\begin{alignat*}{3}
-	\text{Prior:~}      & \Theta &   & \sim \text{Uniform}(0,1)    \\
-	\text{Likelihood:~} & X      &   & \sim \text{Binom}(n,\theta) 
-\end{alignat*}
-% 
-We then use Bayes' rule to calculate the posterior.
-				    
-\begin{align*}						
-	P(\Theta=\theta \mid X=x) & = \frac{1}{\kappa}P(\Theta=\theta)P(X=x\mid\theta)     \\ 
-	                          & = \frac{1}{\kappa}\binom{n}{x}\theta^x(1-\theta)^{n-x} \\
-	                          & = \frac{1}{\kappa'}\theta^x(1-\theta)^{n-x}            
-\end{align*}
-$$\kappa'=\int_{\phi=0}^1\phi^x(1-\phi)^{n-x}~d\phi$$                        
-	
-This results in the posterior, the beta distribution, specifically Beta$(x+1,n-x+1)$. 
-	
-The program in my PPL is shown in listing \ref{lst:coin}, and demonstrates setting up the model, performing inference as well as finding the mean of the posterior. The application is to find the chance of the next coin flip landing heads. This example uses $n=10$ and $x=9$, so the mean produced is roughly 0.83, the mean of Beta$(10,2)$.
-	
-\begin{listing}[!ht]
-	\ocamlcode{code_snippets/coin.ml}	
-	\caption{Coin model}
-	\label{lst:coin}
-\end{listing}
-	
-\subsection{HMM}
-Hidden Markov models are slightly more involved models, where we have a sequence of hidden states, which emit observed states. There are two distributions involved here, the transition distribution, which defines how likely the next state is given the current state, and the emission distribution, which is the 
-% use forward-backward to get exact posterior
-	
-% maybe don't include this?
-\subsection{Linear Regression}
-This example shows how to use multiple data points to 
-	
-\subsection{Mixture Model}
-This example demonstrates a model which cannot be expressed in some PPLs such as STAN or Infer.Net, since it is a non-parametric Bayesian model. This is a Dirichlet Process mixture model with an infinite number of Gaussians\cite{dpmm}. It is used for the common task of clustering a set of data points without knowledge of the number of clusters. This means the number of clusters is allowed to grow with the dataset size. We use a mixture of Gaussians, meaning the likelihood of a points belonging to clusters 
-% Need to show examples which can't be done in graph based thing
-% Need to explain why these examples are actually difficult.
-% http://www.cs.cmu.edu/~epxing/Class/10708-16/slide/lecture18-DP.pdf
-% This is a non-parametric Bayesian model - 
-% no. of params is infinite, grows with size of dataset
-
 \section{Visualisations}
-Visualising the output distributions from inference can be done using the \texttt{Owl\_plplot} module, which allows plotting directly from OCaml, rather than having to interface with other programs manually. I have implemented several helper functions which simplify visualising distributions created by my PPL.
+Visualising the output distributions from inference can be done using the \texttt{Owl\_plplot} module, which allows plotting directly from OCaml, rather than having to interface with other programs manually. I have implemented several helper functions which simplify visualising distributions created by my PPL. Empirical distributions are approximated by histograms displayed as bar charts using \texttt{Owl\_plplot}.
 
-Empirical distributions are approximated by histograms displayed as bar charts using \texttt{Owl\_plplot}. 
-
-For discrete distributions, this conversion is simple - each bar is simply the pmf (probability mass function) of the distribution at each value in the support. This is calculated by drawing $N$ samples, then for each value $x_i$, finding $\frac{n}{N}$, where $n$ is the number of samples that equal $x_i$, to find the approximate probability of that value in the distribution, $P(X = x_i)$. 
+For discrete distributions, this conversion is simple - each bar is simply the pmf (probability mass function) of the distribution at each value in the support. This is calculated by drawing $N$ samples, then for each value $x_i$, finding $\frac{n}{N}$, where $n$ is the number of samples that equal $x_i$, to find the approximate probability of that value in the distribution, $P(X = x_i)$.
 
 Where there is an ordering on the type, discrete distributions can also have their cdf visualised. The cdf of a discrete distribution is a step function. The ordering is given by a first class module representing the type. There are cases where there is no natural ordering - for example a distribution over an arbitrary ADT, so this also allows a user to custom define the ordering. 
 
+\begin{figure}[!htb]
+	\centering
+																																		
+	\caption{The pdf and cdf of a binomial distribution visualised}
+	\label{fig:vis-binom}
+\end{figure}
+
 Continuous distributions are also displayed as histograms, with a set of samples being put into $n$ equal width bins. The height of each bar is the the pdf (continuous analogue to the pmf), which is calculated by finding the number of samples in each bin, then dividing by the total number of samples. To display the cdf, we can display the empirical cdf directly as a scatter plot, or join points to draw a step function.
 
-Other important visualisations for continuous distributions are the Q-Q and P-P plots. These provides a way to qualitatively compare distributions. Q-Q plots plot the quantiles of two distributions against each other as a scatter plot - if all the points lie on the the line $y=x$, the distributions are identical. P-P plots plot the cdfs of two distributions against each other, that is, for two cdfs $F$ and $G$, the points (F(z), G(z)) are plotted for some values of z in the range $(-\infty,+\infty)$. Both these plots are often used to find the differences between some theoretical expected distribution and the distribution given by some data. This can be used in the PPL context to find whether a distribution given by a model matches what was expected in the theory.
+\begin{figure}[!htb]
+	\centering
+																																		
+	\caption{The pdf and cdf of a normal distribution visualised}
+	\label{fig:vis-norm}
+\end{figure}
 
-For primitive continuous distributions, a smooth line can also be drawn since we have a function that can calculate the exact pdf or cdf. This can also be overlaid onto a histogram, to again compare two distributions.
+Other important visualisations for continuous distributions are the Q-Q and P-P plots. These provides a way to qualitatively compare distributions. Q-Q plots plot the quantiles of two distributions against each other as a scatter plot - if all the points lie on the the line $y=x$, the distributions are identical. P-P plots plot the cdfs of two distributions against each other, that is, for two cdfs $F$ and $G$, the points (F(z), G(z)) are plotted for some values of z in the range $(-\infty,+\infty)$. Both these plots are often used to find the differences between some theoretical expected distribution and the distribution given by some data. This can be used in the PPL context to find whether a distribution given by a model matches what was expected in the theory. Figure \ref{fig:vis-qq} shows the output of inference for a model that is expected to output a beta distributions (the coin model in section \ref{sec:coin}) - the points are close to the expected line, visualising a successful inference procedure.
+
+\begin{figure}[!htb]
+	\centering			
+	\caption{The Q-Q and P-P plots of the output of inference for a biased coin model}
+	\label{fig:vis-qq}
+\end{figure}
+
+For primitive continuous distributions, a smooth line can also be drawn since we have a function that can calculate the exact pdf or cdf. This can also be overlaid onto a histogram, to again compare two distributions. Figure \ref{fig:vis-samples} shows an exact beta distribution overlaid onto samples taken from a beta distribution.
+
+\begin{figure}[!htb]
+	\centering
+	
+	\caption{The approsimate and exact pdf of the output of inference for a biased coin model}
+	\label{fig:vis-samples}
+\end{figure}
+
+
+\section{Testing}
+
+Automated testing of PPLs is difficult for reasons outlines in the preparation. However, I still wrote basic unit tests. The test framework I used, Alcotest, lets me check that outputs of functions match expected values. This allows me to test all deterministic helper functions, e.g. normalise. It also lets me test the exact inference method, and very simple distributions and models which only contain a single value.
+
+The test output can be seen below, in figure \ref{fig:test-out}
+\begin{figure}[!htb]
+	\centering
+																																																													
+	\caption{Output from unit tests}
+	\label{fig:test-out}
+\end{figure}

@@ -12,6 +12,8 @@ module type KL_sig = sig
   val kl_continuous: ?n:int -> float primitive -> float dist -> float
   val kolmogorov_smirnov: ?n:int -> ?alpha:float -> float dist -> float primitive -> Owl_stats.hypothesis
   val chi_sq: ?n:int -> ?alpha:float -> 'a dist -> 'a primitive -> Owl_stats.hypothesis
+  val kl_cum_discrete: int array -> 'a primitive -> 'a dist -> (int * likelihood) array
+
 end
 
 module KL_Div(P: Primitives)(D: Samples.Samples): 
@@ -121,6 +123,7 @@ struct
     let num_expected x = Float.of_int n *. (P.pdf d' x) in
     let test_stat = List.sum (module Float) supp ~f:(fun x -> (((num_observed x) -. (num_expected x))**2. /. (num_expected x))) in
     let df = Float.of_int @@ List.length supp - 1 in
+    printf "ts: %f" test_stat;
     let p = Owl_stats.chi2_cdf ~df test_stat in
     if Float.(p < alpha) then
       Printf.printf "two dists are not equal with p=%f\n" p
