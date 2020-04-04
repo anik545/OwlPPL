@@ -9,7 +9,5 @@ module type Empirical = sig
   val to_cdf: 'a t -> ('a -> float)
   val to_list: 'a t -> 'a list
   val mean: 'a t -> 'a
-  (* val print: 'a t -> unit *)
-  val print_map: 'a t -> unit
   val support : 'a t -> 'a support
 end

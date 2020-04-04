@@ -15,6 +15,87 @@
 % show some output from merlin to show the fact that type inference works and is good?
 So far, I have developed a PPL that can be used to define arbitrary probabilistic models and perform Bayesian inference on them. To evaluate the performance of my PPL, I will present some examples to show programs written in my PPL translated into equivalent programs in other PPLs, and then measure time and memory consumption of inference\footnote{All tests are carried out on a single core of an Intel\textsuperscript{(R)} Core\textsuperscript{(TM)} i5-7200U CPU @ 2.50GHz}. I will also determine the correctness of inference procedures by using hypothesis tests which use drawn samples to determine whether two distributions are the same or not. For all these tests, I will use simple models with analytic solutions to compare to.
 
+\section{Examples}
+To show how my PPL would be used on real problems, I now outline a set of example problems. Several examples here will be simple, and have analytic solutions - this is so that I can then test the correctness of applying inference on them. Full derivations of the solutions as well as mathematical descriptions of the models are given in appendix \ref{app:examples}.
+
+\subsection{Sprinkler}
+% to show exact inference on discrete model
+The sprinkler model is a commonly used example in Bayesian inference due to it's simplicity. It is an example of a \textit{Bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}. The code in listing \ref{lst:sprinkler} shows the model in the diagram encoded as a program. This particular program can be used (by applying an inference function) to find the probability of rain given that the grass is wet.
+	
+
+\begin{listing}[!ht]
+	\ocamlcode{code_snippets/sprinkler.ml}	
+	\caption{Sprinkler model}
+	\label{lst:sprinkler}
+\end{listing}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.5\textwidth]{figs/sprinkler-network.png}
+	\caption{Bayesian Network example}
+	\label{fig:sprinkler-network}
+\end{figure}
+
+\subsection{Biased Coin} \label{sec:coin} 
+% to show analytically solvable continuous distribution
+% include graph of beta compared to computed posterior
+Modelling a biased coin shows an example of a very simple model with a continuous posterior that can be calculated analytically\cite{datasci}. 
+% 
+The model is of a coin that is tossed $n$ times to give $x$ heads. We do not know if the coin is biased or not, and would like to find out the bias, $p$ of the coin, where $p$ is the probability of heads, with $p=0.5$ being an unbiased coin.
+% 
+To find the posterior, we use an uninformative prior ($\Theta$), the uniform. This results in the posterior, the beta distribution, specifically Beta$(x+1,n-x+1)$.
+
+The program in my PPL is shown in listing \ref{lst:coin}, and demonstrates setting up the model, performing inference as well as finding the mean of the posterior. The application is to find the chance of the next coin flip landing heads. This example uses $n=10$ and $x=9$, so the mean produced is roughly 0.83, the mean of Beta$(10,2)$.
+
+\begin{listing}[!ht]
+	\ocamlcode{code_snippets/coin.ml}	
+	\caption{Coin model}
+	\label{lst:coin}
+\end{listing}
+
+\begin{figure}[!htb]
+	\begin{minipage}{0.5\textwidth}
+		\centering
+		\jscode{code_snippets/webppl/coin.js}
+		\captionof{listing}{WebPPL}
+	\end{minipage}
+	\begin{minipage}{0.5\textwidth}
+		\centering
+		\clojurecode{code_snippets/anglican/coin.clj}
+		\captionof{listing}{Anglican}
+	\end{minipage}
+	\caption{The coin model in webPPL (js) and anglican (clojure) PPLs}
+	\label{fig:compare-coin}
+\end{figure}
+
+The comparison given in Figure \ref{fig:compare-coin} shows how the same model is defined in other languages. Both languages use similar constructs, despite differing syntax. This example also shows that my PPL is similar to existing systems, and is not more verbose.
+
+\subsection{HMM}
+Hidden Markov models are slightly more involved models, where we have a sequence of hidden states, which emit observed states. There are two distributions involved here, the transition distribution, which defines how likely the next state is given the current state, and the emission distribution, which is the distribution over the observed states given the hidden state. The example in Listing \ref{lst:hmm} uses discrete distributions, but any type of distribution can be used. The exact posterior for simple models can be found using the forward-backward algorithm.
+% use forward-backward to get exact posterior
+\begin{listing}[!ht]
+	\ocamlcode{code_snippets/hmm.ml}
+	\caption{Hidden Markov Model}
+	\label{lst:hmm}
+\end{listing}
+
+\subsection{Linear Regression}
+This example shows how to use multiple data points to infer a continuous distribution. This example can be used to infer the parameters of a line through a set of 2-D points. The fold function can be used to condition on many observations easily. The fmap function is used to map outputs from a distribution. Since the linreg model produces tuples of parameters, we can create individual distributions over either one.
+
+\begin{listing}[!ht]
+	\ocamlcode{code_snippets/linreg.ml}	
+	\caption{Linear Regression}
+	\label{lst:coin}
+\end{listing}
+
+\subsection{Mixture Model}
+This example demonstrates a model which cannot be expressed in some PPLs such as STAN or Infer.Net, since it is a non-parametric Bayesian model. This is a Dirichlet Process mixture model with an infinite number of Gaussians\cite{dpmm}. It is used for the common task of clustering a set of data points without knowledge of the number of clusters. This means the number of clusters is allowed to grow with the dataset size. We use a mixture of Gaussians, meaning the likelihood of a point belonging to each cluster is given by different normal distributions. The full code for this model, along with comparisons to other languages is given in appendix \ref{app:dp}
+% Need to show examples which can't be done in graph based thing
+% Need to explain why these examples are actually difficult.
+% http://www.cs.cmu.edu/~epxing/Class/10708-16/slide/lecture18-DP.pdf
+% This is a non-parametric Bayesian model - 
+% no. of params is infinite, grows with size of dataset
+
 
 \section{Statistical tests}
 To evaluate the correctness of my PPL, I used statistical tests which measure goodness-of-fit, i.e. how similar two distributions are to each other. I compare the empirical distribution of 10,000 samples from an approximated distribution to an exact distribution which is calculated analytically. Test statistic distributions (e.g. the $\chi^2$ distribution) were calculated using \texttt{Owl}, and empirical distributions generated using the \texttt{EmpiricalDist} modules.
@@ -28,7 +109,6 @@ $H_1:$ The sample data do not follow the exact distribution
 
 The $\chi^2$ test is a simple goodness-of-fit test which can test whether or not a given discrete distribution 
 
-
 The test statistic is as follows, with each $i$ being a distinct element in the distribution, $x_i$ is the observed number of samples with the value $i$, and $m_i$ is the expected number of samples for the value $i$.
 
 $$X^{2}=\sum _{i=1}^{k}{\frac {(x_{i}-m_{i})^{2}}{m_{i}}}$$
@@ -37,12 +117,6 @@ This test statistic is compared against the critical value (at the significance 
 \subsubsection{Results}
 \begin{table}[!ht]
 	\centering
-	% \begin{tabular}{|l|l|l|l|l|}
-	% 	\hline
-	% 	          & rejection & importance & metropolis-hastings & particle filter \\ \hline
-	% 	sprinkler &           &            &                     &                 \\ \hline
-	% 	dice      &           &            &                     &                 \\ \hline
-	% \end{tabular}
 	\csvautotabular{data/hypothesis-chi.csv}
 	\caption{p-values of $\chi^2$ test on different models using different inference procedures}
 	\label{tab:chi-pvals}
@@ -89,11 +163,11 @@ The continuous version is similar, with $p$ and $q$ now being density functions:
 
 $${D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx$$
 
-Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins to approximate $q(x)$. I then used Monte Carlo integration to compute the integral.
+Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins to approximate $q(x)$. I then used Monte Carlo integration to compute the integral. Both the metrics (discrete and continuous) were computed with code written using the \texttt{EmpiricalDist} modules. 
 
-Both the metrics (discrete and continuous) were computed with code written using the \texttt{EmpiricalDist} modules. 
+The idea behind conducting this test is ensuring that the KL divergence decreases as we take more samples from the posterior. This ensures that the solution converges to the correct distribution - a KL divergence of 0 implies the distributions are identical.
 
-The idea behind conducting this test is ensuring that the KL divergence decreases as we take more samples from the posterior. This ensures that the solution converges to the correct distribution. I also investigate the rate of convergence using this method.
+Figure \ref{fig:kl} shows the results of this. For each inference procedure, we can see that the KL-divergence for each model decreases as we take more samples. In the case of the sprinkler model, there is a rise near the end, but this can be attributed to noise since the KL-divergence is actually lowest for that model, implying that inference performed best for it.
 
 \begin{figure}[!ht]
 	\centering
@@ -110,8 +184,8 @@ The idea behind conducting this test is ensuring that the KL divergence decrease
 			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_mh.csv};
 			\addlegendentry{mh}
 			% 
-			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_rej.csv};
-			\addlegendentry{rejection}
+			% \addplot table [x index=0, y index=1, col sep=comma] {data/coin_rej.csv};
+			% \addlegendentry{rejection}
 			% 
 			\addplot table [x index=0, y index=1, col sep=comma] {data/coin_imp.csv};
 			\addlegendentry{importance}
@@ -139,9 +213,16 @@ The idea behind conducting this test is ensuring that the KL divergence decrease
 			\addplot table [x index=0, y index=1, col sep=comma] {data/sprinkler_mh.csv};
 			\addlegendentry{mh}
 			% 
-			\addplot table [x index=0, y index=1, col sep=comma] {data/sprinkler_rej.csv};
-			\addlegendentry{rejection}
-			% % 
+			% \addplot table [x index=0, y index=1, col sep=comma] {data/sprinkler_rej.csv};
+			% \addlegendentry{rejection}
+			% 
+			\addplot table [x index=0, y index=1, col sep=comma] {data/sprinkler_imp.csv};
+			\addlegendentry{importance}
+			% 
+			\addplot table [x index=0, y index=1, col sep=comma] {data/sprinkler_smc.csv};
+			\addlegendentry{smc}
+			% 
+															
 			% \pgfplotsinvokeforeach{1,...,\numberofcols}{
 			% 	\addplot table [x index=0,y index=#1, col sep=comma] {data/kl_sprinkler_all.csv};
 			% 	\pgfplotstablegetcolumnnamebyindex{#1}\of{\datatable}\to{\colname}
@@ -192,8 +273,8 @@ Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares aga
 	% TODO: ADD ERROR BARS for maybe 95% confidence interval - use ppl to generate confidence interval 
 	\perfgraph{data/times_mh.csv}{Metropolis-Hastings}{time (ms)}
 	\perfgraph{data/times_smc.csv}{Particle Filter}{time (ms)}
-	\perfgraph{data/times_rej.csv}{Rejection}{time (ms)}
-	\caption{Performance of my ppl against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs.Error bars show the 95\% confidence interval}
+	\perfgraph{data/times_rej.csv}{Rejection Sampling}{time (ms)}
+	\caption{Performance of my ppl against other languages for different models and inference algorithms, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:time-perf}
 \end{figure}
 
@@ -202,22 +283,17 @@ Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares aga
 	% TODO: ADD ERROR BARS for maybe 95% confidence interval - use ppl to generate confidence interval 
 	\perfgraph{data/mems_mh.csv}{Metropolis-Hastings}{memory usage (bytes)}
 	\perfgraph{data/mems_smc.csv}{Particle Filter}{memory usage (bytes)}
-	\perfgraph{data/mems_rej.csv}{Rejection}{memory usage (bytes)}
+	\perfgraph{data/mems_rej.csv}{Rejection Sampling}{memory usage (bytes)}
 	\caption{Memory Usage of my ppl, compared against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:mem-perf}
 \end{figure}
 
+These graphs show that my PPL performs reasonably well compared to webPPL in both memory and time. It is less efficient for some models, but not excessively so. In particular, my implementation of a particle filter performs relatively poorly. This is possibly because when using a large number of particles, a large number of small memory allocations are made by OCaml, which introduced overhead both to my program and the garbage collector. The languages I compare with are both also garbage collected, but may be more optimised for this use case. Anglican is a Clojure library, which runs on the JVM, whereas WebPPL is run using nodejs, a JavaScript interpreter. It is possible there is an interpretive overhead with webPPL, explaining slower running times - however based on my results, it is not significant.
 
-% explain why i chose these languages to compare against?
-For sequential Monte Carlo algorithms, I compared running times with regards to the number of particles used.
-				
+% For sequential Monte Carlo algorithms, I compared running times with regards to the number of particles used.
+
 % don't have just one subsection
 % do i need to talk about profiling at all - what does it show?
 % \subsection{Profiling}
 % \subsubsection{Spacetime}
 % \subsubsection{GProf}
-
-\section{Comparison to other PPLs}
-
-\subsection{A simple model}
-\subsection{A more complex model}

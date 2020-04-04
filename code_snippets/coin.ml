@@ -1,8 +1,8 @@
 let coin_mean inference_algorithm =
   let coin heads =
-    let* weight = continuous_uniform 0. 1. in
-    observe heads (binomial 10 weight)
-      (return weight)
+    let* theta = continuous_uniform 0. 1. in
+    observe heads (binomial 10 theta)
+      (return theta)
   in
 
   let posterior_single_coin = infer (coin 9) inference_algorithm in
