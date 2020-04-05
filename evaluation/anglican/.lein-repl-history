@@ -1,0 +1,217 @@
+coin-model
+smc
+re
+rej
+imp
+timeit
+(timeit "coin-model" "smc")
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+)
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+)
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+)
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+)
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+)
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+)
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+)
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+)
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+)
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+)
+; type of args is arrayseq
+(defn timeit [& args]
+  (let [model (first args) 
+        method (second args)]
+  (do
+  (prn args)
+  (prn (resolve (symbol method)) (resolve (symbol model))))
+  (prn (time1
+    ((resolve (symbol method))
+    (resolve (symbol model)))
+      ))
+  )
+)
+(timeit "coin-model" "smc") 
+(timeit coin-model smc") 
+(timeit coin-model smc) 
+(timeit "coin-model" smc) 
+(timeit coin-model "smc") 
+(timeit "coin-model" "smc") 
+(defn r [] ())
+(resolve (symbol "r"))
+(resolve (symbol "r23"))
+(resolve (symbol "r2312"))
+(resolve (symbol "r236"))
+symbol "smc"
+(symbol "smc")
++(symbol "smc")
+'(symbol "smc")
+~(symbol "smc")
+(~(symbol "smc") )
+(~(symbol "smc") coin-model)
+smc
+(~(symbol "smc") coin-model)
+(~(resolve symbol "smc") coin-model)
+(~(-> resolve symbol "smc") coin-model)
+~smc
+smc
+'smc
+(quote (3 3 ))
+(quote (3 3))
+(symbol smc)
+(symbol "smc")
+(resolve (symbol "smc"))
+(defn smc [model]
+  (doall (->> (doquery :smc model [] :number-of-particles 10000)
+   (take 10000)
+   (map :result)))
+)
+(resolve (symbol "smc"))
+((resolve (symbol "smc")))
+(defn smc [] ())
+((resolve (symbol "smc")))
+(((symbol "smc")))
+((symbol "smc"))
+(symbol "smc")
+(apply (symbol "smc"))
+(apply (symbol "smc") [])
+(apply (symbol "smc") ())
+(apply (symbol "smc") )
+(apply ((symbol "smc")) )
+(apply (symbol "smc") )
+(apply ~(symbol "smc") )
+(apply '(symbol "smc") )
+(apply (symbol "smc") )
+(symbol "smc")
+((resolve (symbol "smc")))
+(resolve (symbol "smc"))
+eval-clojure
+eval_clojure
+(load "eval_clojure.clj")
+(load "eval_clojure")
+timeit
+eval_clojure/timeit
+(resolve (symbol "smc"))
+(resolve (symbol "imp"))
+(resolve (symbol "eval_clojure.imp"))
+(resolve (symbol "eval_clojure/imp"))
+(ns-resolve (symbol "eval_climp"))
+(ns-resolve "eval_clojure" (symbol "imp"))
+(ns-resolve eval_clojure (symbol "imp"))
+(ns-resolve 'eval_clojure (symbol "imp"))
+(ns-resolve 'eval_clojure (symbol "impsfd"))
+(ns-resolve 'eval_clojure (symbol "imp))
+)
+;
+(ns-resolve 'eval_clojure (symbol "imp))
+(ns-resolve 'eval_clojure (symbol "imp"))
+(ns-resolve 'models (symbol "imp"))
+(ns-resolve 'models (symbol "coin-model"))
+(require [models])
+(:require [models])
+(require [models])
+(require "models")
+(require ["models.clj"])
+(require [models])
+*ns*
+eval_clojure
+eval_clojure/s,c
+eval_clojure/smc
+models/smc
+models/
+coin-mode
+models/coin-model
+(require [models])
+(load models)
+(load "models")
+(ns-resolve 'models (symbol "coin-model"))
+(load "as")
+(load "models")
+(ns-resolve 'models (symbol "coin"))

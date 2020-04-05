@@ -2,6 +2,8 @@ import numpy as np
 import time
 import subprocess
 
+# model, method, data
+
 
 def js(model, inf="mh", mem=False):
     try:
@@ -38,7 +40,16 @@ def py(model, inf='mh', mem=False):
 
 
 def anglican(model, inf='mh', mem=False):
-    return 10.
+    try:
+        cmd = ['lein', 'run', '-m', 'eval_clojure/timeit', model, inf]
+        if mem:
+            cmd = ['time', '-f', '"%M"'] + cmd
+        a = subprocess.check_output(
+            cmd,
+            cwd="/home/anik/Files/work/project/evaluation")
+        return int(float(a.split('\n')[-2]))
+    except:
+        return float('inf')
 
 
 ocaml.not_built = True

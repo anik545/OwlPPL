@@ -1,0 +1,3 @@
+(executables
+ (names owlppl_eval)
+ (libraries ppl core))
