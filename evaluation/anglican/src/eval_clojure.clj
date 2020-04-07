@@ -11,7 +11,7 @@
      (/ (double (- (. System (nanoTime)) start#)) 1000000.0)))
 
 (defn smc [model]
-  (doall (->> (doquery :smc model [] :number-of-particles 10000)
+  (doall (->> (doquery :smc model [] :number-of-particles 100)
    (take 10000)
    (map :result)))
 )

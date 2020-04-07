@@ -113,7 +113,7 @@ An example of this being used to add a new primitive distribution is given in li
 \subsection{Empirical Distributions}
 
 The output of Bayesian inference is a probability distribution over the variable we are concerned with. Ideally, we would be able to produce an exact posterior distribution, and be able to extract exact statistics from it. However, approximate inference only allows us to create functions to sample from this posterior. Since my inference procedures all produce an object of type \texttt{'a dist}, we can define a signature for a type of an empirical distribution. The type is abstract since there are different implementations for discrete and continuous distributions. For discrete distributions, we use a \texttt{Core.Map}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/core_kernel/Core_kernel/Map/index.html}}, whereas continuous distributions use a \texttt{Core.Set}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/core_kernel/Core_kernel/Set/index.html}}. Creating values with these types required passing a first class module representing the type of the keys - this is so that an appropriate compare function can be used in the internal tree data structure.
-	
+
 I also provide modules which are backed by the polymorphic versions of these data structures (\texttt{Core.Map.Poly}). These types don't require the use of first class modules to create objects, since the keys are compared using the polymorphic compare function. While this makes using the module simpler to use (no need to pass the first class module), it also makes them more inefficient due to the use of polymorphic comparison.
 
 \begin{listing}[ht]
@@ -261,7 +261,7 @@ let importance n d =
   categorical particles
 	\end{ocamlcode-in}
 	\caption{Likelihood weighting}
-	\label{lst:mh}
+	\label{lst:imp}
 \end{listing}
 % \end{noindent}
 
@@ -353,7 +353,7 @@ Where there is an ordering on the type, discrete distributions can also have the
 
 \begin{figure}[!htb]
 	\centering
-																																		
+																																				
 	\caption{The pdf and cdf of a binomial distribution visualised}
 	\label{fig:vis-binom}
 \end{figure}
@@ -362,7 +362,7 @@ Continuous distributions are also displayed as histograms, with a set of samples
 
 \begin{figure}[!htb]
 	\centering
-																																		
+																																				
 	\caption{The pdf and cdf of a normal distribution visualised}
 	\label{fig:vis-norm}
 \end{figure}
@@ -379,7 +379,7 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 
 \begin{figure}[!htb]
 	\centering
-	
+			
 	\caption{The approsimate and exact pdf of the output of inference for a biased coin model}
 	\label{fig:vis-samples}
 \end{figure}
@@ -392,7 +392,7 @@ Automated testing of PPLs is difficult for reasons outlines in the preparation. 
 The test output can be seen below, in figure \ref{fig:test-out}
 \begin{figure}[!htb]
 	\centering
-																																																													
+																																																															
 	\caption{Output from unit tests}
 	\label{fig:test-out}
 \end{figure}

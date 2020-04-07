@@ -32,7 +32,7 @@ let linreg_model i () =
   let m = fmap fst linreg' in
 
   let d = infer m i in
-  sample_mean ~n:1000 d
+  sample_mean ~n:10000 d
 
 let time f =
   let t = Unix.gettimeofday () in

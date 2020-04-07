@@ -1,2 +1,11 @@
 (lang dune 2.0)
 (name ppl)
+(version 0.1)
+
+(source (github anik545/OwlPPL))
+(license MIT)
+(authors "Anik Roy")
+(maintainers "anik545@gmail.com")
+
+(package
+    (name ppl))

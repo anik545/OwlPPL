@@ -7,4 +7,5 @@
  (names test)
  (modules test)
  (libraries core owl ppl alcotest qcheck qcheck-alcotest)
- (action (run %{test} -e)))
+ (action
+  (run %{test} -e)))

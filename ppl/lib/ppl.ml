@@ -1,7 +1,10 @@
 include Dist.GADT_Dist
 include Inference
 include Helpers
-include Plot
-module Primitives = Primitive_dists.Primitive_Dists
-module KL = Kl.KL
-module Samples = Samples.DiscreteSamples
+
+module Plot : module type of Plot = Plot
+
+module Primitives = Prim_dist
+module Evaluation = Evaluation
+
+module Samples : module type of Empirical.Discrete = Empirical.Discrete

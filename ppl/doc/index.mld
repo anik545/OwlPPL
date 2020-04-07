@@ -1,0 +1,13 @@
+{0 ppl index}
+
+Probabilistic programming
+
+{1 Library ppl}
+
+Modules:
+{!modules:
+Ppl
+Ppl.Plot
+Ppl.Evaluation
+Ppl.Samples
+}

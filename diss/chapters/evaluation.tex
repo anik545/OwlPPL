@@ -85,11 +85,11 @@ This example shows how to use multiple data points to infer a continuous distrib
 \begin{listing}[!ht]
 	\ocamlcode{code_snippets/linreg.ml}	
 	\caption{Linear Regression}
-	\label{lst:coin}
+	\label{lst:linreg}
 \end{listing}
 
 \subsection{Mixture Model}
-This example demonstrates a model which cannot be expressed in some PPLs such as STAN or Infer.Net, since it is a non-parametric Bayesian model. This is a Dirichlet Process mixture model with an infinite number of Gaussians\cite{dpmm}. It is used for the common task of clustering a set of data points without knowledge of the number of clusters. This means the number of clusters is allowed to grow with the dataset size. We use a mixture of Gaussians, meaning the likelihood of a point belonging to each cluster is given by different normal distributions. The full code for this model, along with comparisons to other languages is given in appendix \ref{app:dp}
+This example demonstrates a model which cannot be expressed in some PPLs such as STAN or Infer.Net, since it is a non-parametric Bayesian model. This is a Dirichlet Process mixture model with an infinite number of Gaussians\cite{dpmm}. It is used for the common task of clustering a set of data points without knowledge of the number of clusters. This means the number of clusters is allowed to grow with the dataset size. We use a mixture of Gaussians, meaning the likelihood of a point belonging to each cluster is given by different normal distributions. The full code for this model, along with comparisons to other languages is given in appendix \ref{app:dp}.
 % Need to show examples which can't be done in graph based thing
 % Need to explain why these examples are actually difficult.
 % http://www.cs.cmu.edu/~epxing/Class/10708-16/slide/lecture18-DP.pdf
@@ -222,7 +222,7 @@ Figure \ref{fig:kl} shows the results of this. For each inference procedure, we 
 			\addplot table [x index=0, y index=1, col sep=comma] {data/sprinkler_smc.csv};
 			\addlegendentry{smc}
 			% 
-															
+																											
 			% \pgfplotsinvokeforeach{1,...,\numberofcols}{
 			% 	\addplot table [x index=0,y index=#1, col sep=comma] {data/kl_sprinkler_all.csv};
 			% 	\pgfplotstablegetcolumnnamebyindex{#1}\of{\datatable}\to{\colname}

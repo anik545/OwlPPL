@@ -4,9 +4,6 @@
 
 
 (defquery coin
-  (let [prob (sample (beta 1 1))] ;; 1. prior
-    (loop [[f & r :as s] [true true false true true]]
-      (when (seq s)
-        (observe (flip prob) f) ;; 2. incorporate data
-        (recur r)))
-    prob))
+  (let [theta (sample (uniform-continuous 0 1))] ;; 1. prior
+    (observe (binomial 10 theta) 9)
+    theta))

@@ -19,7 +19,7 @@ let infer_strats n = [
 let test_model (m,true_dist) =
 
   let kl_div = fun d -> 
-    KL.kl_continuous ~n:1000
+    Evaluation.kl_continuous ~n:1000
       true_dist d
   in
 

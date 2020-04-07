@@ -1,11 +1,13 @@
 open Core
 open Dist.GADT_Dist
+
 type prob = float
 
 type 'a samples = ('a * likelihood) list
 
-let unduplicate xs = 
-  let map = Map.Poly.of_alist_fold xs ~f:(+.) ~init:0. in
+(** [unduplicate xs] takes a list of particles and collapses particles with the same value **)
+let unduplicate xs =
+  let map = Map.Poly.of_alist_fold xs ~f:( +. ) ~init:0. in
   Map.Poly.to_alist map
 
 let resample xs =
@@ -13,17 +15,18 @@ let resample xs =
   (* sample from the distribution specified by the old particles *)
   let old_dist = categorical xs in
   (* generate new particles from th *)
-  sequence @@ List.init n ~f:(fun _ -> (fmap (fun x-> (x, 1.)) (old_dist)))
+  sequence @@ List.init n ~f:(fun _ -> fmap (fun x -> (x, 1.)) old_dist)
 
-let normalise xs = 
+let normalise xs =
   let norm = List.sum (module Float) ~f:snd xs in
-  List.map ~f:(fun (v,p)->(v,p/.norm)) xs
+  List.map ~f:(fun (v, p) -> (v, p /. norm)) xs
 
 let flatten xss =
-  let mul_likelihood xs p = List.map ~f:(fun (x,q) -> (x, p *.q)) xs in
+  let mul_likelihood xs p = List.map ~f:(fun (x, q) -> (x, p *. q)) xs in
   (* let rec flat_map xss = match xss with
       (xs, p)::xs' -> (mul_likelihood xs p) @ flatten' xs'
      | [] -> []
      in *)
-  List.concat_map xss ~f:(fun (xs,p) -> mul_likelihood xs p)
+  List.concat_map xss ~f:(fun (xs, p) -> mul_likelihood xs p)
+
 (* flat_map xss *)

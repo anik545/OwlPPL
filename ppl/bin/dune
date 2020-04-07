@@ -2,5 +2,6 @@
 
 (executables
  (modes byte native)
- (names ppl_50_line dice sprinkler coins single_coin linreg hmm geometric main)
+ (names ppl_50_line dice sprinkler coins single_coin linreg hmm geometric
+   main)
  (libraries ppl core owl owl-plplot))

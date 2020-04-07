@@ -1,13 +1,13 @@
 opam-version: "2.0"
 name: "OwlPPL"
 version: "0.1"
-synopsis: "Owl PPL"
+synopsis: "A DSL for probabilistic programming"
 description: """
-PPL for third year project
+A Universal Probabilistic Programming Language for Ocaml. Produced for a final year Computer Science project.
 """
 maintainer: "Anik Roy"
 authors: "ar899@cam.ac.uk"
-license: ""
+license: "MIT"
 homepage: "https://github.com/anik545/OwlPPL"
 bug-reports: ""
 dev-repo: "git@github.com:anik545/OwlPPL.git"
