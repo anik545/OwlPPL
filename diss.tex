@@ -1,9 +1,9 @@
 \documentclass[12pt,notitlepage,a4paper]{report}
 
 \usepackage[outputdir=out]{minted}
-\usepackage[T1]{fontenc}
 \usepackage{lmodern}
-
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
 \usepackage{verbatim}
 \usepackage{csvsimple}
 \usepackage{pgfplots}
@@ -19,6 +19,10 @@
 \usepackage{amsmath}
 \usepackage{xcolor}
 \usepackage[margin=2cm,headheight=13.6pt]{geometry}
+\usepackage{microtype}
+\usepackage{longtable,booktabs}
+\usepackage{amssymb,amsmath}
+\usepackage{fixltx2e} % provides \textsubscript
 \pgfplotsset{compat=1.13}
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -30,6 +34,12 @@
 \newmintedfile[clojurecode]{javascript}{frame=single,framesep=10pt}
 % \newcommand{\ocamlcode}[1]{}
 \newminted[ocamlcode-in]{ocaml}{frame=single,framesep=10pt}
+
+\DeclareUnicodeCharacter{2060}{\nolinebreak}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
 \raggedbottom                           % try to avoid widows and orphans
 \sloppy
@@ -167,6 +177,7 @@ This is the beta distribution - Beta()
 \section{Dirichlet Process} \label{app:dp}
 
 \chapter{Full Documentation} \label{app:docs}
+\input{chapters/docs}
 
 \chapter{Project Proposal}
 \input{propbody}
