@@ -1,8 +1,15 @@
-open Dist.GADT_Dist
+(** Implementation of inference algorithms 
+
+    Inference algorithms to be called on probabilistic models defined using {!module-Dist}
+*)
+
+open Dist
 
 exception Undefined
 
 type 'a samples = ('a * float) list
+
+(** {2:inf_helpers Helpers} *)
 
 val unduplicate : 'a samples -> 'a samples
 
@@ -12,13 +19,19 @@ val normalise : 'a samples -> 'a samples
 
 val flatten : ('a samples * float) list -> 'a samples
 
+(** {2:inf_exact Exact Inference} *)
+
 val enumerate : 'a dist -> float -> 'a samples
 
 val exact_inference : 'a dist -> 'a dist
 
+(** {2:inf_imp Importance Sampling} *)
+
 val importance : int -> 'a dist -> 'a samples dist
 
 val importance' : int -> 'a dist -> 'a dist
+
+(** {2:rej_helpers Rejetion Sampling} *)
 
 type rejection_type = Hard | Soft
 
@@ -45,6 +58,8 @@ val rejection_hard :
 
 val rejection : ?n:int -> rejection_type -> 'a dist -> 'a dist
 
+(** {2:inf_smc Sequential Monte Carlo} *)
+
 val smc : int -> 'a dist -> 'a samples dist
 
 val smc' : int -> 'a dist -> 'a dist
@@ -57,6 +72,8 @@ val smcMultiple : int -> int -> 'a dist -> 'a samples dist
 
 val smcMultiple' : int -> int -> 'a dist -> 'a dist
 
+(** {2:inf_mh Metropolis Hastings} *)
+
 val mh' : int -> 'a dist -> 'a dist
 
 val mh'' : int -> 'a dist -> 'a dist
@@ -67,13 +84,21 @@ val mh : burn:int -> 'a dist -> unit -> 'a
 
 val mh_transform : burn:int -> 'a dist -> 'a dist
 
+(** {2:inf_pmcmc Particle Independent Metropolis Hastings} *)
+
+val pimh : int -> 'a dist -> 'a samples list dist
+
 val pimh' : int -> int -> 'a dist -> 'a dist
+
+(** {2:inf_pc Particle Cascade} *)
 
 val resamplePC : 'a samples -> int -> 'a samples dist
 
 val cascade : int -> 'a dist -> 'a samples dist
 
 val cascade' : int -> 'a dist -> 'a dist
+
+(** {2:com Common} *)
 
 type infer_strat =
   | MH of int

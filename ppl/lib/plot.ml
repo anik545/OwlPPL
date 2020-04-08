@@ -24,9 +24,9 @@ let hist_dist_discrete ?h ?(n = 5000) ?(fname = "fig.png") d =
 
 let qq_plot ?h ?(n = 1000) ?(fname = "fig.png") d d' =
   let open Owl_plplot in
-  (* let Plot.qqplot ~pd:(Primitives.ppf) *)
-  let samples_d = Array.init n (fun _ -> Prim_dist.sample d') in
-  let samples_d' = Array.init n (fun _ -> Dist.GADT_Dist.sample d) in
+  (* let Plot.qqplot ~pd:(Primitive.ppf) *)
+  let samples_d = Array.init n (fun _ -> Primitive.sample d') in
+  let samples_d' = Array.init n (fun _ -> Dist.sample d) in
 
   let pl = match h with None -> Plot.create ~m:1 ~n:1 fname | Some h -> h in
   Plot.qqplot ~h:pl ~x:(one_row_mat samples_d) (one_row_mat samples_d');
@@ -34,9 +34,9 @@ let qq_plot ?h ?(n = 1000) ?(fname = "fig.png") d d' =
 
 let prob_plot ?h ?(n = 1000) ?(fname = "fig.png") d d' =
   let open Owl_plplot in
-  (* let Plot.qqplot ~pd:(Primitives.ppf) *)
-  let cdf_d = Prim_dist.cdf d' in
-  let samples_d' = Array.init n (fun _ -> Dist.GADT_Dist.sample d) in
+  (* let Plot.qqplot ~pd:(Primitive.ppf) *)
+  let cdf_d = Primitive.cdf d' in
+  let samples_d' = Array.init n (fun _ -> Dist.sample d) in
 
   let pl = match h with None -> Plot.create ~m:1 ~n:1 fname | Some h -> h in
   Plot.probplot ~h:pl ~dist:cdf_d (one_row_mat samples_d');

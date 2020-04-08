@@ -17,9 +17,11 @@ let extract_exact model =
   match exact_inference model with
   | Primitive xs ->
       let supp =
-        match P.support xs with DiscreteFinite xs -> xs | _ -> raise Undefined
+        match Primitive.support xs with
+        | DiscreteFinite xs -> xs
+        | _ -> raise Undefined
       in
-      List.map supp ~f:(fun x -> (x, (P.pdf xs) x))
+      List.map supp ~f:(fun x -> (x, (Primitive.pdf xs) x))
   | _ -> []
 
 let test_exact_inference_grass () =

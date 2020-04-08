@@ -1,5 +1,5 @@
 open Core
-open Dist.GADT_Dist
+open Dist
 
 type prob = float
 

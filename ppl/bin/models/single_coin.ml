@@ -5,7 +5,7 @@ open Core
 let single_coin =
   let pr = continuous_uniform 0. 1. in
 
-  let toss t = condition' (fun p -> Primitives.(pdf @@ binomial 10 p) t) in
+  let toss t = condition' (fun p -> Primitive.(pdf @@ binomial 10 p) t) in
 
   let obs = 9 in
 
@@ -16,7 +16,7 @@ let single_coin =
 
 (* let coin heads = 
    let* coinweight = continuous_uniform 0. 1. in
-   observe heads Primitives.(binomial 10 coinweight)
+   observe heads Primitive.(binomial 10 coinweight)
     (return coinweight) *)
 
 let post_single_coin = mh' 700 @@ single_coin

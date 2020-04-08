@@ -4,7 +4,7 @@ include Enum
 include Importance
 include Smc
 include Mh
-open Dist.GADT_Dist
+open Dist
 
 type infer_strat =
   | MH of int

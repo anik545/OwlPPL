@@ -11,7 +11,7 @@ let linreg_model i () =
      let open Float in
      let* m = normal 0. 2. in
      let* c = normal 0. 2. in
-     List.fold obs ~init:(return (m,c)) ~f:(fun d (x,y) -> observe y (P.(normal (m*x+c) 1.)) d) *)
+     List.fold obs ~init:(return (m,c)) ~f:(fun d (x,y) -> observe y (Primitive.(normal (m*x+c) 1.)) d) *)
   let linreg' = 
     let linear = 
       let* a = normal 0. 2. in
@@ -19,7 +19,7 @@ let linreg_model i () =
       return (a,b)
     in
     let open Float in
-    let point d (x,y) = condition' (fun (a,b) -> Primitives.(pdf @@ normal (a*x+b) 1.) y) d in
+    let point d (x,y) = condition' (fun (a,b) -> Primitive.(pdf @@ normal (a*x+b) 1.) y) d in
 
     let points ps d = List.fold ~f:(point) ~init:d ps in
 

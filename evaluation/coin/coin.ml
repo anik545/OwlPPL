@@ -2,7 +2,7 @@ open Ppl
 open Core
 let coin_mean inf () = 
   let coin heads = 
-    let posterior = condition' (fun p -> Primitives.(pdf @@ binomial 10 p) heads) (continuous_uniform 0. 1.) in
+    let posterior = condition' (fun p -> Primitive.(pdf @@ binomial 10 p) heads) (continuous_uniform 0. 1.) in
     posterior
   in
 

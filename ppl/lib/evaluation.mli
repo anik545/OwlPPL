@@ -1,37 +1,35 @@
-(** A module for evaluating the correctness of models and inference procedures *)
+(** A module for evaluating the correctness of models and inference procedures 
 
+    Contains functionality to perform hypothesis tests and KL-divergences for both 
+    continuous and discrete distributions
+*)
 
 type 'a samples = 'a Empirical.Discrete.t
-type 'a primitive = 'a Prim_dist.primitive
-type 'a dist = 'a Dist.GADT_Dist.dist
 
-val kl_discrete: 
-  ?n:int -> (** number of samples to use *)
-  'a primitive -> 
-  'a dist -> 
-  float
+type 'a dist = 'a Dist.dist
+
+(** {2:kl KL-Divergence} *)
+
+val kl_discrete : ?n:int -> 'a Primitive.t -> 'a dist -> float
 (** Find the KL divergence for two discrete distributions *)
 
-val kl_continuous: 
-  ?n:int -> (** number of samples to use *)
-  float primitive -> 
-  float dist -> 
-  float
+val kl_continuous : ?n:int -> float Primitive.t -> float dist -> float
 (** Find the KL divergence for two continuous distributions *)
 
-val kolmogorov_smirnov: 
-  ?n:int -> (** number of samples to use *)
-  ?alpha:float -> (** significance level *)
-  float dist -> 
-  float primitive -> Owl_stats.hypothesis
+val kl_cum_discrete :
+  int array -> 'a Primitive.t -> 'a dist -> (int * float) array
+(**  *)
+
+(** {2:hyp_tests Hypothesis Tests} *)
+
+val kolmogorov_smirnov :
+  ?n:int ->
+  ?alpha:float ->
+  float dist ->
+  float Primitive.t ->
+  Owl_stats.hypothesis
 (** Perform kolmogorov smirnov test, returns a [hypothesis] which is true if the null hypothesis is rejected  *)
 
-val chi_sq:
-  ?n:int -> 
-  ?alpha:float -> 
-  'a dist -> 
-  'a primitive -> Owl_stats.hypothesis
+val chi_sq :
+  ?n:int -> ?alpha:float -> 'a dist -> 'a Primitive.t -> Owl_stats.hypothesis
 (** Perform chi-squared test, returns a [hypothesis] which is true if the null hypothesis is rejected  *)
-
-val kl_cum_discrete: int array -> 'a primitive -> 'a dist -> (int * float) array
-(**  *)

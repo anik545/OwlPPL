@@ -18,7 +18,7 @@ let dpMixture =
   let n = List.length obs in
   let start = fmap (fun (x,_,_) -> x ) clusters in
 
-  let score y (_, var, mean) = Primitives.pdf Primitives.(normal mean (sqrt var)) y in
+  let score y (_, var, mean) = Primitive.pdf Primitive.(normal mean (sqrt var)) y in
 
   let build d y = 
     condition' (fun x -> score y (snd (List.hd_exn (x)))) 

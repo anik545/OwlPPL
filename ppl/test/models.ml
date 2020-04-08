@@ -4,16 +4,17 @@ open Core
 (* coin, see 9 heads out of 10 flips *)
 let single_coin =
   let pr = continuous_uniform 0. 1. in
-  let toss t = condition' (fun p -> Primitives.(pdf @@ binomial 10 p) t) in
+  let toss t = condition' (fun p -> Primitive.(pdf @@ binomial 10 p) t) in
   let obs = 9 in
   (* we see x=9 heads *)
   let posterior = toss obs pr in
   (* let posterior' = condition (fun p -> pdf (Binomial(10,p)) obs) (continuous_uniform 0. 1.) in *)
   posterior
 
+
 (* exact posterior:  Beta(x+ 1; n-x+ 1) *)
 (* here, x=9, n=10 *)
-let single_coin_exact = Primitives.beta 10. 2.
+let single_coin_exact = Primitive.beta 10. 2.
 
 let flip = bernoulli
 
@@ -49,4 +50,4 @@ let grass_model' () =
 let grass_model = grass_model' ()
 
 let grass_model_exact =
-  Primitives.categorical [ (true, 0.704225); (false, 0.295775) ]
+  Primitive.categorical [ (true, 0.704225); (false, 0.295775) ]

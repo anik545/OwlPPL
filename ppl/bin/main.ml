@@ -29,7 +29,7 @@ let sprinkler () =
     ]
   in
   let ri =
-    Primitives.categorical
+    Primitive.categorical
       [ (true, 0.707927677329624472); (false, 0.292072322670375473) ]
   in
   let model = Sprinkler.grass_model' in
@@ -37,16 +37,16 @@ let sprinkler () =
 
 (* continuous prior, continuous posterior, discrete observation/soft conditioning *)
 let single_coin () =
-  let ri = Primitives.beta 10. 2. in
+  let ri = Primitive.beta 10. 2. in
   let infer_strats =
     [
       (* Rejection(1000, Hard); Rejection(1000,Soft); 
-       RejectionTrans(1000, Hard); RejectionTrans(1000,Soft);  *)
+         RejectionTrans(1000, Hard); RejectionTrans(1000,Soft);  *)
       Importance 100;
       (* MH(10); MH(100); MH(1000);
-       SMC(10); SMC(100); SMC(1000);
-       PIMH(100);
-       PC(100) *)
+         SMC(10); SMC(100); SMC(1000);
+         PIMH(100);
+         PC(100) *)
     ]
   in
   let model = Single_coin.single_coin in

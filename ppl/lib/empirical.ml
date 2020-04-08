@@ -1,4 +1,9 @@
-open Dist.GADT_Dist
+open Dist
+(** A module for empirical distributions generated from samplers  
+
+    A asd 
+*)
+
 open Core
 
 (* poly version *)

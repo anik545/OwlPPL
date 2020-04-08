@@ -1,6 +1,6 @@
 open Common
 open Core
-open Dist.GADT_Dist
+open Dist
 
 (* sequential monte carlo - particle filter *)
 let rec smc : 'a. int -> 'a dist -> 'a samples dist =
@@ -29,7 +29,8 @@ let rec smc : 'a. int -> 'a dist -> 'a samples dist =
         particles
   (* initialise n particles wih weights from the pdf *)
   | Primitive d ->
-      List.init n ~f:(fun _ -> fmap (fun x -> (x, P.pdf d x)) (Primitive d))
+      List.init n ~f:(fun _ ->
+          fmap (fun x -> (x, Primitive.pdf d x)) (Primitive d))
       |> sequence
   (* initialise n particles with the same value and weight *)
   | Return x -> List.init n ~f:(fun _ -> return (x, 1.)) |> sequence

@@ -4,8 +4,7 @@
 *)
 
 open Owl_plplot.Plot
-open Dist.GADT_Dist
-open Prim_dist
+open Dist
 
 (** {2:histograms Histograms}  *)
 
@@ -24,7 +23,7 @@ val qq_plot :
   ?n:int ->
   ?fname:string ->
   float dist ->
-  float primitive ->
+  float Primitive.t ->
   handle
 (** *)
 
@@ -33,6 +32,6 @@ val prob_plot :
   ?n:int ->
   ?fname:string ->
   float dist ->
-  float primitive ->
+  float Primitive.t ->
   handle
 (** *)

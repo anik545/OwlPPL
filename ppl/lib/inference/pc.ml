@@ -1,6 +1,6 @@
 (* open Common *)
 open Core
-open Dist.GADT_Dist
+open Dist
 
 (* particle cascade *)
 (* https://arxiv.org/pdf/1407.2864.pdf *)

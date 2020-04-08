@@ -162,7 +162,7 @@ The \texttt{score} function is similar to the condition operator, except instead
 \begin{ocamlcode-in}
 let condition b d = Conditional((fun _ -> if b then 1. else 0.), d)
 let score s d = Conditional((fun _ -> s),d)
-let observe x dst d = Conditional((fun _ -> P.pdf dst x),d) 
+let observe x dst d = Conditional((fun _ -> Primitive.pdf dst x),d) 
 \end{ocamlcode-in}	
 	\caption{The definitions of the different conditioning operators}
 	\label{lst:cond}
@@ -353,7 +353,7 @@ Where there is an ordering on the type, discrete distributions can also have the
 
 \begin{figure}[!htb]
 	\centering
-																																				
+																																					
 	\caption{The pdf and cdf of a binomial distribution visualised}
 	\label{fig:vis-binom}
 \end{figure}
@@ -362,7 +362,7 @@ Continuous distributions are also displayed as histograms, with a set of samples
 
 \begin{figure}[!htb]
 	\centering
-																																				
+																																					
 	\caption{The pdf and cdf of a normal distribution visualised}
 	\label{fig:vis-norm}
 \end{figure}
@@ -379,7 +379,7 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 
 \begin{figure}[!htb]
 	\centering
-			
+				
 	\caption{The approsimate and exact pdf of the output of inference for a biased coin model}
 	\label{fig:vis-samples}
 \end{figure}
@@ -392,7 +392,7 @@ Automated testing of PPLs is difficult for reasons outlines in the preparation. 
 The test output can be seen below, in figure \ref{fig:test-out}
 \begin{figure}[!htb]
 	\centering
-																																																															
+																																																																
 	\caption{Output from unit tests}
 	\label{fig:test-out}
 \end{figure}

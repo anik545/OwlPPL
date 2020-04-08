@@ -1,3 +1,8 @@
+(** Module defining a type for primitive distributions
+
+
+*)
+
 (** The type of supports - the values with a distribution can take *)
 type 'a support =
   | DiscreteFinite of 'a list  (** A list of valid values *)
@@ -23,52 +28,56 @@ module type PRIM_DIST = sig
   val support : t support
 end
 
-type 'a primitive = (module PRIM_DIST with type t = 'a)
+type 'a t
 (** Type of primitive dists wrapping a module *)
 
-(** {2:inbuilt_dists Predefined Distributions} *)
+(** {2:new_prim New Distributions} *)
 
-val binomial : int -> float -> int primitive
-(**  *)
-
-val categorical : ('a * float) list -> 'a primitive
-(**  *)
-
-val normal : float -> float -> float primitive
-(**  *)
-
-val discrete_uniform : 'a list -> 'a primitive
-(**  *)
-
-val beta : float -> float -> float primitive
-(**  *)
-
-val gamma : float -> float -> float primitive
-(**  *)
-
-val poisson : float -> int primitive
-(**  *)
-
-val continuous_uniform : float -> float -> float primitive
-(**  *)
-
-(* {2: Basic Operations} *)
-
-val pdf : 'a primitive -> 'a -> float
-
-val logpdf : 'a primitive -> 'a -> float
-
-val cdf : 'a primitive -> 'a -> float
-
-val sample : 'a primitive -> 'a
-
-val support : 'a primitive -> 'a support
-
-val new_primitive :
+val create_primitive :
   sample:(unit -> 'a) ->
   pdf:('a -> float) ->
   cdf:('a -> float) ->
   support:'a support ->
-  (module PRIM_DIST with type t = 'a)
+  'a t
+
+(** {2:inbuilt_dists Predefined Distributions} *)
+
+val binomial : int -> float -> int t
+(**  *)
+
+val categorical : ('a * float) list -> 'a t
+(**  *)
+
+val normal : float -> float -> float t
+(**  *)
+
+val discrete_uniform : 'a list -> 'a t
+(**  *)
+
+val beta : float -> float -> float t
+(**  *)
+
+val gamma : float -> float -> float t
+(**  *)
+
+val poisson : float -> int t
+(**  *)
+
+val continuous_uniform : float -> float -> float t
+(**  *)
+
+(** {2:basic_ops Basic Operations} *)
+
+val pdf : 'a t -> 'a -> float
+
+val logpdf : 'a t -> 'a -> float
+
+val cdf : 'a t -> 'a -> float
+
+val sample : 'a t -> 'a
+
+val support : 'a t -> 'a support
+
+(** {2:prim_other Other} *)
 
 val merge_supports : 'a support * 'a support -> 'a support

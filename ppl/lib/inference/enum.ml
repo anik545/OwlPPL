@@ -1,7 +1,6 @@
 include Common
 open Core
-open Dist.GADT_Dist.P
-open Dist.GADT_Dist
+open Dist
 
 exception Undefined
 
@@ -25,9 +24,9 @@ let rec enumerate : type a. a dist -> score -> (a * score) list =
         let ch = enumerate d multiplier in
         List.map ch ~f:(fun (x, p) -> (x, p *. c x))
     | Primitive p -> (
-        match P.support p with
+        match Primitive.support p with
         | DiscreteFinite xs ->
-            List.map xs ~f:(fun x -> (x, multiplier *. pdf p x))
+            List.map xs ~f:(fun x -> (x, multiplier *. Primitive.pdf p x))
         | _ -> raise Undefined )
     | Return x -> [ (x, multiplier) ]
 

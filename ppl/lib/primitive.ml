@@ -31,7 +31,7 @@ module type PRIM_DIST = sig
   val support : t support
 end
 
-type 'a primitive = (module PRIM_DIST with type t = 'a)
+type 'a t = (module PRIM_DIST with type t = 'a)
 
 let binomial n p =
   ( module struct
@@ -140,28 +140,28 @@ let continuous_uniform a b =
   end : PRIM_DIST
     with type t = float )
 
-let pdf (type a) (d : a primitive) =
-  let (module D) = d in
+let pdf (type a) d =
+  let (module D : PRIM_DIST with type t = a) = d in
   D.pdf
 
-let logpdf (type a) (d : a primitive) x =
-  let (module D) = d in
+let logpdf (type a) d x =
+  let (module D : PRIM_DIST with type t = a) = d in
   log (D.pdf x)
 
-let cdf (type a) (d : a primitive) =
-  let (module D) = d in
+let cdf (type a) d =
+  let (module D : PRIM_DIST with type t = a) = d in
   D.cdf
 
 (* let ppf (type a) (d:a primitive) = let (module D) = d in D.ppf *)
-let sample (type a) (d : a primitive) =
-  let (module D) = d in
+let sample (type a) d =
+  let (module D : PRIM_DIST with type t = a) = d in
   D.sample ()
 
-let support (type a) (d : a primitive) =
-  let (module D) = d in
+let support (type a) d =
+  let (module D : PRIM_DIST with type t = a) = d in
   D.support
 
-let new_primitive (type a) ~sample ~pdf ~cdf ~support =
+let create_primitive (type a) ~sample ~pdf ~cdf ~support =
   let module D = struct
     type t = a
 

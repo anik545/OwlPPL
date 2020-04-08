@@ -46,9 +46,9 @@ end
 
 (* How would an user add a new distribution? *)
 module type Primitives = sig
-  type 'a primitive
+  type 'a t
 
-  include Primitive_Distributions with type 'a primitive := 'a primitive
+  include Primitive_Distributions with type 'a primitive := 'a t
 
   type 'a support =
     | DiscreteFinite of 'a list
@@ -57,13 +57,41 @@ module type Primitives = sig
     | ContinuousInfinite
     | Merged of 'a support * 'a support
 
-  val sample : 'a primitive -> 'a
+  val sample : 'a t -> 'a
 
-  val pdf : 'a primitive -> 'a -> float
+  val pdf : 'a t -> 'a -> float
 
-  val cdf : 'a primitive -> 'a -> float
+  val cdf : 'a t -> 'a -> float
 
-  val logpdf : 'a primitive -> 'a -> float
+  val logpdf : 'a t -> 'a -> float
 
-  val support : 'a primitive -> 'a support
+  val support : 'a t -> 'a support
+end
+
+module type Ops = sig
+  type 'a dist
+
+  val ( +~ ) : int dist -> int dist -> int dist
+
+  val ( -~ ) : int dist -> int dist -> int dist
+
+  val ( *~ ) : int dist -> int dist -> int dist
+
+  val ( /~ ) : int dist -> int dist -> int dist
+
+  val ( +.~ ) : float dist -> float dist -> float dist
+
+  val ( -.~ ) : float dist -> float dist -> float dist
+
+  val ( *.~ ) : float dist -> float dist -> float dist
+
+  val ( /.~ ) : float dist -> float dist -> float dist
+
+  val ( &~ ) : bool dist -> bool dist -> bool dist
+
+  val ( |~ ) : bool dist -> bool dist -> bool dist
+
+  val not : bool dist -> bool dist
+
+  val ( ^~ ) : string dist -> string dist -> string dist
 end

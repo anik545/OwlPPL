@@ -32,7 +32,7 @@ let hmm =
     | _ -> raise Undefined
   in
   (* emmission probabilities for observed state (normal) *)
-  let score y x = Primitives.(pdf @@ normal (float_of_int x) 1.) y in
+  let score y x = Primitive.(pdf @@ normal (float_of_int x) 1.) y in
   let expand d y =
     condition' (fun l -> score y (List.hd_exn l))
     @@ let* rest = d in
@@ -48,10 +48,10 @@ type 'a hidden_state = 'a
 type 'a observed_state = 'a
 
 let hmm_general (transition : 'a hidden_state -> 'a hidden_state dist)
-    (emission : 'a hidden_state -> 'b observed_state Primitives.primitive)
+    (emission : 'a hidden_state -> 'b observed_state Primitive.t)
     (* need a pdf for emissions *) (observed_values : 'a observed_state list)
     (start : 'b hidden_state list dist) =
-  let score y x = Primitives.pdf (emission x) y in
+  let score y x = Primitive.pdf (emission x) y in
   let expand d y =
     condition' (fun l -> score y (List.hd_exn l))
     @@ let* rest = d in

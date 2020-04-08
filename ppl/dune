@@ -9,3 +9,39 @@
    (:standard -p -w A-48))
   (flags
    (:standard -w A-48))))
+
+(rule
+ (alias pdfdoc)
+ (target htmldoc_docs.pdf)
+ (mode
+  (promote
+   (into doc)))
+ (deps
+  (alias doc)
+  doc/include_docs)
+ (action
+  (progn
+   (bash "htmldoc $(cat doc/include_docs) -t pdf -f %{target} ")
+  ;  (bash "cp %{target} /home/anik/Files/work/project/diss/htmldocs.pdf")
+   )))
+
+(rule
+ (alias texdoc)
+ (target pandoc_docs.tex)
+ (deps
+  (alias doc)
+  doc/include_docs)
+ (mode
+  (promote
+   (into doc)))
+ (action
+  (progn
+   (bash
+     "pandoc $(cat doc/include_docs) -o %{target}")
+   (bash "cp %{target} /home/anik/Files/work/project/diss/chapters/docs.tex"))))
+
+(alias
+ (name alldocs)
+ (deps
+  (alias texdoc)
+  (alias pdfdoc)))

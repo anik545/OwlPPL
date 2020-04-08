@@ -24,7 +24,7 @@ let p_rain_given_wet_grass = exact_inference @@ grass_model'
 let () =
   match exact_inference grass_model' with
   | Primitive xs ->
-      let p = P.pdf xs in
+      let p = Primitive.pdf xs in
       Printf.printf
         "P(rain | grass is wet): %f \nP(not rain | grass is wet): %f\n" (p true)
         (p false)

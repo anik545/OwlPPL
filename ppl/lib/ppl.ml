@@ -1,10 +1,23 @@
-include Dist.GADT_Dist
+(** DSL for Probabilistic Programming
+
+    Universal PPL in OCaml
+*)
+
+(** {2:submods Submodules } *)
+
+module Plot = Plot
+module Primitive = Primitive
+module Evaluation = Evaluation
+module Empirical = Empirical
+module Inference = Inference
+module Dist = Dist
+module Helpers = Helpers
+
+module Samples : Empirical.S = Empirical.Discrete
+
+(* */** *)
+include Dist
 include Inference
 include Helpers
 
-module Plot : module type of Plot = Plot
-
-module Primitives = Prim_dist
-module Evaluation = Evaluation
-
-module Samples : module type of Empirical.Discrete = Empirical.Discrete
+(* */** *)

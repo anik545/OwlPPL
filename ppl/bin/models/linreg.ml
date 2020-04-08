@@ -20,7 +20,7 @@ let linreg =
   in
   let open Float in
   let point d (x, y) =
-    condition' (fun (a, b, c) -> Primitives.(pdf @@ normal ((a * x) + b) c) y) d
+    condition' (fun (a, b, c) -> Primitive.(pdf @@ normal ((a * x) + b) c) y) d
   in
 
   let points ps d = List.fold ~f:point ~init:d ps in
@@ -35,7 +35,7 @@ let linreg' =
   let* c = normal 0. 2. in
   List.fold obs
     ~init:(return (m, c))
-    ~f:(fun d (x, y) -> observe y P.(normal ((m * x) + c) 1.) d)
+    ~f:(fun d (x, y) -> observe y Primitive.(normal ((m * x) + c) 1.) d)
 
 let m' = fmap fst linreg'
 

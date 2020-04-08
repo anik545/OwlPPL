@@ -12,7 +12,7 @@ let root_dir = "/home/anik/Files/work/project/diss/data"
 (* For generating csv to be plotted *)
 (* create array of x,y pairs *)
 let gen_csv ?fname model exact infer_strat
-    (kl_method : ?n:int -> 'a Primitives.primitive -> 'a dist -> likelihood) =
+    (kl_method : ?n:int -> 'a Primitive.t -> 'a dist -> likelihood) =
   let inferred = infer model infer_strat in
   let arr = Array.map x_vals ~f:(fun n -> (n, kl_method ~n exact inferred)) in
   match fname with
@@ -25,7 +25,7 @@ let gen_csv ?fname model exact infer_strat
   | None -> arr
 
 let gen_csv' ?fname model exact infer_strats
-    (kl_method : ?n:int -> 'a Primitives.primitive -> 'a dist -> likelihood) =
+    (kl_method : ?n:int -> 'a Primitive.t -> 'a dist -> likelihood) =
   let inferreds = Array.map ~f:(fun i -> infer model i) infer_strats in
   let arr =
     Array.transpose
@@ -90,57 +90,55 @@ let test_kl_function () =
   (* Using kl discrete for continuous distributions will diverge with number of samples *)
   (* converge to 0 *)
   let diff1 =
-    Evaluation.kl_continuous ~n:10 Primitives.(normal 0. 1.) (normal 0. 1.)
+    Evaluation.kl_continuous ~n:10 Primitive.(normal 0. 1.) (normal 0. 1.)
   in
   let diff2 =
-    Evaluation.kl_continuous ~n:100 Primitives.(normal 0. 1.) (normal 0. 1.)
+    Evaluation.kl_continuous ~n:100 Primitive.(normal 0. 1.) (normal 0. 1.)
   in
   let diff3 =
-    Evaluation.kl_continuous ~n:1000 Primitives.(normal 0. 1.) (normal 0. 1.)
+    Evaluation.kl_continuous ~n:1000 Primitive.(normal 0. 1.) (normal 0. 1.)
   in
   let diff4 =
-    Evaluation.kl_continuous ~n:10000 Primitives.(normal 0. 1.) (normal 0. 1.)
+    Evaluation.kl_continuous ~n:10000 Primitive.(normal 0. 1.) (normal 0. 1.)
   in
   let () = Printf.printf "%f %f %f %f\n" diff1 diff2 diff3 diff4 in
 
   (* diverges to ?? *)
   let diff1 =
     Evaluation.kl_continuous ~n:10
-      Primitives.(continuous_uniform 0. 1.)
+      Primitive.(continuous_uniform 0. 1.)
       (beta 10. 2.)
   in
   let diff2 =
     Evaluation.kl_continuous ~n:100
-      Primitives.(continuous_uniform 0. 1.)
+      Primitive.(continuous_uniform 0. 1.)
       (beta 10. 2.)
   in
   let diff3 =
     Evaluation.kl_continuous ~n:1000
-      Primitives.(continuous_uniform 0. 1.)
+      Primitive.(continuous_uniform 0. 1.)
       (beta 10. 2.)
   in
   let diff4 =
     Evaluation.kl_continuous ~n:10000
-      Primitives.(continuous_uniform 0. 1.)
+      Primitive.(continuous_uniform 0. 1.)
       (beta 10. 2.)
   in
   let () = Printf.printf "%f %f %f %f\n" diff1 diff2 diff3 diff4 in
 
   (* converge to 0 *)
   let diff1 =
-    Evaluation.kl_discrete ~n:10 Primitives.(binomial 10 0.5) (binomial 10 0.5)
+    Evaluation.kl_discrete ~n:10 Primitive.(binomial 10 0.5) (binomial 10 0.5)
   in
   let diff2 =
-    Evaluation.kl_discrete ~n:100 Primitives.(binomial 10 0.5) (binomial 10 0.5)
+    Evaluation.kl_discrete ~n:100 Primitive.(binomial 10 0.5) (binomial 10 0.5)
   in
   let diff3 =
-    Evaluation.kl_discrete ~n:1000
-      Primitives.(binomial 10 0.5)
-      (binomial 10 0.5)
+    Evaluation.kl_discrete ~n:1000 Primitive.(binomial 10 0.5) (binomial 10 0.5)
   in
   let diff4 =
     Evaluation.kl_discrete ~n:10000
-      Primitives.(binomial 10 0.5)
+      Primitive.(binomial 10 0.5)
       (binomial 10 0.5)
   in
   let () = Printf.printf "%f %f %f %f\n" diff1 diff2 diff3 diff4 in
@@ -148,22 +146,22 @@ let test_kl_function () =
   (* converge to 0.5  *)
   let diff1 =
     Evaluation.kl_discrete ~n:10
-      Primitives.(discrete_uniform [ 0; 1 ])
+      Primitive.(discrete_uniform [ 0; 1 ])
       (binomial 1 0.9)
   in
   let diff2 =
     Evaluation.kl_discrete ~n:100
-      Primitives.(discrete_uniform [ 0; 1 ])
+      Primitive.(discrete_uniform [ 0; 1 ])
       (binomial 1 0.9)
   in
   let diff3 =
     Evaluation.kl_discrete ~n:1000
-      Primitives.(discrete_uniform [ 0; 1 ])
+      Primitive.(discrete_uniform [ 0; 1 ])
       (binomial 1 0.9)
   in
   let diff4 =
     Evaluation.kl_discrete ~n:10000
-      Primitives.(discrete_uniform [ 0; 1 ])
+      Primitive.(discrete_uniform [ 0; 1 ])
       (binomial 1 0.9)
   in
   let () = Printf.printf "%f %f %f %f\n" diff1 diff2 diff3 diff4 in

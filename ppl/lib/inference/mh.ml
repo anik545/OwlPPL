@@ -1,6 +1,6 @@
 (* open Common *)
 open Core
-open Dist.GADT_Dist
+open Dist
 
 (* metropolis-hastings *)
 (* 

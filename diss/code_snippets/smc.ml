@@ -24,7 +24,7 @@ let rec smc: 'a.int -> 'a dist -> 'a samples dist = fun n d ->
   (* initialise n particles wih weights from the pdf *)
   | Primitive d ->
     List.init n
-      ~f:(fun _ -> (fmap (fun x-> (x, P.pdf d x)) (Primitive d)))
+      ~f:(fun _ -> (fmap (fun x-> (x, Primitive.pdf d x)) (Primitive d)))
     |> sequence
   (* initialise n particles with the same value and weight *)
   | Return x ->

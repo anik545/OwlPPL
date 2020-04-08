@@ -1,4 +1,4 @@
-open Dist.GADT_Dist
+open Dist
 
 (* TODO: make generic - accept an averaging function *)
 let sample_mean ?(n = 100000) d =
@@ -8,6 +8,8 @@ let sample_mean ?(n = 100000) d =
   loop n d 0. /. float_of_int n
 
 let take_k_samples k d = Core.Array.init k ~f:(fun _ -> sample d)
+
+let sample_variance ?(n = 10000) d = take_k_samples n d |> Owl_stats.var
 
 let undup xs =
   let map = Core.Map.Poly.of_alist_fold xs ~f:( +. ) ~init:0. in
@@ -57,8 +59,8 @@ let print_exact_exn (type a) (module S : Base.Stringable.S with type t = a)
   let open Core in
   match d with
   | Primitive xs ->
-      let p = P.pdf xs in
-      let s = P.support xs in
+      let p = Primitive.pdf xs in
+      let s = Primitive.support xs in
       let supp =
         match s with DiscreteFinite s -> s | _ -> raise Not_discrete
       in
