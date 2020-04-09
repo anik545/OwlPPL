@@ -5,6 +5,10 @@ hansei/
 owl/
 *spacetime*
 doc.zip
+
+diss/wordcount.txt
+diss/linecount.txt
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

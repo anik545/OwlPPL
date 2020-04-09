@@ -2,7 +2,7 @@
 
 (executables
  (names eval_hypothesis_tests eval_kl_tests)
- (modules eval_hypothesis_tests test_models models eval_kl_tests)
+ (modules eval_hypothesis_tests models eval_kl_tests)
  (libraries core owl ppl alcotest))
 
 (tests
