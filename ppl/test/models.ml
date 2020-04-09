@@ -11,7 +11,6 @@ let single_coin =
   (* let posterior' = condition (fun p -> pdf (Binomial(10,p)) obs) (continuous_uniform 0. 1.) in *)
   posterior
 
-
 (* exact posterior:  Beta(x+ 1; n-x+ 1) *)
 (* here, x=9, n=10 *)
 let single_coin_exact = Primitive.beta 10. 2.

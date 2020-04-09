@@ -1,11 +1,18 @@
+(copy_files# unit_tests/*)
+
 (executables
- (names test_models test_hypothesis test_kl)
- (modules test_models models test_kl test_hypothesis)
+ (names eval_hypothesis_tests eval_kl_tests)
+ (modules eval_hypothesis_tests test_models models eval_kl_tests)
  (libraries core owl ppl alcotest))
 
 (tests
- (names test)
- (modules test)
+ (names
+  test
+  ;   test_evaluation test_dist test_helpers test_inference test_plot test_primitive test_empirical
+  )
+ (modules test test_evaluation test_dist test_helpers test_inference
+   test_plot test_primitive test_empirical)
  (libraries core owl ppl alcotest qcheck qcheck-alcotest)
- (action
-  (run %{test} -e)))
+ ;  (action
+ ;   (run %{test} -e))
+ )

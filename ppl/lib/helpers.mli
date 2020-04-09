@@ -16,7 +16,13 @@ val sample_variance : ?n:int -> float dist -> float
 val take_k_samples : int -> 'a dist -> 'a array
 (** *)
 
-val undup : ('a * float) list -> ('a, float) Core.Map.Poly.t
+val unduplicate : ('a * float) list -> ('a * float) list
+(** Removes duplicates and sums the probabilities associated so that each value appears once *)
+
+val flatten : (('a * float) list * float) list -> ('a * float) list
+(**  *)
+
+val normalise : ('a * float) list -> ('a * float) list
 (** *)
 
 val weighted_dist : ?n:int -> 'a dist -> ('a, int) Core.Map.Poly.t
@@ -44,3 +50,6 @@ val time : (unit -> 'a) -> 'a
 
 val memo : ('a -> 'b) -> 'a -> 'b
 (** *)
+
+val memo_no_poly :
+  (module Base__.Hashtbl_intf.Key.S with type t = 'a) -> ('a -> 'b) -> 'a -> 'b

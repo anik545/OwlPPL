@@ -39,7 +39,6 @@ let hmm =
        let* x = trans (List.hd_exn rest) in
        return (x :: rest)
   in
-
   let states = List.fold_left ~f:expand ~init:start values in
   liftM List.rev states
 
@@ -58,7 +57,6 @@ let hmm_general (transition : 'a hidden_state -> 'a hidden_state dist)
        let* x = transition (List.hd_exn rest) in
        return (x :: rest)
   in
-
   let states = List.fold_left ~f:expand ~init:start observed_values in
   liftM List.rev states
 

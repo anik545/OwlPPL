@@ -26,13 +26,10 @@ let m' = sample_mean ~n:1000 x' (* ~ 0 *)
 let () =
   let n = 10000 in
   let pl = Plot.create ~m:2 ~n:1 "fig.jpg" in
-
   Plot.subplot pl 0 0;
   let pl = Ppl.Plot.hist_dist_continuous ~h:pl ~n x in
-
   Plot.subplot pl 1 0;
   let pl = Ppl.Plot.hist_dist_continuous ~h:pl ~n x' in
-
   Plot.output pl
 
 let model =
@@ -51,7 +48,6 @@ let model =
 let model1_a =
   let ( let+ ) cond dist = Conditional (cond, dist ()) in
   let ( let* ) = ( let* ) in
-
   let* a = discrete_uniform [ 0; 1 ] in
   let* b = discrete_uniform [ 0; 1 ] in
   let* c = discrete_uniform [ 0; 1 ] in

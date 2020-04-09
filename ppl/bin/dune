@@ -1,7 +1,7 @@
 (copy_files# models/*)
 
 (executables
- (modes byte native)
+ (modes native)
  (names ppl_50_line dice sprinkler coins single_coin linreg hmm geometric
    main)
  (libraries ppl core owl owl-plplot))

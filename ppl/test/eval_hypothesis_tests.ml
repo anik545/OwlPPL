@@ -1,3 +1,5 @@
+(* Performs hypothesis tests to check inference and writes data to a csv to be plotted *)
+
 open Ppl
 open Evaluation
 open Core
@@ -68,7 +70,6 @@ let chi () =
     else sprintf "%s/hypothesis-chi.csv" root_dir
   in
   let oc = Out_channel.create fname in
-
   let ks = do_chi () in
   print_headers oc infs;
   List.iter ks ~f:(fun line -> print_line oc line);

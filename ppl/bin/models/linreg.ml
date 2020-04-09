@@ -22,9 +22,7 @@ let linreg =
   let point d (x, y) =
     condition' (fun (a, b, c) -> Primitive.(pdf @@ normal ((a * x) + b) c) y) d
   in
-
   let points ps d = List.fold ~f:point ~init:d ps in
-
   (* let obs = List.init 10 ~f:(fun x -> let x = float_of_int x in (x,x*.2.)) in *)
   let posterior = points obs linear in
   posterior

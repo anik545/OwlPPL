@@ -1,14 +1,8 @@
 open Core
 open Dist
+include Helpers
 
-type prob = float
-
-type 'a samples = ('a * likelihood) list
-
-(** [unduplicate xs] takes a list of particles and collapses particles with the same value **)
-let unduplicate xs =
-  let map = Map.Poly.of_alist_fold xs ~f:( +. ) ~init:0. in
-  Map.Poly.to_alist map
+type 'a samples = ('a * float) list
 
 let resample xs =
   let n = List.length xs in
@@ -16,17 +10,3 @@ let resample xs =
   let old_dist = categorical xs in
   (* generate new particles from th *)
   sequence @@ List.init n ~f:(fun _ -> fmap (fun x -> (x, 1.)) old_dist)
-
-let normalise xs =
-  let norm = List.sum (module Float) ~f:snd xs in
-  List.map ~f:(fun (v, p) -> (v, p /. norm)) xs
-
-let flatten xss =
-  let mul_likelihood xs p = List.map ~f:(fun (x, q) -> (x, p *. q)) xs in
-  (* let rec flat_map xss = match xss with
-      (xs, p)::xs' -> (mul_likelihood xs p) @ flatten' xs'
-     | [] -> []
-     in *)
-  List.concat_map xss ~f:(fun (xs, p) -> mul_likelihood xs p)
-
-(* flat_map xss *)

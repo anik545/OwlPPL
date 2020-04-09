@@ -14,7 +14,6 @@ let kl_discrete ?(n = 1000) p q =
   let pdf_p = Primitive.pdf p in
   let pdf_q = D.to_pdf q in
   let support_q = D.support q in
-
   let f x =
     let p_x = pdf_p x in
     match pdf_q x with 0. -> raise Undefined | q_x -> p_x *. log (p_x /. q_x)
@@ -25,7 +24,6 @@ let kl_cum_discrete ns p q =
   (* ns is increasing array of sample numbers to storer *)
   let q_emp = ref D.empty in
   let pdf_p = Primitive.pdf p in
-
   let total_n = ns.(Array.length ns - 1) in
   let i = ref 0 in
   let arr = Array.create ~len:(Array.length ns) (0, 0.) in

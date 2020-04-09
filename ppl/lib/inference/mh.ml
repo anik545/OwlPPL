@@ -76,7 +76,6 @@ let mh ~burn d =
   let seq = Sequence.unfold_step ~init:(sample proposal) ~f:iterate in
   let seq = Sequence.drop_eagerly seq burn in
   let r = ref seq in
-
   let sample () =
     match Sequence.next !r with
     | Some (hd, tl) ->
@@ -98,7 +97,6 @@ let mh_transform ~burn d =
   in
   let seq = Sequence.unfold_step ~init:(sample proposal) ~f:iterate in
   let seq = Sequence.drop_eagerly seq burn in
-
   (* burn initial states *)
   let r = ref seq in
   (* could also return a sample function here instead *)

@@ -24,7 +24,6 @@ let g2' =
     let* x = geometric 0.5 in
     return x
   in
-
   let d' = condition' (fun x -> if x < 2 then 0. else 1. /. float_of_int x) d in
   d'
 

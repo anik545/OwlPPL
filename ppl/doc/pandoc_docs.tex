@@ -354,13 +354,18 @@ A set of utilities for generating statistics and printing distributions
 
 \hypertarget{samples}{\subsubsection{\texorpdfstring{\protect\hyperlink{samples}{}Samples}{Samples}}\label{samples}}
 
-\protect\hyperlink{val-sampleux5fmean}{}\texttt{val\ sample\_mean\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}
+\begin{description}
+\item[{\protect\hyperlink{val-sampleux5fmean}{}\texttt{val\ sample\_mean\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}\\
+\protect\hyperlink{val-sampleux5fvariance}{}\texttt{val\ sample\_variance\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}\\
+\protect\hyperlink{val-takeux5fkux5fsamples}{}\texttt{val\ take\_k\_samples\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ array}\\
+\protect\hyperlink{val-unduplicate}{}\texttt{val\ unduplicate\ :\ (\textquotesingle{}a\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ list}}]
+Removes duplicates and sums the probabilities associated so that each
+value appears once
+\end{description}
 
-\protect\hyperlink{val-sampleux5fvariance}{}\texttt{val\ sample\_variance\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}
+\protect\hyperlink{val-flatten}{}\texttt{val\ flatten\ :\ ((\textquotesingle{}a\ *\ float)\ list\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ list}
 
-\protect\hyperlink{val-takeux5fkux5fsamples}{}\texttt{val\ take\_k\_samples\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ array}
-
-\protect\hyperlink{val-undup}{}\texttt{val\ undup\ :\ (\textquotesingle{}a\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a,~float)\ Core.Map.Poly.t}
+\protect\hyperlink{val-normalise}{}\texttt{val\ normalise\ :\ (\textquotesingle{}a\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ list}
 
 \protect\hyperlink{val-weightedux5fdist}{}\texttt{val\ weighted\_dist\ :\ ?⁠n:int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a,~int)\ Core.Map.Poly.t}
 
@@ -379,6 +384,8 @@ A set of utilities for generating statistics and printing distributions
 \protect\hyperlink{val-time}{}\texttt{val\ time\ :\ (unit\ -\textgreater{}\ \textquotesingle{}a)\ -\textgreater{}\ \textquotesingle{}a}
 
 \protect\hyperlink{val-memo}{}\texttt{val\ memo\ :\ (\textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b)\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b}
+
+\protect\hyperlink{val-memoux5fnoux5fpoly}{}\texttt{val\ memo\_no\_poly\ :\ (module\ Base\_\_.Hashtbl\_intf.Key.S\ with\ type\ t\ =\ \textquotesingle{}a)\ -\textgreater{}\ (\textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b)\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b}
 
 \href{../index.html}{Up} -- \href{../../../index.html}{ppl} »
 \href{../../index.html}{Ppl} » \href{../index.html}{Dist} » PplOps
@@ -902,13 +909,18 @@ A set of utilities for generating statistics and printing distributions
 
 \hypertarget{samples}{\subsubsection{\texorpdfstring{\protect\hyperlink{samples}{}Samples}{Samples}}\label{samples}}
 
-\protect\hyperlink{val-sampleux5fmean}{}\texttt{val\ sample\_mean\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}
+\begin{description}
+\item[{\protect\hyperlink{val-sampleux5fmean}{}\texttt{val\ sample\_mean\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}\\
+\protect\hyperlink{val-sampleux5fvariance}{}\texttt{val\ sample\_variance\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}\\
+\protect\hyperlink{val-takeux5fkux5fsamples}{}\texttt{val\ take\_k\_samples\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ array}\\
+\protect\hyperlink{val-unduplicate}{}\texttt{val\ unduplicate\ :\ (\textquotesingle{}a\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ list}}]
+Removes duplicates and sums the probabilities associated so that each
+value appears once
+\end{description}
 
-\protect\hyperlink{val-sampleux5fvariance}{}\texttt{val\ sample\_variance\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}
+\protect\hyperlink{val-flatten}{}\texttt{val\ flatten\ :\ ((\textquotesingle{}a\ *\ float)\ list\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ list}
 
-\protect\hyperlink{val-takeux5fkux5fsamples}{}\texttt{val\ take\_k\_samples\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ array}
-
-\protect\hyperlink{val-undup}{}\texttt{val\ undup\ :\ (\textquotesingle{}a\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a,~float)\ Core.Map.Poly.t}
+\protect\hyperlink{val-normalise}{}\texttt{val\ normalise\ :\ (\textquotesingle{}a\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ list}
 
 \protect\hyperlink{val-weightedux5fdist}{}\texttt{val\ weighted\_dist\ :\ ?⁠n:int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a,~int)\ Core.Map.Poly.t}
 
@@ -927,6 +939,8 @@ A set of utilities for generating statistics and printing distributions
 \protect\hyperlink{val-time}{}\texttt{val\ time\ :\ (unit\ -\textgreater{}\ \textquotesingle{}a)\ -\textgreater{}\ \textquotesingle{}a}
 
 \protect\hyperlink{val-memo}{}\texttt{val\ memo\ :\ (\textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b)\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b}
+
+\protect\hyperlink{val-memoux5fnoux5fpoly}{}\texttt{val\ memo\_no\_poly\ :\ (module\ Base\_\_.Hashtbl\_intf.Key.S\ with\ type\ t\ =\ \textquotesingle{}a)\ -\textgreater{}\ (\textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b)\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b}
 
 \href{../index.html}{Up} -- \href{../../index.html}{ppl} »
 \href{../index.html}{Ppl} » Evaluation

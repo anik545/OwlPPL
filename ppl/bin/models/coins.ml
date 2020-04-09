@@ -6,11 +6,8 @@ let coin_tossing =
     let* isFair = bernoulli 0.8 in
     if isFair then return 0.5 else beta 5. 1.
   in
-
   let toss d b = condition' (fun w -> if b then w else 1. -. w) d in
-
   let tosses bs d = List.fold bs ~init:d ~f:toss in
-
   let observations =
     [ true; false; true; true; false; true; true; true; false ]
   in

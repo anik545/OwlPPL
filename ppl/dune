@@ -3,7 +3,8 @@
   (flags
    (:standard -g -w A-48)))
  (noerr
-  (flags (:standard)))
+  (flags
+   (:standard -w -a)))
  (profile
   (ocamlopt_flags
    (:standard -p -w A-48))
@@ -22,7 +23,7 @@
  (action
   (progn
    (bash "htmldoc $(cat doc/include_docs) -t pdf -f %{target} ")
-  ;  (bash "cp %{target} /home/anik/Files/work/project/diss/htmldocs.pdf")
+   ;  (bash "cp %{target} /home/anik/Files/work/project/diss/htmldocs.pdf")
    )))
 
 (rule
@@ -36,8 +37,7 @@
    (into doc)))
  (action
   (progn
-   (bash
-     "pandoc $(cat doc/include_docs) -o %{target}")
+   (bash "pandoc $(cat doc/include_docs) -o %{target}")
    (bash "cp %{target} /home/anik/Files/work/project/diss/chapters/docs.tex"))))
 
 (alias

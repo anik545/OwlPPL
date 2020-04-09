@@ -119,7 +119,7 @@ module Continuous = struct
 
   open Owl_stats
 
-  let empty = histogram (`N 0) [||]
+  let empty = histogram (`N 1) [||]
 
   let from_dist ?(n = 300) d =
     (* sturges rule *)

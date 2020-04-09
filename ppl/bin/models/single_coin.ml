@@ -4,11 +4,8 @@ open Core
 (* https://www.cl.cam.ac.uk/teaching/1819/DataSci/notes0.pdf pg33 *)
 let single_coin =
   let pr = continuous_uniform 0. 1. in
-
   let toss t = condition' (fun p -> Primitive.(pdf @@ binomial 10 p) t) in
-
   let obs = 9 in
-
   (* we see x=9 heads *)
   let posterior = toss obs pr in
   (* let posterior' = condition (fun p -> pdf (Binomial(10,p)) obs) (continuous_uniform 0. 1.) in *)

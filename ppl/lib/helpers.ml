@@ -1,4 +1,22 @@
 open Dist
+open Core
+
+(** [unduplicate xs] takes a list of particles and collapses particles with the same value **)
+let unduplicate xs =
+  let map = Map.Poly.of_alist_fold xs ~f:( +. ) ~init:0. in
+  Map.Poly.to_alist map
+
+let normalise xs =
+  let norm = List.sum (module Float) ~f:snd xs in
+  List.map ~f:(fun (v, p) -> (v, p /. norm)) xs
+
+let flatten xss =
+  let mul_likelihood xs p = List.map ~f:(fun (x, q) -> (x, p *. q)) xs in
+  (* let rec flat_map xss = match xss with
+      (xs, p)::xs' -> (mul_likelihood xs p) @ flatten' xs'
+     | [] -> []
+     in *)
+  List.concat_map xss ~f:(fun (xs, p) -> mul_likelihood xs p)
 
 (* TODO: make generic - accept an averaging function *)
 let sample_mean ?(n = 100000) d =
@@ -10,10 +28,6 @@ let sample_mean ?(n = 100000) d =
 let take_k_samples k d = Core.Array.init k ~f:(fun _ -> sample d)
 
 let sample_variance ?(n = 10000) d = take_k_samples n d |> Owl_stats.var
-
-let undup xs =
-  let map = Core.Map.Poly.of_alist_fold xs ~f:( +. ) ~init:0. in
-  map
 
 (* TODO: create a prob_map module *)
 let weighted_dist ?(n = 300) (d : 'a dist) : ('a, int) Core.Map.Poly.t =
@@ -36,20 +50,32 @@ let time f =
   Printf.printf "Execution time: %f seconds\n" (t1 -. t);
   res
 
+(** [memo f] is a memoized version of f. 
+    Intended for use with non-deterministic functions so that we fix outputs when called with a given input *)
 let memo f =
-  let m = Hashtbl.create 10 in
+  let m = Hashtbl.Poly.create ~size:10 () in
   let f' x =
-    match Hashtbl.find_opt m x with
+    match Hashtbl.Poly.find m x with
     | Some n -> n
     | None ->
         let el = f x in
-        Hashtbl.add m x el;
+        Hashtbl.Poly.add_exn m ~key:x ~data:el;
         el
   in
   f'
 
-(* let x = memo (fun _ -> sample @@ beta 1. 1.) 
-   let y = x 5 *)
+let memo_no_poly m f =
+  let m = Hashtbl.create m ~size:10 in
+  let f' x =
+    match Hashtbl.find m x with
+    | Some n -> n
+    | None ->
+        let el = f x in
+        Hashtbl.add_exn m ~key:x ~data:el;
+        el
+  in
+  f'
+
 exception Not_discrete
 
 exception Not_primitive

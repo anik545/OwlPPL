@@ -1,3 +1,5 @@
+(* Runs KL diverence on inferred distributions to check correctness of inference *)
+
 open Ppl
 open Core
 
@@ -42,13 +44,11 @@ let gen_csv' ?fname model exact infer_strats
           (List.map ~f:print_infer_strat_short @@ Array.to_list infer_strats)
       in
       fprintf oc "samples,%s\n" s;
-
       Array.iteri arr ~f:(fun i a ->
           fprintf oc "%d,%s\n" x_vals.(i)
             (String.concat ~sep:","
                ( Array.to_list
                @@ Array.map a ~f:(fun x -> string_of_float (Float.abs x)) )));
-
       let () = Out_channel.close oc in
       arr
   | None -> arr
@@ -102,7 +102,6 @@ let test_kl_function () =
     Evaluation.kl_continuous ~n:10000 Primitive.(normal 0. 1.) (normal 0. 1.)
   in
   let () = Printf.printf "%f %f %f %f\n" diff1 diff2 diff3 diff4 in
-
   (* diverges to ?? *)
   let diff1 =
     Evaluation.kl_continuous ~n:10
@@ -125,7 +124,6 @@ let test_kl_function () =
       (beta 10. 2.)
   in
   let () = Printf.printf "%f %f %f %f\n" diff1 diff2 diff3 diff4 in
-
   (* converge to 0 *)
   let diff1 =
     Evaluation.kl_discrete ~n:10 Primitive.(binomial 10 0.5) (binomial 10 0.5)
@@ -142,7 +140,6 @@ let test_kl_function () =
       (binomial 10 0.5)
   in
   let () = Printf.printf "%f %f %f %f\n" diff1 diff2 diff3 diff4 in
-
   (* converge to 0.5  *)
   let diff1 =
     Evaluation.kl_discrete ~n:10
