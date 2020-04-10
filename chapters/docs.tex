@@ -386,6 +386,8 @@ The signature for new primitives distributions
 
 \protect\hyperlink{val-cdf}{}\texttt{val\ cdf\ :\ t\ -\textgreater{}\ float}
 
+\protect\hyperlink{val-ppf}{}\texttt{val\ ppf\ :\ t\ -\textgreater{}\ float}
+
 \protect\hyperlink{val-support}{}\texttt{val\ support\ :\ t\ support}
 
 \href{../index.html}{Up} -- \href{../../index.html}{ppl} »
@@ -460,7 +462,7 @@ Type of primitive dists wrapping a module
 \hypertarget{newux5fprim}{\subsubsection{\texorpdfstring{\protect\hyperlink{newux5fprim}{}New
 Distributions}{New Distributions}}\label{newux5fprim}}
 
-\protect\hyperlink{val-createux5fprimitive}{}\texttt{val\ create\_primitive\ :\ sample:(unit\ -\textgreater{}\ \textquotesingle{}a)\ -\textgreater{}\ pdf:(\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ cdf:(\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ support:\textquotesingle{}a\ support\ -\textgreater{}\ \textquotesingle{}a\ t}
+\protect\hyperlink{val-createux5fprimitive}{}\texttt{val\ create\_primitive\ :\ sample:(unit\ -\textgreater{}\ \textquotesingle{}a)\ -\textgreater{}\ pdf:(\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ cdf:(\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ support:\textquotesingle{}a\ support\ -\textgreater{}\ ppf:(\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ \textquotesingle{}a\ t}
 
 \hypertarget{inbuiltux5fdists}{\subsubsection{\texorpdfstring{\protect\hyperlink{inbuiltux5fdists}{}Predefined
 Distributions}{Predefined Distributions}}\label{inbuiltux5fdists}}
@@ -489,6 +491,8 @@ Operations}{Basic Operations}}\label{basicux5fops}}
 \protect\hyperlink{val-logpdf}{}\texttt{val\ logpdf\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}
 
 \protect\hyperlink{val-cdf}{}\texttt{val\ cdf\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}
+
+\protect\hyperlink{val-ppf}{}\texttt{val\ ppf\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}
 
 \protect\hyperlink{val-sample}{}\texttt{val\ sample\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a}
 
@@ -627,16 +631,24 @@ to graph PPL distributions
 
 \hypertarget{histograms}{\subsubsection{\texorpdfstring{\protect\hyperlink{histograms}{}Histograms}{Histograms}}\label{histograms}}
 
-\protect\hyperlink{val-histux5fdistux5fcontinuous}{}\texttt{val\ hist\_dist\_continuous\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ Owl\_plplot.Plot.handle}
+\protect\hyperlink{val-histux5fdistux5fcontinuous}{}\texttt{val\ hist\_dist\_continuous\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ ?⁠title:string\ -\textgreater{}\ ?⁠xlabel:string\ -\textgreater{}\ ?⁠ylabel:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ Owl\_plplot.Plot.handle}
 
-\protect\hyperlink{val-histux5fdistux5fdiscrete}{}\texttt{val\ hist\_dist\_discrete\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ Owl\_plplot.Plot.handle}
+\protect\hyperlink{val-histux5fdistux5fdiscrete}{}\texttt{val\ hist\_dist\_discrete\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ ?⁠title:string\ -\textgreater{}\ ?⁠xlabel:string\ -\textgreater{}\ ?⁠ylabel:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ Owl\_plplot.Plot.handle}
 
 \hypertarget{otherux5fplots}{\subsubsection{\texorpdfstring{\protect\hyperlink{otherux5fplots}{}Other
 Plots}{Other Plots}}\label{otherux5fplots}}
 
-\protect\hyperlink{val-qqux5fplot}{}\texttt{val\ qq\_plot\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ Owl\_plplot.Plot.handle}
+\protect\hyperlink{val-qqux5fplot}{}\texttt{val\ qq\_plot\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ ?⁠title:string\ -\textgreater{}\ ?⁠xlabel:string\ -\textgreater{}\ ?⁠ylabel:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ Owl\_plplot.Plot.handle}
 
-\protect\hyperlink{val-probux5fplot}{}\texttt{val\ prob\_plot\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ Owl\_plplot.Plot.handle}
+\protect\hyperlink{val-ppux5fplot}{}\texttt{val\ pp\_plot\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ ?⁠title:string\ -\textgreater{}\ ?⁠xlabel:string\ -\textgreater{}\ ?⁠ylabel:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ Owl\_plplot.Plot.handle}
+
+\protect\hyperlink{val-ecdfux5fcontinuous}{}\texttt{val\ ecdf\_continuous\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ ?⁠title:string\ -\textgreater{}\ ?⁠xlabel:string\ -\textgreater{}\ ?⁠ylabel:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ Owl\_plplot.Plot.handle}
+
+\protect\hyperlink{val-ecdfux5fdiscrete}{}\texttt{val\ ecdf\_discrete\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ ?⁠title:string\ -\textgreater{}\ ?⁠xlabel:string\ -\textgreater{}\ ?⁠ylabel:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ Owl\_plplot.Plot.handle}
+
+\protect\hyperlink{val-addux5fpdf}{}\texttt{val\ add\_pdf\ :\ ?⁠scale:float\ -\textgreater{}\ dist:float\ Primitive.t\ -\textgreater{}\ Owl\_plplot.Plot.handle\ -\textgreater{}\ Owl\_plplot.Plot.handle}
+
+\protect\hyperlink{val-show}{}\texttt{val\ show\ :\ Owl\_plplot.Plot.handle\ -\textgreater{}\ unit}
 
 \href{../index.html}{Up} -- \href{../../index.html}{ppl} »
 \href{../index.html}{Ppl} » Empirical
