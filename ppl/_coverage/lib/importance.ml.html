@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Coverage report</title>
+    <link rel="stylesheet" href="../coverage.css" />
+    <script src="../highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <div id="header">
+      <h1>
+        <a href="../index.html">
+          <span class="dirname">lib/</span>importance.ml
+        </a>
+      </h1>
+      <h2>71.05%</h2>
+    </div>
+    <div id="navbar">
+      <span class="unvisited" style="top:31.91%"></span>
+      <span class="unvisited" style="top:40.43%"></span>
+      <span class="unvisited" style="top:41.49%"></span>
+      <span class="unvisited" style="top:42.55%"></span>
+      <span class="unvisited" style="top:43.62%"></span>
+      <span class="unvisited" style="top:44.68%"></span>
+      <span class="unvisited" style="top:45.74%"></span>
+      <span class="unvisited" style="top:46.81%"></span>
+      <span class="unvisited" style="top:47.87%"></span>
+      <span class="unvisited" style="top:48.94%"></span>
+      <span class="unvisited" style="top:50.00%"></span>
+      <span class="unvisited" style="bottom:48.94%"></span>
+      <span class="unvisited" style="bottom:47.87%"></span>
+      <span class="unvisited" style="bottom:46.81%"></span>
+      <span class="unvisited" style="bottom:44.68%"></span>
+      <span class="unvisited" style="bottom:34.04%"></span>
+      <span class="unvisited" style="bottom:20.21%"></span>
+      <span class="unvisited" style="bottom:15.96%"></span>
+    </div>
+    <div id="report">
+      <div id="lines-layer">
+        <pre>
+<a id="L1"></a><span > </span>
+<a id="L2"></a><span class="visited"> </span>
+<a id="L3"></a><span > </span>
+<a id="L4"></a><span > </span>
+<a id="L5"></a><span > </span>
+<a id="L6"></a><span > </span>
+<a id="L7"></a><span > </span>
+<a id="L8"></a><span class="visited"> </span>
+<a id="L9"></a><span > </span>
+<a id="L10"></a><span > </span>
+<a id="L11"></a><span class="visited"> </span>
+<a id="L12"></a><span class="visited"> </span>
+<a id="L13"></a><span > </span>
+<a id="L14"></a><span > </span>
+<a id="L15"></a><span > </span>
+<a id="L16"></a><span > </span>
+<a id="L17"></a><span > </span>
+<a id="L18"></a><span > </span>
+<a id="L19"></a><span > </span>
+<a id="L20"></a><span class="visited"> </span>
+<a id="L21"></a><span > </span>
+<a id="L22"></a><span class="visited"> </span>
+<a id="L23"></a><span class="visited"> </span>
+<a id="L24"></a><span class="visited"> </span>
+<a id="L25"></a><span > </span>
+<a id="L26"></a><span class="visited"> </span>
+<a id="L27"></a><span > </span>
+<a id="L28"></a><span class="visited"> </span>
+<a id="L29"></a><span > </span>
+<a id="L30"></a><span class="unvisited"> </span>
+<a id="L31"></a><span class="visited"> </span>
+<a id="L32"></a><span class="visited"> </span>
+<a id="L33"></a><span class="visited"> </span>
+<a id="L34"></a><span > </span>
+<a id="L35"></a><span > </span>
+<a id="L36"></a><span > </span>
+<a id="L37"></a><span > </span>
+<a id="L38"></a><span class="unvisited"> </span>
+<a id="L39"></a><span class="unvisited"> </span>
+<a id="L40"></a><span class="unvisited"> </span>
+<a id="L41"></a><span class="unvisited"> </span>
+<a id="L42"></a><span class="unvisited"> </span>
+<a id="L43"></a><span class="unvisited"> </span>
+<a id="L44"></a><span class="unvisited"> </span>
+<a id="L45"></a><span class="unvisited"> </span>
+<a id="L46"></a><span class="unvisited"> </span>
+<a id="L47"></a><span class="unvisited"> </span>
+<a id="L48"></a><span class="unvisited"> </span>
+<a id="L49"></a><span class="unvisited"> </span>
+<a id="L50"></a><span class="unvisited"> </span>
+<a id="L51"></a><span > </span>
+<a id="L52"></a><span class="unvisited"> </span>
+<a id="L53"></a><span > </span>
+<a id="L54"></a><span > </span>
+<a id="L55"></a><span class="visited"> </span>
+<a id="L56"></a><span class="visited"> </span>
+<a id="L57"></a><span class="visited"> </span>
+<a id="L58"></a><span class="visited"> </span>
+<a id="L59"></a><span > </span>
+<a id="L60"></a><span > </span>
+<a id="L61"></a><span > </span>
+<a id="L62"></a><span class="unvisited"> </span>
+<a id="L63"></a><span class="visited"> </span>
+<a id="L64"></a><span > </span>
+<a id="L65"></a><span class="visited"> </span>
+<a id="L66"></a><span class="visited"> </span>
+<a id="L67"></a><span > </span>
+<a id="L68"></a><span class="visited"> </span>
+<a id="L69"></a><span > </span>
+<a id="L70"></a><span > </span>
+<a id="L71"></a><span class="visited"> </span>
+<a id="L72"></a><span class="visited"> </span>
+<a id="L73"></a><span class="visited"> </span>
+<a id="L74"></a><span > </span>
+<a id="L75"></a><span class="unvisited"> </span>
+<a id="L76"></a><span class="visited"> </span>
+<a id="L77"></a><span class="visited"> </span>
+<a id="L78"></a><span > </span>
+<a id="L79"></a><span class="unvisited"> </span>
+<a id="L80"></a><span class="visited"> </span>
+<a id="L81"></a><span class="visited"> </span>
+<a id="L82"></a><span > </span>
+<a id="L83"></a><span > </span>
+<a id="L84"></a><span > </span>
+<a id="L85"></a><span > </span>
+<a id="L86"></a><span class="visited"> </span>
+<a id="L87"></a><span > </span>
+<a id="L88"></a><span > </span>
+<a id="L89"></a><span > </span>
+<a id="L90"></a><span > </span>
+<a id="L91"></a><span > </span>
+<a id="L92"></a><span > </span>
+<a id="L93"></a><span > </span>
+<a id="L94"></a><span > </span>
+</pre>
+      </div>
+      <div id="text-layer">
+        <pre id="line-numbers">
+<a href="#L1"> 1</a>
+<a href="#L2"> 2</a>
+<a href="#L3"> 3</a>
+<a href="#L4"> 4</a>
+<a href="#L5"> 5</a>
+<a href="#L6"> 6</a>
+<a href="#L7"> 7</a>
+<a href="#L8"> 8</a>
+<a href="#L9"> 9</a>
+<a href="#L10">10</a>
+<a href="#L11">11</a>
+<a href="#L12">12</a>
+<a href="#L13">13</a>
+<a href="#L14">14</a>
+<a href="#L15">15</a>
+<a href="#L16">16</a>
+<a href="#L17">17</a>
+<a href="#L18">18</a>
+<a href="#L19">19</a>
+<a href="#L20">20</a>
+<a href="#L21">21</a>
+<a href="#L22">22</a>
+<a href="#L23">23</a>
+<a href="#L24">24</a>
+<a href="#L25">25</a>
+<a href="#L26">26</a>
+<a href="#L27">27</a>
+<a href="#L28">28</a>
+<a href="#L29">29</a>
+<a href="#L30">30</a>
+<a href="#L31">31</a>
+<a href="#L32">32</a>
+<a href="#L33">33</a>
+<a href="#L34">34</a>
+<a href="#L35">35</a>
+<a href="#L36">36</a>
+<a href="#L37">37</a>
+<a href="#L38">38</a>
+<a href="#L39">39</a>
+<a href="#L40">40</a>
+<a href="#L41">41</a>
+<a href="#L42">42</a>
+<a href="#L43">43</a>
+<a href="#L44">44</a>
+<a href="#L45">45</a>
+<a href="#L46">46</a>
+<a href="#L47">47</a>
+<a href="#L48">48</a>
+<a href="#L49">49</a>
+<a href="#L50">50</a>
+<a href="#L51">51</a>
+<a href="#L52">52</a>
+<a href="#L53">53</a>
+<a href="#L54">54</a>
+<a href="#L55">55</a>
+<a href="#L56">56</a>
+<a href="#L57">57</a>
+<a href="#L58">58</a>
+<a href="#L59">59</a>
+<a href="#L60">60</a>
+<a href="#L61">61</a>
+<a href="#L62">62</a>
+<a href="#L63">63</a>
+<a href="#L64">64</a>
+<a href="#L65">65</a>
+<a href="#L66">66</a>
+<a href="#L67">67</a>
+<a href="#L68">68</a>
+<a href="#L69">69</a>
+<a href="#L70">70</a>
+<a href="#L71">71</a>
+<a href="#L72">72</a>
+<a href="#L73">73</a>
+<a href="#L74">74</a>
+<a href="#L75">75</a>
+<a href="#L76">76</a>
+<a href="#L77">77</a>
+<a href="#L78">78</a>
+<a href="#L79">79</a>
+<a href="#L80">80</a>
+<a href="#L81">81</a>
+<a href="#L82">82</a>
+<a href="#L83">83</a>
+<a href="#L84">84</a>
+<a href="#L85">85</a>
+<a href="#L86">86</a>
+<a href="#L87">87</a>
+<a href="#L88">88</a>
+<a href="#L89">89</a>
+<a href="#L90">90</a>
+<a href="#L91">91</a>
+<a href="#L92">92</a>
+<a href="#L93">93</a>
+<a href="#L94">94</a>
+</pre>
+<pre><code class="ocaml"># 1 "lib/inference/importance.ml"
+(* open Common *)
+open Core
+open Dist
+open Common
+
+(* likelihood weighting *)
+let importance n d = <span data-count="2">s</span>equence @@ List.ini<span data-count="2">t</span> n ~f:(fun _ -&gt; <span data-count="200">p</span>rior d)
+
+let importance' n d =
+  <span data-count="2">l</span>et* l = importanc<span data-count="2">e</span> n d in
+  <span data-count="100">c</span>ategorical l
+
+(* let importance' n d = 
+   let particles_dist = sequence @@ List.init n ~f:(fun _ -&gt; prior d) in
+   let* particles = particles_dist in 
+   categorical particles *)
+
+let rec create' n d sofar =
+  <span data-count="2336">i</span>f n = 0 then <span data-count="4">s</span>ofar
+  else
+    <span data-count="2332">m</span>atch sample d with
+    | <span data-count="400">S</span>ome x -&gt; create' (n - 1) d (x :: sofar)
+    | <span data-count="1932">N</span>one -&gt; create' n d sofar
+
+let create n d = <span data-count="4">c</span>reate' n d []
+
+<span data-count="4">t</span>ype rejection_type = Hard | Soft [@@deriving show]
+
+let reject_transform_hard ?(threshold = <span data-count="0">0</span>.) d =
+  <span data-count="200">l</span>et rec repeat () =
+    <span data-count="2954">l</span>et* x, s = prior_with_scor<span data-count="2954">e</span> d in
+    <span data-count="12754">i</span>f Float.(s &gt; threshold) then <span data-count="10000">r</span>eturn (x, s) else <span data-count="2754">r</span>epeat ()
+  in
+  repeat ()
+
+let rec reject'' : 'a. 'a dist -&gt; 'a option dist = function
+  | <span data-count="0">C</span>onditional (c, d') -&gt; (
+      let* x = reject'<span data-count="0">'</span> d' in
+      <span data-count="0">m</span>atch x with
+      | <span data-count="0">S</span>ome y -&gt; if Float.(<span data-count="0">c</span> y = 0.) then <span data-count="0">r</span>eturn None else <span data-count="0">r</span>eturn (Some y)
+      | <span data-count="0">N</span>one -&gt; return None )
+  | <span data-count="0">B</span>ind (d, f) -&gt; (
+      let* x = reject'<span data-count="0">'</span> d in
+      <span data-count="0">m</span>atch x with
+      | <span data-count="0">S</span>ome y -&gt;
+          let* z = reject'<span data-count="0">'</span> (<span data-count="0">f</span> y) in
+          <span data-count="0">r</span>eturn z
+      | <span data-count="0">N</span>one -&gt; return None )
+  | <span data-count="0">x</span> -&gt;
+      let* y = x in
+      <span data-count="0">r</span>eturn (Some y)
+
+let reject_transform_soft d =
+  <span data-count="200">l</span>et rec repeat () =
+    <span data-count="88467">l</span>et* x, s = prior_with_scor<span data-count="88467">e</span> d in
+    <span data-count="98267">l</span>et* accept = bernoull<span data-count="98267">i</span> s in
+    <span data-count="98267">i</span>f accept then <span data-count="10000">r</span>eturn (x, s) else <span data-count="88267">r</span>epeat ()
+  in
+  repeat ()
+
+let rejection_transform ?(n = <span data-count="0">1</span>0000) s d =
+  <span data-count="4">l</span>et reject_dist =
+    match s with
+    | <span data-count="2">H</span>ard -&gt; reject_transform_hard ~threshold:0.
+    | <span data-count="2">S</span>oft -&gt; reject_transform_soft
+  in
+  sequenc<span data-count="4">e</span> @@ List.ini<span data-count="4">t</span> n ~f:(fun _ -&gt; <span data-count="400">r</span>eject_dist d) &gt;&gt;= categorical
+
+let rejection_soft d =
+  <span data-count="2">l</span>et* x, s = prior_with_scor<span data-count="2">e</span> d in
+  <span data-count="2068">l</span>et* accept = bernoull<span data-count="2068">i</span> s in
+  <span data-count="2068">i</span>f accept then <span data-count="200">r</span>eturn (Some (x, s)) else <span data-count="1868">r</span>eturn None
+
+let rejection_hard ?(threshold = <span data-count="0">0</span>.) d =
+  <span data-count="2">l</span>et* x, s = prior_with_scor<span data-count="2">e</span> d in
+  <span data-count="264">i</span>f Float.(s &gt; threshold) then <span data-count="200">r</span>eturn (Some (x, s)) else <span data-count="64">r</span>eturn None
+
+let rejection ?(n = <span data-count="0">1</span>0000) s d =
+  <span data-count="4">l</span>et reject_dist =
+    match s with <span data-count="2">H</span>ard -&gt; rejection_hard ~threshold:0. | <span data-count="2">S</span>oft -&gt; rejection_soft
+  in
+  (* List.init n ~f:(fun _ -&gt; sample (reject_dist d))
+     |&gt; List.filter ~f:(is_some)
+     |&gt; List.filter_opt *)
+  creat<span data-count="4">e</span> n (reject_dis<span data-count="4">t</span> d) |&gt; unduplicat<span data-count="4">e</span> |&gt; normalis<span data-count="4">e</span> |&gt; categorica<span data-count="3">l</span>
+
+(* 
+let rec create d n =
+  if n = 0 then [] 
+  else 
+    match sample d with
+    | Some x -&gt; x::(create d (n-1))
+    | None -&gt; create d n *)
+</code></pre>
+      </div>
+    </div>
+    <script src="../coverage.js"></script>
+  </body>
+</html>

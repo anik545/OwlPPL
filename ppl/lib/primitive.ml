@@ -27,7 +27,8 @@ module type PRIM_DIST = sig
   val cdf : t -> float
 
   (* TODO: add ppf function *)
-  (* val ppf:  *)
+  val ppf : t -> float
+
   val support : t support
 end
 
@@ -42,6 +43,8 @@ let binomial n p =
     let pdf = Owl_stats_dist.binomial_pdf ~n ~p
 
     let cdf = Owl_stats_dist.binomial_cdf ~n ~p
+
+    let ppf _ = raise NotImplemented
 
     let support = DiscreteFinite (List.init n ~f:ident)
   end : PRIM_DIST
@@ -65,6 +68,8 @@ let categorical (type a) xs =
 
     let cdf _ = raise NotImplemented
 
+    let ppf _ = raise NotImplemented
+
     let support = DiscreteFinite (List.map ~f:fst xs)
   end : PRIM_DIST
     with type t = a )
@@ -78,6 +83,8 @@ let normal mu sigma =
     let pdf = Owl_stats_dist.gaussian_pdf ~mu ~sigma
 
     let cdf = Owl_stats_dist.gaussian_cdf ~mu ~sigma
+
+    let ppf = Owl_stats_dist.gaussian_ppf ~mu ~sigma
 
     let support = ContinuousInfinite
   end : PRIM_DIST
@@ -93,6 +100,8 @@ let discrete_uniform (type a) xs =
 
     let cdf _ = raise NotImplemented
 
+    let ppf _ = raise NotImplemented
+
     let support = DiscreteFinite xs
   end : PRIM_DIST
     with type t = a )
@@ -106,6 +115,8 @@ let beta a b =
     let pdf = Owl_stats_dist.beta_pdf ~a ~b
 
     let cdf = Owl_stats_dist.beta_cdf ~a ~b
+
+    let ppf = Owl_stats_dist.beta_ppf ~a ~b
 
     let support = ContinuousFinite [ (0., 1.) ]
   end : PRIM_DIST
@@ -121,6 +132,8 @@ let gamma shape scale =
 
     let cdf = Owl_stats_dist.gamma_cdf ~shape ~scale
 
+    let ppf _ = raise NotImplemented
+
     let support = ContinuousInfinite
   end : PRIM_DIST
     with type t = float )
@@ -135,7 +148,8 @@ let continuous_uniform a b =
 
     let cdf = Owl_stats_dist.uniform_cdf ~a ~b
 
-    (* let ppf = Owl_stats_dist.uniform_ppf ~a ~b *)
+    let ppf = Owl_stats_dist.uniform_ppf ~a ~b
+
     let support = ContinuousFinite [ (a, b) ]
   end : PRIM_DIST
     with type t = float )
@@ -161,7 +175,11 @@ let support (type a) d =
   let (module D : PRIM_DIST with type t = a) = d in
   D.support
 
-let create_primitive (type a) ~sample ~pdf ~cdf ~support =
+let ppf (type a) d =
+  let (module D : PRIM_DIST with type t = a) = d in
+  D.ppf
+
+let create_primitive (type a) ~sample ~pdf ~cdf ~support ~ppf =
   let module D = struct
     type t = a
 
@@ -170,6 +188,8 @@ let create_primitive (type a) ~sample ~pdf ~cdf ~support =
     let pdf = pdf
 
     let cdf = cdf
+
+    let ppf = ppf
 
     let support = support
   end in
@@ -197,6 +217,8 @@ let poisson l =
       (l ** float_of_int k) * exp (-l) / fact k
 
     let cdf k = gammainc (float_of_int (k + 1)) l /. fact k
+
+    let ppf _ = raise NotImplemented
 
     let support = DiscreteInfinite
   end : PRIM_DIST

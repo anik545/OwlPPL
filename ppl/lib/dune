@@ -1,8 +1,21 @@
+(* -*- tuareg -*- *)
+
+let default_pps ?(additional="") () = "(preprocess (pps ppx_js_style ppx_deriving.show ppx_jane " ^ additional ^ "))"
+let preprocess =
+  match Sys.getenv "COVERAGE" with
+  | ""|"false"|"f"|"no"|"F"|"False" -> default_pps ()
+  | exception Not_found -> default_pps ()
+  |  _ -> default_pps ~additional: "bisect_ppx" ()
+
+let () = Jbuild_plugin.V1.send @@ {|
+
 (copy_files# inference/*)
 
 (library
  (name ppl)
  (public_name ppl)
  (libraries core owl owl-plplot)
- (preprocess
-  (pps ppx_js_style ppx_deriving.show ppx_jane)))
+
+ |} ^ preprocess ^ {|)
+
+|}

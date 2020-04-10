@@ -18,9 +18,12 @@ let single_coin =
 
 let post_single_coin = mh' 700 @@ single_coin
 
-let mn = sample_mean ~n:100 post_single_coin (* 0.833 *)
+let exact_coin = Primitive.beta 10. 2.
 
-let () = Printf.printf "%f\n" mn
+(* 0.833 *)
+(* let mn = sample_mean ~n:100 post_single_coin  *)
+
+(* let () = Printf.printf "%f\n" mn *)
 
 (* 
 let () =

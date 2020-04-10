@@ -11,7 +11,7 @@
   ;   test_evaluation test_dist test_helpers test_inference test_plot test_primitive test_empirical
   )
  (modules test test_evaluation test_dist test_helpers test_inference
-   test_plot test_primitive test_empirical)
+   test_plot test_primitive test_empirical unit_test_models)
  (libraries core owl ppl alcotest qcheck qcheck-alcotest)
  ;  (action
  ;   (run %{test} -e))

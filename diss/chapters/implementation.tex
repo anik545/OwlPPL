@@ -349,21 +349,25 @@ Visualising the output distributions from inference can be done using the \textt
 
 For discrete distributions, this conversion is simple - each bar is simply the pmf (probability mass function) of the distribution at each value in the support. This is calculated by drawing $N$ samples, then for each value $x_i$, finding $\frac{n}{N}$, where $n$ is the number of samples that equal $x_i$, to find the approximate probability of that value in the distribution, $P(X = x_i)$.
 
-Where there is an ordering on the type, discrete distributions can also have their cdf visualised. The cdf of a discrete distribution is a step function. The ordering is given by a first class module representing the type. There are cases where there is no natural ordering - for example a distribution over an arbitrary ADT, so this also allows a user to custom define the ordering. 
-
+Where there is an ordering on the type, discrete distributions can also have their cdf visualised. The cdf of a discrete distribution is a step function. The ordering is given by a first class module representing the type. There are cases where there is no natural ordering - for example a distribution over an arbitrary ADT, so this also allows a user to custom define the ordering.
+% 
 \begin{figure}[!htb]
 	\centering
-																																					
-	\caption{The pdf and cdf of a binomial distribution visualised}
+	\subfloat[PDF]{{\includegraphics[width=0.4\textwidth]{figs/binompdf_hist.png} }}%
+	\qquad
+	\subfloat[CDF]{{\includegraphics[width=0.4\textwidth]{figs/binom_ecdf.png} }}%
+	\caption{Samples from a binomial distribution visualised}
 	\label{fig:vis-binom}
 \end{figure}
-
+% 
 Continuous distributions are also displayed as histograms, with a set of samples being put into $n$ equal width bins. The height of each bar is the the pdf (continuous analogue to the pmf), which is calculated by finding the number of samples in each bin, then dividing by the total number of samples. To display the cdf, we can display the empirical cdf directly as a scatter plot, or join points to draw a step function.
 
 \begin{figure}[!htb]
 	\centering
-																																					
-	\caption{The pdf and cdf of a normal distribution visualised}
+	\subfloat[PDF]{{\includegraphics[width=0.4\textwidth]{figs/normpdf_hist.png} }}%
+	\qquad
+	\subfloat[CDF]{{\includegraphics[width=0.4\textwidth]{figs/norm_ecdf.png} }}%
+	\caption{Approximate pdf and cdf of samples from a standard normal distribution}
 	\label{fig:vis-norm}
 \end{figure}
 
@@ -371,7 +375,10 @@ Other important visualisations for continuous distributions are the Q-Q and P-P 
 
 \begin{figure}[!htb]
 	\centering			
-	\caption{The Q-Q and P-P plots of the output of inference for a biased coin model}
+	\subfloat[Q-Q plot]{{\includegraphics[width=0.4\textwidth]{figs/qq.png} }}%
+	\qquad
+	\subfloat[P-P plot]{{\includegraphics[width=0.4\textwidth]{figs/pp.png} }}%
+	\caption{Plots to compare inferred distributions with the exact solutions}
 	\label{fig:vis-qq}
 \end{figure}
 
@@ -379,8 +386,22 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 
 \begin{figure}[!htb]
 	\centering
-				
-	\caption{The approsimate and exact pdf of the output of inference for a biased coin model}
+	% \subfloat[Code that generated the plot]{{\inputminted{ocaml}{code_snippets/plotter.ml} }}%
+	% \qquad
+	% \subfloat[P-P plot]{{\includegraphics[width=0.4\textwidth]{figs/coin_compare.png} }}%
+								
+	\begin{minipage}{0.45\textwidth}
+		\centering
+		\inputminted{ocaml}{code_snippets/plotter.ml}	
+		\captionof{listing}{Code to produce plot}
+	\end{minipage}
+	\begin{minipage}{0.45\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{figs/coin_compare.png}
+		\captionof{figure}{Output}
+	\end{minipage}
+								
+	\caption{The approximate and exact pdf of the output of inference for a biased coin model}
 	\label{fig:vis-samples}
 \end{figure}
 
@@ -389,10 +410,12 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 
 Automated testing of PPLs is difficult for reasons outlines in the preparation. However, I still wrote basic unit tests. The test framework I used, Alcotest, lets me check that outputs of functions match expected values. This allows me to test all deterministic helper functions, e.g. normalise. It also lets me test the exact inference method, and very simple distributions and models which only contain a single value.
 
-The test output can be seen below, in figure \ref{fig:test-out}
+The test output and code coverage output can be seen in figure \ref{fig:test-out}.
 \begin{figure}[!htb]
 	\centering
-																																																																
-	\caption{Output from unit tests}
+	\subfloat[Test report]{{\includegraphics[width=0.4\textwidth]{figs/bins.png} }}%
+	\qquad
+	\subfloat[Code coverage report]{{\includegraphics[width=0.4\textwidth]{figs/sprinkler-network.png} }}%
+	\caption{Output from running unit tests}
 	\label{fig:test-out}
 \end{figure}

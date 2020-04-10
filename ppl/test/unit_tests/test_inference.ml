@@ -55,15 +55,56 @@ let test_exact_inference_no_condition () =
     "check same dist no condition" (extract_exact dist) x
 
 (* TODO: check inference doesnt raise exceptions for each inference method and model *)
-
-open Alcotest
-
-let tests : unit test list =
+let infer_strats =
   [
-    ( "inference",
+    MH 100;
+    PC 100;
+    Prior;
+    SMC 100;
+    PIMH 100;
+    Importance 100;
+    Rejection (100, Hard);
+    Rejection (100, Soft);
+    RejectionTrans (100, Hard);
+    RejectionTrans (100, Soft);
+    Prior;
+    Enum;
+    Forward;
+  ]
+
+let inf_with_desc = List.map infer_strats ~f:(fun x -> (x, show_infer_strat x))
+
+type model = F of float dist | B of bool dist
+
+let models =
+  Unit_test_models.[ (B grass_model, "sprinkler"); (F single_coin, "coin") ]
+
+let inference_tests =
+  List.map models ~f:(fun (model, model_desc) ->
+      List.map inf_with_desc ~f:(fun (inf, desc) ->
+          ( desc ^ ",model:" ^ model_desc,
+            `Quick,
+            fun () ->
+              match model with
+              | B m ->
+                  Alcotest.(check pass)
+                    desc
+                    (take_k_samples 50 (infer m inf))
+                    [||]
+              | F m ->
+                  Alcotest.(check pass)
+                    desc
+                    (take_k_samples 50 (infer m inf))
+                    [||] )))
+  |> List.concat
+
+let tests : unit Alcotest.test list =
+  [
+    ( "exact inference",
       [
-        test_case "adding model" `Quick test_exact_inference_adding;
-        test_case "grass model" `Quick test_exact_inference_grass;
-        test_case "no conditioning" `Quick test_exact_inference_no_condition;
+        ("adding model", `Quick, test_exact_inference_adding);
+        ("grass model", `Quick, test_exact_inference_grass);
+        ("no conditioning", `Quick, test_exact_inference_no_condition);
       ] );
+    ("inference is sampleable", [] @ inference_tests);
   ]

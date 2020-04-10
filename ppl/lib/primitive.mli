@@ -25,6 +25,8 @@ module type PRIM_DIST = sig
 
   val cdf : t -> float
 
+  val ppf : t -> float
+
   val support : t support
 end
 
@@ -38,6 +40,7 @@ val create_primitive :
   pdf:('a -> float) ->
   cdf:('a -> float) ->
   support:'a support ->
+  ppf:('a -> float) ->
   'a t
 
 (** {2:inbuilt_dists Predefined Distributions} *)
@@ -73,6 +76,8 @@ val pdf : 'a t -> 'a -> float
 val logpdf : 'a t -> 'a -> float
 
 val cdf : 'a t -> 'a -> float
+
+val ppf : 'a t -> 'a -> float
 
 val sample : 'a t -> 'a
 
