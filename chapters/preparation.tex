@@ -34,7 +34,7 @@ Testing systems which are linked to randomness can be quite tricky, as it is dif
 
 As such, most of the unit tests I wrote are fairly simple and only catch very basic bugs. Unit tests were possible to write for the exact inference procedure when working with discrete distributions, since we always expect the same output distribution. However, all the other inference algorithms are approximate, so tests suffer from the problems described above. I was still able to carry out a full evaluation, performing hypothesis tests such as the kolmogorov-smirnov or chi-squared tests.
 
-However, there are several auxiliary functions that can be tested effectively using conventional methods, so I was able to test them as normal. I also used the \texttt{Quickcheck} library to perform tests, which allows me to ensure certain invariants are preserved by functions by testing on large amounts of randomly generated inputs.
+However, there are several auxiliary functions that can be tested effectively using conventional methods, so I was able to test them as normal. I also used the \texttt{Quickcheck} library to perform tests, which allows me to ensure certain invariants are preserved by functions by testing on large amounts of randomly generated inputs. I also use the \texttt{bisect\_ppx} library to produce code coverage reports so that I can ensure I am thoroughly testing code.
 
 % talk about using very basic unit tests
 % unit testing ppl is 
@@ -60,6 +60,7 @@ The main tools I used are listed here:
 	\item Opam - OCaml package manager
 	\item Alcotest - Unit testing framework
 	\item Quickcheck - Random testing library
+	\item Bisect\_ppx - Code coverage tool
 	\item Spacetime - Memory profiler for OCaml
 	\item Gprof - A Linux profiler
 	      % \item Landmarks - Profiler for OCaml
@@ -68,7 +69,7 @@ The main tools I used are listed here:
 	\item Git with GitHub - version control
 \end{itemize}
 
-Using OCaml 4.08 allows me to use new features of OCaml, in particular the ability to define custom let operators as syntax sugar for monads. The dune build system also allows me to more easily manage building and testing my code, as well as automatically creating documentation from comments and function signatures in my code. The profilers I used allowed me to work out the causes of performance issues and remedy them. 
+Using OCaml 4.08 allows me to use new features of OCaml, in particular the ability to define custom let operators as syntax sugar for monads. The dune build system also allows me to more easily manage building and testing my code, as well as automatically creating documentation from comments and function signatures in my code. The profilers I used allowed me to work out the causes of performance issues and remedy them.
 
 \section{OCaml}
 I have chosen to use the OCaml language to implement my PPL. There are many features of OCaml which make it suitable for writing a DSL. Using OCaml, I can make sure that expressions in the DSL are well-typed, so that programs don't fail to run. OCaml's algebraic datatypes also make it easy to represent probabilistic programs as trees, and pattern matching makes it easy to 'interpret' and transform these trees. The module system also makes sure that certain types are hidden from the user, which can ensure only valid structures are created by the user.
