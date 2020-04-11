@@ -45,7 +45,7 @@ val print_exact_float : float dist -> unit
 
 (** {2:other_helpers Others} *)
 
-val time : (unit -> 'a) -> 'a
+val time : (unit -> 'a) -> 'a * float
 (** *)
 
 val memo : ('a -> 'b) -> 'a -> 'b

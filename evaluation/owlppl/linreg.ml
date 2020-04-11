@@ -33,27 +33,3 @@ let linreg_model i () =
 
   let d = infer m i in
   sample_mean ~n:1000 d
-
-let time f =
-  let t = Unix.gettimeofday () in
-  let res = f () in
-  let t1 = Unix.gettimeofday () in
-  let exec_time = (t1 -. t) in
-  Printf.printf "Execution time: %f seconds\n" exec_time;
-  res, exec_time*.1000.
-
-let model = 
-  try (Sys.get_argv ()).(1)
-  with Invalid_argument _ -> "mh"
-let () = Printf.printf "%s" @@ model
-let i = match model with
-    "mh" -> MH(100)
-  | "smc" -> SMC(100)
-  | "rej" -> Rejection(100,Hard)
-  | _ -> raise @@ Invalid_argument model
-
-
-let mn,t = time (linreg_model i)
-
-let () = Printf.printf "%f\n" mn
-let () = Printf.printf "%f\n" t

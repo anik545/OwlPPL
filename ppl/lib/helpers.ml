@@ -47,8 +47,9 @@ let time f =
   let t = Unix.gettimeofday () in
   let res = f () in
   let t1 = Unix.gettimeofday () in
-  Printf.printf "Execution time: %f seconds\n" (t1 -. t);
-  res
+  let exec_time = t1 -. t in
+  Printf.printf "Execution time: %f seconds\n" exec_time;
+  (res, exec_time *. 1000.)
 
 (** [memo f] is a memoized version of f. 
     Intended for use with non-deterministic functions so that we fix outputs when called with a given input *)

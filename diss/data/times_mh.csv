@@ -1,4 +1,4 @@
-model,OwlPPL,WebPPL
-coin,930.0,774.0
-hmm,590.0,742.0
-linreg,243.0,4775.0
+model,OwlPPL,WebPPL,Anglican,err-OwlPPL,err-WebPPL,err-Anglican
+coin,964.5,771.0,495.0,8.5,6.0,9.0
+hmm,507.5,747.0,559.5,7.5,10.0,60.5
+linreg,195.5,5278.0,513.0,10.5,339.0,27.0

@@ -215,3 +215,128 @@ models/coin-model
 (load "as")
 (load "models")
 (ns-resolve 'models (symbol "coin"))
+hmm
+(hmm)
+(defquery hmm
+  (let [
+    observations [false false false]
+    init-dist    (discrete [true])
+    trans-dists  {true  (flip 0.7)
+                  false (flip 0.3)}
+    obs-dists    {true  (flip 0.9)
+                  false (flip 0.1)}]
+    (reduce
+      (fn [states obs]
+        (let [state (sample (get trans-dists
+                                 (peek states)))]
+          (observe (get obs-dists state) obs)
+          (conj states state)))
+      [(sample init-dist)]
+      observations)
+      )
+)
+(defquery hmm
+  (let [
+    observations [false false false]
+    init-dist    (discrete [true])
+    trans-dists  {true  (flip 0.7)
+                  false (flip 0.3)}
+    obs-dists    {true  (flip 0.9)
+                  false (flip 0.1)}]
+    (reduce
+      (fn [states obs]
+        (let [state (sample (get trans-dists
+                                 (peek states)))]
+          (observe (get obs-dists state) obs)
+          (conj states state)))
+      [(sample init-dist)]
+      observations)
+      )
+)
+(use anglican)
+coin
+timeit
+models/hmm
+models
+ns
+ns models
+(ns models)
+models
+models/hmm
+hmm
+(use anglican)
+(use anglican.core)
+(require models)
+(require [models])
+(ns-resolve 'eval_clojure (symbol "imp))
+"
+(ns-resolve 'eval_clojure (symbol "imp"))
+categorical
+categorica
+l
+categorica;
+categorical
+(use 'anglican)
+(use 'anglican.cire)
+(use 'anglican.cioe)
+(use 'anglican.core)
+(use 'anglican.cire)
+(categorical [true 1.])
+  (:use [anglican core emit runtime])
+(ns models
+  (:use [anglican core emit runtime])
+)
+(defquery hmm
+  (let [
+    observations [false false false]
+    init-dist    (categorical [true 1.])
+    trans-dists  {true  (flip 0.7)
+                  false (flip 0.3)}
+    obs-dists    {true  (flip 0.9)
+                  false (flip 0.1)}]
+    (reduce
+      (fn [states obs]
+        (let [state (sample (get trans-dists
+                                 (peek states)))]
+          (observe (get obs-dists state) obs)
+          (conj states state)))
+      [(sample init-dist)]
+      observations)
+      )
+)
+hmm
+(doquery)
+(doquery hmm   (doall (->> (doquery :importance model []))
+   (take n)
+   (map :result)))
+  (doall (->> (doquery :importance model [])
+   (take n)
+   (map :result)))
+  (doall (->> (doquery :importance model [])
+   (take n)
+   (map :result)))
+(def model hmm)
+  (doall (->> (doquery :importance model [])
+   (take n)
+   (map :result)))
+(def n 10000)
+  (doall (->> (doquery :importance model [])
+   (take n)
+   (map :result)))
+(def n 10)
+  (doall (->> (doquery :importance model [])
+   (take n)
+   (map :result)))
+  (doall (->> (doquery :importance model [])
+   (take n)
+   (map :result)))
+(sample* (categorical true 1.))
+(sample* (categorical (true 1.)))
+(sample* (categorical [true 1.]))
+(sample* (categorical [true 1. false 1.]))
+(sample* (categorical [a 1.]))
+(sample* (categorical ['a 1.]))
+(sample* (categorical [1. 1.]))
+(sample* (categorical [1 1.]))
+(sample* (categorical {1 1.}))
+(sample* (categorical {1 1. 2 1.}))

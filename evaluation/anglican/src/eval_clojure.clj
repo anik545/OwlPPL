@@ -10,27 +10,35 @@
          ret# ~expr]
      (/ (double (- (. System (nanoTime)) start#)) 1000000.0)))
 
+(def n 10000)
+
 (defn smc [model]
-  (doall (->> (doquery :smc model [] :number-of-particles 100)
-   (take 10000)
+  (doall (->> (doquery :smc model [] :number-of-particles 1000)
+   (take n)
    (map :result)))
 )
 
 (defn mh [model]
   (doall (->> (doquery :lmh model [])
-   (take 10000)
+   (take n)
+   (map :result)))
+)
+
+(defn pimh [model]
+  (doall (->> (doquery :pimh model [] :number-of-particles 	1000)
+   (take n)
    (map :result)))
 )
 
 (defn rej [model]
   (doall (->> (doquery :importance model [])
-   (take 10000)
+   (take n)
    (map :result)))
 )
 
 (defn imp [model]
   (doall (->> (doquery :importance model [])
-   (take 10000)
+   (take n)
    (map :result)))
 )
 

@@ -1,13 +1,6 @@
 open Core
 open Ppl
 
-let time f =
-  let t = Unix.gettimeofday () in
-  let res = f () in
-  let t1 = Unix.gettimeofday () in
-  let exec_time = (t1 -. t) in
-  res, exec_time*.1000.
-
 let ignore_output f = fun x y -> let _ = f x y in ()
 
 let model = (Sys.get_argv ()).(1)
@@ -17,7 +10,6 @@ let model = match model with
   | "dpmm" -> ignore_output Dpmm.dpMixture
   | "coin" -> ignore_output Coin.coin_mean
   | _ -> raise @@ Invalid_argument model
-
 
 let inference = (Sys.get_argv ()).(2)
 let inference_alg = match inference with

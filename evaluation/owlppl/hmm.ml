@@ -25,28 +25,3 @@ let hmm_model inf () =
   in
   let m = infer model inf in
   Array.init 1000 ~f:(fun _ -> sample m)
-
-let time f =
-  let t = Unix.gettimeofday () in
-  let res = f () in
-  let t1 = Unix.gettimeofday () in
-  let exec_time = (t1 -. t) in
-  Printf.printf "Execution time: %f seconds\n" exec_time;
-  res, exec_time*.1000.
-
-let model = 
-  try (Sys.get_argv ()).(1)
-  with Invalid_argument _ -> "mh"
-let i = match model with
-    "mh" -> MH(100)
-  | "smc" -> MH(100)
-  | "rej" -> Rejection(100,Hard)
-  | "imp" -> Importance(100)
-  | "pimh" -> PIMH(100)
-  | "pc" -> PC(100)
-  | "exact" -> Enum
-  | _ -> raise @@ Invalid_argument model
-
-let mn,t = time (hmm_model i)
-
-let () = Printf.printf "%f\n" t

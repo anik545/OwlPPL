@@ -1,13 +1,13 @@
 var n = 1000;
-var coin_model = function(method) {
-  return function() {
-    var coin = function() {
+var coin_model = function (method) {
+  return function () {
+    var coin = function () {
       var theta = uniform(0.0, 1.0);
       observe(Binomial({ n: 10, p: theta }), 9);
       return theta;
     };
     var inferred = Infer(method, coin);
-    let samples = repeat(n, function() {
+    let samples = repeat(n, function () {
       return sample(inferred);
     });
     return listMean(samples);
@@ -17,7 +17,7 @@ var coin_model = function(method) {
 // repeat(10, function() {
 //   return timeit(coin_model(10000));
 // });
-var get_method = function() {
+var get_method = function () {
   var method_arg = argv._[2];
   if (method_arg === undefined || method_arg === "mh") {
     return {
@@ -25,12 +25,12 @@ var get_method = function() {
       kernel: "MH",
       samples: n,
       burn: 1000,
-      lag: 100
+      lag: 100,
     };
   } else if (method_arg === "smc") {
     return { method: "SMC", samples: n, particles: 100 };
   } else if (method_arg === "rej") {
-    return { method: "rejection", samples: n };
+    return { method: "rej", samples: n };
   }
 };
 
