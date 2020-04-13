@@ -9,14 +9,14 @@ import subprocess
 def js(model, inf="mh", mem=False):
     print(model, inf, "webppl")
     try:
-        cmd = ['webppl', 'webppl/'+model+'.js',
+        cmd = ['webppl', model+'.js',
                '--require', 'webppl-timeit', '--', inf]
         if mem:
             cmd = ['time', '-f', '"%M"'] + cmd
         a = subprocess.check_output(
-            cmd,
-            cwd="/home/anik/Files/work/project/evaluation")
-        return int(float(a.split('\n')[-2]))
+            cmd, stderr=subprocess.STDOUT,
+            cwd="/home/anik/Files/work/project/evaluation/webppl")
+        return int(float(a.split('\n')[-2].replace('"', '')))
     except:
         return float('inf')
 
@@ -27,13 +27,13 @@ def ocaml(model, inf="mh", mem=False):
         if ocaml.not_built:
             subprocess.call(['dune', 'build'])
             ocaml.not_built = False
-        cmd = ['dune', 'exec', 'owlppl/owlppl_eval.exe', model, inf]
+        cmd = ['dune', 'exec', './owlppl_eval.exe', model, inf]
         if mem:
             cmd = ['time', '-f', '"%M"'] + cmd
         a = subprocess.check_output(
-            cmd, cwd="/home/anik/Files/work/project/evaluation")
+            cmd, stderr=subprocess.STDOUT, cwd="/home/anik/Files/work/project/evaluation/owlppl")
 
-        return int(float(a.split('\n')[-2]))
+        return int(float(a.split('\n')[-2].replace('"', '')))
     except:
         return float('inf')
 
@@ -50,9 +50,9 @@ def anglican(model, inf='mh', mem=False):
         if mem:
             cmd = ['time', '-f', '"%M"'] + cmd
         a = subprocess.check_output(
-            cmd,
+            cmd, stderr=subprocess.STDOUT,
             cwd="/home/anik/Files/work/project/evaluation/anglican")
-        return int(float(a.split('\n')[-2]))
+        return int(float(a.split('\n')[-2].replace('"', '')))
     except:
         return float('inf')
 
@@ -60,7 +60,12 @@ def anglican(model, inf='mh', mem=False):
 ocaml.not_built = True
 
 n = 3
-models = ['coin', 'hmm', 'linreg']
+models = [
+    # 'coin',
+    # 'hmm',
+    'linreg',
+    # 'sprinkler'
+]
 lang_funcs = [
     ('OwlPPL', ocaml),
     ('WebPPL', js),
@@ -131,7 +136,6 @@ def write_to_csv1(times, fname="times.csv"):
 
     root_dir = "/home/anik/Files/work/project/diss/data"
     fname = root_dir + '/' + fname
-    print(times)
     with open(fname, 'w') as f:
         lines = []
         header = "model,"+",".join(languages) + ",err-"+",err-".join(languages)
@@ -167,9 +171,11 @@ mode = sys.argv[1]
 if mode == "time" or mode == "all":
     for m in models:
         times_inf_by_language = get_stats_for_model(m, mem=False)
+        print(times_inf_by_language)
         write_to_csv1(times_inf_by_language, fname="times_" + m + ".csv")
 
 if mode == "mem" or mode == "all":
     for m in models:
         mems_inf_by_language = get_stats_for_model(m, mem=True)
+        print(mems_inf_by_language)
         write_to_csv1(mems_inf_by_language, fname="mems_" + m + ".csv")

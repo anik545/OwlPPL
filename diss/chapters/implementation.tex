@@ -87,7 +87,7 @@ The structure that I landed on to represent general models is a generalised alge
 	\label{lst:gadt1}
 \end{listing}
 
-An important feature of this type is that it is polymorphic - this allows distributions to be defined over any type. Usually, this type is floats or ints, but polymorphism allows us to define distributions over anything, including distributions over distributions - a feature used in certain models such as a Dirichlet process.
+An important feature of this type is that it is polymorphic - this allows distributions to be defined over any type. Usually, this type is floats or integers, but polymorphism allows us to define distributions over anything, including distributions over distributions - a feature used in certain models such as a Dirichlet process.
 
 \subsection{Primitive Distributions}
 In PPLs, users build complex models by composing more simple elementary primitive distributions (ERP) \cite{pmlr-v15-wingate11a}. These primitive distributions need to have a few operations defined on them, namely \texttt{sample, pdf, cdf} and \texttt{support}.
@@ -113,7 +113,7 @@ An example of this being used to add a new primitive distribution is given in li
 
 \subsection{Empirical Distributions}
 
-The output of Bayesian inference is a probability distribution over the variable we are concerned with. Ideally, we would be able to produce an exact posterior distribution, and be able to extract exact statistics from it. However, approximate inference only allows us to create functions to sample from this posterior. Since my inference procedures all produce an object of type \texttt{'a dist}, we can define a signature for a type of an empirical distribution. The type is abstract since there are different implementations for discrete and continuous distributions. For discrete distributions, we use a \texttt{Core.Map}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/core_kernel/Core_kernel/Map/index.html}}, whereas continuous distributions use a \texttt{Core.Set}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/core_kernel/Core_kernel/Set/index.html}}. Creating values with these types required passing a first class module representing the type of the keys - this is so that an appropriate compare function can be used in the internal tree data structure.
+The output of Bayesian inference is a probability distribution over the variable we are concerned with. Ideally, we would be able to produce an exact posterior distribution, and be able to extract exact statistics from it. However, approximate inference only allows us to create functions to sample from this posterior. Since my inference procedures all produce an object of type \texttt{'a dist}, we can define a signature for a type of an empirical distribution. The type is abstract since there are different implementations for discrete and continuous distributions. For discrete distributions, we use a \texttt{Core.Map}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/base/Base/Map/index.html}}, whereas continuous distributions use a \texttt{Core.Set}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/base/Base/Set/index.html}}. Creating values with these types required passing a first class module representing the type of the keys - this is so that an appropriate compare function can be used in the internal tree data structure.
 
 I also provide modules which are backed by the polymorphic versions of these data structures (\texttt{Core.Map.Poly}). These types don't require the use of first class modules to create objects, since the keys are compared using the polymorphic compare function. While this makes using the module simpler to use (no need to pass the first class module), it also makes them more inefficient due to the use of polymorphic comparison.
 
@@ -390,7 +390,7 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 	% \subfloat[Code that generated the plot]{{\inputminted{ocaml}{code_snippets/plotter.ml} }}%
 	% \qquad
 	% \subfloat[P-P plot]{{\includegraphics[width=0.4\textwidth]{figs/coin_compare.png} }}%
-									
+													
 	\begin{minipage}{0.45\textwidth}
 		\centering
 		\inputminted{ocaml}{code_snippets/plotter.ml}	
@@ -401,7 +401,7 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 		\includegraphics[width=\linewidth]{figs/coin_compare.png}
 		\captionof{figure}{Output}
 	\end{minipage}
-									
+													
 	\caption{The approximate and exact pdf of the output of inference for a biased coin model}
 	\label{fig:vis-samples}
 \end{figure}

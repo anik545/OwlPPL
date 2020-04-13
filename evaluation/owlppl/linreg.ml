@@ -32,4 +32,7 @@ let linreg_model i () =
   let m = fmap fst linreg' in
 
   let d = infer m i in
+  (* let mn = sample_mean ~n:1000 d in
+     Array.iter ~f:(printf "%f, ") (take_k_samples 1000 d);
+     printf "%f" mn;mn *)
   sample_mean ~n:1000 d

@@ -63,7 +63,7 @@ let pimh n d = mh n (Smc.smc n d)
 
 let pimh' k n d = mh' k (Smc.smc' n d)
 
-let mh ~burn d =
+let mh_sampler' ~burn d =
   let open Core.Sequence.Step in
   let proposal = prior_with_score d in
   let iterate (x, s) =
@@ -93,20 +93,47 @@ let mh_transform ~burn d =
     let ratio = if Float.(s = 0.) then 1. else r /. s in
     let accept = sample @@ bernoulli @@ Float.min 1. ratio in
     let next = if accept then (y, r) else (x, s) in
-    Yield (return next, next)
+    Yield (next, next)
   in
   let seq = Sequence.unfold_step ~init:(sample proposal) ~f:iterate in
   let seq = Sequence.drop_eagerly seq burn in
   (* burn initial states *)
   let r = ref seq in
-  (* could also return a sample function here instead *)
-  match Sequence.next !r with
-  | Some (hd, tl) ->
-      let* x, _ = hd in
-      (* this assignment has to happen inside the bind
-       so that successive samples (and calls on the f inside the bind)
-       change the mutable state, here the sequence.
-    *)
-      r := tl;
-      return x
-  | None -> raise Undefined
+  let sample () =
+    match Sequence.next !r with
+    | Some (hd, tl) ->
+        r := tl;
+        fst hd
+    | None -> raise Undefined
+  in
+  let* _ = return () in
+  return (sample ())
+
+(* could also return a sample function here instead *)
+(* Bind(return (), fun v -> s v)
+   Bind(return head_value, fun v -> set_tail;return v)
+   match Sequence.next !r with
+   | Some(hd,tl) -> 
+   let* x,_ = hd in
+   match Sequence.next tl with
+    r := tl;
+    (return x)
+   | None -> raise Undefined
+
+   let* r' = r in
+   match Sequence.next !r' with
+   | Some(hd,tl) -> 
+   r := tl;
+   (return (fst hd))
+   | None -> raise Undefined *)
+
+(* match Sequence.next !r with
+   | Some (hd, tl) ->
+   let* x, _ = hd in
+   (* this assignment has to happen inside the bind
+     so that successive samples (and calls on the f inside the bind)
+     change the mutable state, here the sequence.
+  *)
+   r := tl;
+   return x
+   | None -> raise Undefined *)

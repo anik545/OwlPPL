@@ -44,7 +44,7 @@ let print_infer_strat_short = function
   | Forward -> "forward"
 
 let infer dist = function
-  | MH n -> mh' n dist
+  | MH n -> mh_transform ~burn:n dist
   | SMC n -> smcStandard' n dist
   | PC n -> cascade' n dist
   | PIMH n -> pimh' n n dist

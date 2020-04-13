@@ -22,7 +22,7 @@ let normcdf () = ecdf_continuous ~fname (normal 0. 1.) |> show
 let normpdf () = hist_dist_continuous ~fname (normal 0. 1.) |> show
 
 let binompdf () =
-  hist_dist_discrete ~n:100 ~fname (fmap float_of_int (binomial 10 0.5)) |> show
+  hist_dist_discrete ~fname (fmap float_of_int (binomial 10 0.5)) |> show
 
 let binomcdf () =
   ecdf_discrete ~fname (fmap float_of_int @@ binomial 10 0.5) |> show

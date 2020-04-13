@@ -1,332 +1,3 @@
-coin-model
-smc
-re
-rej
-imp
-timeit
-(timeit "coin-model" "smc")
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-)
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-)
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-)
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-)
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-)
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-)
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-)
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-)
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-)
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-)
-; type of args is arrayseq
-(defn timeit [& args]
-  (let [model (first args) 
-        method (second args)]
-  (do
-  (prn args)
-  (prn (resolve (symbol method)) (resolve (symbol model))))
-  (prn (time1
-    ((resolve (symbol method))
-    (resolve (symbol model)))
-      ))
-  )
-)
-(timeit "coin-model" "smc") 
-(timeit coin-model smc") 
-(timeit coin-model smc) 
-(timeit "coin-model" smc) 
-(timeit coin-model "smc") 
-(timeit "coin-model" "smc") 
-(defn r [] ())
-(resolve (symbol "r"))
-(resolve (symbol "r23"))
-(resolve (symbol "r2312"))
-(resolve (symbol "r236"))
-symbol "smc"
-(symbol "smc")
-+(symbol "smc")
-'(symbol "smc")
-~(symbol "smc")
-(~(symbol "smc") )
-(~(symbol "smc") coin-model)
-smc
-(~(symbol "smc") coin-model)
-(~(resolve symbol "smc") coin-model)
-(~(-> resolve symbol "smc") coin-model)
-~smc
-smc
-'smc
-(quote (3 3 ))
-(quote (3 3))
-(symbol smc)
-(symbol "smc")
-(resolve (symbol "smc"))
-(defn smc [model]
-  (doall (->> (doquery :smc model [] :number-of-particles 10000)
-   (take 10000)
-   (map :result)))
-)
-(resolve (symbol "smc"))
-((resolve (symbol "smc")))
-(defn smc [] ())
-((resolve (symbol "smc")))
-(((symbol "smc")))
-((symbol "smc"))
-(symbol "smc")
-(apply (symbol "smc"))
-(apply (symbol "smc") [])
-(apply (symbol "smc") ())
-(apply (symbol "smc") )
-(apply ((symbol "smc")) )
-(apply (symbol "smc") )
-(apply ~(symbol "smc") )
-(apply '(symbol "smc") )
-(apply (symbol "smc") )
-(symbol "smc")
-((resolve (symbol "smc")))
-(resolve (symbol "smc"))
-eval-clojure
-eval_clojure
-(load "eval_clojure.clj")
-(load "eval_clojure")
-timeit
-eval_clojure/timeit
-(resolve (symbol "smc"))
-(resolve (symbol "imp"))
-(resolve (symbol "eval_clojure.imp"))
-(resolve (symbol "eval_clojure/imp"))
-(ns-resolve (symbol "eval_climp"))
-(ns-resolve "eval_clojure" (symbol "imp"))
-(ns-resolve eval_clojure (symbol "imp"))
-(ns-resolve 'eval_clojure (symbol "imp"))
-(ns-resolve 'eval_clojure (symbol "impsfd"))
-(ns-resolve 'eval_clojure (symbol "imp))
-)
-;
-(ns-resolve 'eval_clojure (symbol "imp))
-(ns-resolve 'eval_clojure (symbol "imp"))
-(ns-resolve 'models (symbol "imp"))
-(ns-resolve 'models (symbol "coin-model"))
-(require [models])
-(:require [models])
-(require [models])
-(require "models")
-(require ["models.clj"])
-(require [models])
-*ns*
-eval_clojure
-eval_clojure/s,c
-eval_clojure/smc
-models/smc
-models/
-coin-mode
-models/coin-model
-(require [models])
-(load models)
-(load "models")
-(ns-resolve 'models (symbol "coin-model"))
-(load "as")
-(load "models")
-(ns-resolve 'models (symbol "coin"))
-hmm
-(hmm)
-(defquery hmm
-  (let [
-    observations [false false false]
-    init-dist    (discrete [true])
-    trans-dists  {true  (flip 0.7)
-                  false (flip 0.3)}
-    obs-dists    {true  (flip 0.9)
-                  false (flip 0.1)}]
-    (reduce
-      (fn [states obs]
-        (let [state (sample (get trans-dists
-                                 (peek states)))]
-          (observe (get obs-dists state) obs)
-          (conj states state)))
-      [(sample init-dist)]
-      observations)
-      )
-)
-(defquery hmm
-  (let [
-    observations [false false false]
-    init-dist    (discrete [true])
-    trans-dists  {true  (flip 0.7)
-                  false (flip 0.3)}
-    obs-dists    {true  (flip 0.9)
-                  false (flip 0.1)}]
-    (reduce
-      (fn [states obs]
-        (let [state (sample (get trans-dists
-                                 (peek states)))]
-          (observe (get obs-dists state) obs)
-          (conj states state)))
-      [(sample init-dist)]
-      observations)
-      )
-)
-(use anglican)
-coin
-timeit
-models/hmm
-models
-ns
-ns models
-(ns models)
-models
-models/hmm
-hmm
-(use anglican)
-(use anglican.core)
-(require models)
-(require [models])
-(ns-resolve 'eval_clojure (symbol "imp))
-"
-(ns-resolve 'eval_clojure (symbol "imp"))
-categorical
-categorica
-l
-categorica;
-categorical
-(use 'anglican)
-(use 'anglican.cire)
-(use 'anglican.cioe)
-(use 'anglican.core)
-(use 'anglican.cire)
-(categorical [true 1.])
-  (:use [anglican core emit runtime])
-(ns models
-  (:use [anglican core emit runtime])
-)
-(defquery hmm
-  (let [
-    observations [false false false]
-    init-dist    (categorical [true 1.])
-    trans-dists  {true  (flip 0.7)
-                  false (flip 0.3)}
-    obs-dists    {true  (flip 0.9)
-                  false (flip 0.1)}]
-    (reduce
-      (fn [states obs]
-        (let [state (sample (get trans-dists
-                                 (peek states)))]
-          (observe (get obs-dists state) obs)
-          (conj states state)))
-      [(sample init-dist)]
-      observations)
-      )
-)
-hmm
-(doquery)
-(doquery hmm   (doall (->> (doquery :importance model []))
-   (take n)
-   (map :result)))
-  (doall (->> (doquery :importance model [])
-   (take n)
-   (map :result)))
-  (doall (->> (doquery :importance model [])
-   (take n)
-   (map :result)))
-(def model hmm)
-  (doall (->> (doquery :importance model [])
-   (take n)
-   (map :result)))
-(def n 10000)
-  (doall (->> (doquery :importance model [])
-   (take n)
-   (map :result)))
-(def n 10)
-  (doall (->> (doquery :importance model [])
-   (take n)
-   (map :result)))
   (doall (->> (doquery :importance model [])
    (take n)
    (map :result)))
@@ -340,3 +11,490 @@ hmm
 (sample* (categorical [1 1.]))
 (sample* (categorical {1 1.}))
 (sample* (categorical {1 1. 2 1.}))
+(and true false)
+(ns models
+  (:use [anglican core emit runtime])
+  (:gen-class))
+(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (or (= sprinkler-dist false)
+                           (= is-raining false))
+                           ]
+    (observe wet-grass-dist true)
+    is-raining))
+(doquery :lmh sprinkler)
+(doquery :lmh sprinkler ][)
+(doquery :lmh sprinkler [])
+(defquery sprinkler-bayes-net [sprinkler wet-grass]
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true ) 
+                         (sample (flip 0.8))
+                         (= is-cloudy false) 
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true) 
+                             (flip 0.1)
+                             (= is-cloudy false) 
+                             (flip 0.5))
+        wet-grass-dist (cond 
+                         (and (= sprinkler true) 
+                              (= is-raining true))           
+                         (flip 0.99)
+                         (and (= sprinkler false) 
+                              (= is-raining false))
+                         (flip 0.0)
+                         (or  (= sprinkler true) 
+                              (= is-raining true))
+                         (flip 0.9))]
+    (observe sprinkler-dist sprinkler)
+    (observe wet-grass-dist wet-grass)
+    is-raining))
+(->> (doquery :smc sprinkler-bayes-net [true true] :number-of-particles 100)
+     (take 10000)
+     (collect-by :result)
+     (s/empirical-distribution)
+     (#(plot/bar-chart (keys %) (vals %))))
+(->> (doquery :smc sprinkler-bayes-net [true true] :number-of-particles 100)
+     (take 10000)
+     (collect-by :result)
+     (s/empirical-distribution)
+(doquery :smc sprinkler-bayes-net [true true] :number-of-particles 100)
+(->> (doquery :smc sprinkler-bayes-net [true true] :number-of-particles 100)
+     (take 10000)
+     (collect-by :result))
+(->> (doquery :smc sprinkler-bayes-net [true true] :number-of-particles 100)
+     (take 10000)
+     (map :result))
+(->> (doquery :smc sprinkler-bayes-net [true true] :number-of-particles 100)
+     (take 10000))
+sprinkler
+(sample sprinkler)
+(sample* sprinkler)
+(sample* sprinkler-bayes-net)
+(doquery :smc sprinkler [true true] :number-of-particles 100)
+(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (
+          (cond (or is-raining sprinkler-dist)
+          (dirac true)
+          (dirac false)
+          ))
+                           ]
+    (observe wet-grass-dist true)
+    is-raining))
+(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (
+          (cond (or is-raining sprinkler-dist)
+          (flip 1.)
+          (flip 0.)
+          ))
+                           ]
+    (observe wet-grass-dist true)
+    is-raining))
+ (doquery :smc sprinkler [] :number-of-particles 100)
+(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (
+          (cond (or is-raining sprinkler-dist)
+          (flip 1.)
+          :else (flip 0.)
+          ))
+                           ]
+    (observe wet-grass-dist true)
+    is-raining))
+ (doquery :smc sprinkler [] :number-of-particles 100)
+ (doquery :smc sprinkler [] :number-of-particles 100)(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (cond (or (= is-raining true) (= sprinkler-dist true))
+                             (flip 1.)
+                             :else (flip 0.))]
+    (observe wet-grass-dist true)
+    is-raining))
+    (doquery :smc sprinkler [] :number-of-particles 100)
+(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (cond (or (= is-raining true) (= sprinkler-dist true))
+                             (flip 1.)
+                             :else (flip 0.))]
+    (observe wet-grass-dist true)
+    is-raining))
+    (doquery :smc sprinkler [] :number-of-particles 100)
+(ns models
+  (:use [anglican core emit runtime])
+  (:gen-class))
+(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (cond (or (= is-raining true) (= sprinkler-dist true))
+                             (flip 1.)
+                             :else (flip 0.))]
+    (observe wet-grass-dist true)
+    is-raining))
+    (doquery :smc sprinkler [] :number-of-particles 100)
+(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (cond (or (= is-raining true) (= sprinkler-dist true))
+                             (flip 1.)
+                             :else (flip 0.))]
+    (observe wet-grass-dist true)
+    is-raining))(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (cond (or (= is-raining true) (= sprinkler-dist true))
+                             (flip 1.)
+                             :else (flip 0.))]
+    (observe wet-grass-dist true)
+    is-raining))(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (cond (or (= is-raining true) (= sprinkler-dist true))
+                             (flip 1.)
+                             :else (flip 0.))]
+    (observe wet-grass-dist true)
+    is-raining))
+(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (cond (or (= is-raining true) (= sprinkler-dist true))
+                             (flip 1.)
+                             :else (flip 0.))]
+    (observe wet-grass-dist true)
+    is-raining))
+(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (cond (or (= is-raining true) (= sprinkler-dist true))
+                             (flip 1.)
+                             :else (flip 0.))]
+    (observe wet-grass-dist true)
+    is-raining))
+(use [anglican core emit runtime])
+(use ['anglican 'core 'emit 'runtime])
+(defquery sprinkler
+  (let [is-cloudy (sample (flip 0.5))
+        is-raining (cond (= is-cloudy true)
+                         (sample (flip 0.8))
+                         (= is-cloudy false)
+                         (sample (flip 0.2)))
+        sprinkler-dist (cond (= is-cloudy true)
+                             (flip 0.1)
+                             (= is-cloudy false)
+                             (flip 0.5))
+        wet-grass-dist (cond (or (= is-raining true) (= sprinkler-dist true))
+                             (flip 1.)
+                             :else (flip 0.))]
+    (observe wet-grass-dist true)
+    is-raining))
+sprinkler
+    (doquery :smc sprinkler [] :number-of-particles 100)
+(->> (doquery :smc sprinkler [] :number-of-particles 100) (take 10))
+(->> (doquery :smc sprinkler [] :number-of-particles 100) (take 100))
+(->> (doquery :smc sprinkler [] :number-of-particles 100) (take 1000))
+(->> (doquery :smc sprinkler [] :number-of-particles 100) (take 10000))
+(->> (doquery :smc sprinkler [] :number-of-particles 100) (take 100000))
+(ns models
+  (:use [anglican core emit runtime])
+  (:gen-class))
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]] 
+  (reduce (fn [obs [x y]] (observe (normal (+ c (* m x)) 1.) y)) observations)
+   m))
+(->> (doquery :lmh linreg []) (take 100))
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  (map
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+   m))
+(->> (doquery :lmh linreg []) (take 100))
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  (map
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+   m))
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  (map
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+   m))
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  (map
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+   m))
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  (map
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+   m))
+(doquery linreg)
+(doquery :lmh linreg)
+(doquery :lmh linreg [])
+(map (fn [[x y]] (+ x y))) [[1 2] [3 4]])
+(map (fn [[x y]] (+ x y))) [[1 2] [3 4]]))
+(map (fn [[x y]] (+ x y)) [[1 2] [3 4]]))
+(map (fn [[x y]] (+ x y) ) [[1 2] [3 4]] ))
+(map (fn [[x y]] (+ x y) ) [[1 2] [3 4]] )
+(observe)
+(observe* (normal 0. 1.) 0.)
+(observe (normal 0. 1.) 0.)
+(observe* (normal 0. 1.) 0.)
+(observe* (normal 0. 1.) 1.)
+(observe* (normal 0. 1.) 1.2)
+(observe* (normal 0. 1.) 1.1)
+(        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  (map
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  (map
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+(def observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]])
+(def observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]])
+  (map    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+(map (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) ) observations)
+(map (fn [[x y]] (observe* (normal (+ c (* m x)) 1.) y) ) observations)
+(def m 2.)
+(def c 0.)
+(map (fn [[x y]] (observe* (normal (+ c (* m x)) 1.) y) ) observations)
+observations
+(map (fn [[x y]] (observe* (normal (+ c (* m x)) 1.) y) ) observations)
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  (map
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+   ))
+linreg
+(doquery :lmh linreg [])
+(count [1 2 4])
+(count [[1 3] 2 4])
+(count [[1 3] [2 5] [4 6]])
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  ; (map
+  ;   (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+  ;   observations)
+    (loop [n 0]
+      (if (< n (count observations))
+        (let [[xn yn] (nth observations n)]
+          (observe (normal (+ c (* m xn)) 1.) yn)
+          (recur (+ n 1)))))
+ m
+   ))
+(doquery :lmh linreg [])
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  ; (map
+  ;   (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+  ;   observations)
+    (loop [n 0]
+      (if (< n (count observations))
+        (let [[xn yn] (nth observations n)]
+          (observe (normal (+ c (* m xn)) 1.) yn)
+          (recur (+ n 1)))))
+ {:m m}
+   ))
+(doquery :lmh linreg [])
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  ; (map
+  ;   (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+  ;   observations)
+    (loop [n 0]
+      (if (< n (count observations))
+        (let [[xn yn] (nth observations n)]
+        (prn xn yn)
+          (observe (normal (+ c (* m xn)) 1.) yn)
+          (recur (+ n 1)))))
+ {:m m}
+   ))
+(doquery :lmh linreg [])
+(defquery linreg
+  (let [m (sample (normal 0. 2.))
+        c (sample (normal 0. 2.))
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  ; (map
+  ;   (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+  ;   observations)
+    (loop [n 0]
+      (if (< n (count observations))
+        (let [[xn yn] (nth observations n)]
+        (prn xn yn)
+          (observe (normal (+ c (* m xn)) 1.) yn)
+          (recur (+ n 1)))))
+ {:m m}
+   ))
+(doquery :lmh linreg [])
+(ns models
+  (:use [anglican core emit runtime])
+  (:gen-class))
+(defquery linreg
+  (let [m (normal 0. 2.)
+        c (normal 0. 2.)
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  ; (map
+  ;   (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+  ;   observations)
+    (loop [n 0]
+      (if (< n (count observations))
+        (let [[xn yn] (nth observations n)]
+        (prn xn yn)
+          (observe (normal (+ c (* m xn)) 1.) yn)
+          (recur (+ n 1)))))
+ {:m m}
+   ))
+(doquery :lmh linreg [])
+(defquery linreg
+  (let [m (sample (normal 0. 2.))
+        c (sample (normal 0. 2.))
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  (map
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+    ; (loop [n 0]
+    ;   (if (< n (count observations))
+    ;     (let [[xn yn] (nth observations n)]
+    ;       (observe (normal (+ c (* m xn)) 1.) yn)
+    ;       (recur (+ n 1)))))
+    m
+   )
+(doquery :lmh linreg [])
+(ns models
+  (:use [anglican core emit runtime])
+  (:gen-class))
+(defquery linreg
+  (let [m (sample (normal 0. 2.))
+        c (sample (normal 0. 2.))
+        observations [[0 0] [1 2] [2 4] [3 6] [4 8] [5 10] [6 12] [7 14] [8 16] [9 18]]]
+  (map
+    (fn [[x y]] (observe (normal (+ c (* m x)) 1.) y) )
+    observations)
+    ; (loop [n 0]
+    ;   (if (< n (count observations))
+    ;     (let [[xn yn] (nth observations n)]
+    ;       (observe (normal (+ c (* m xn)) 1.) yn)
+    ;       (recur (+ n 1)))))
+    m
+   )
+(take 100 (doquery :lmh linreg []))
+(take 10 (doquery :lmh linreg []))

@@ -49,9 +49,12 @@ let hist_dist_discrete ?h ?(n = 5000) ?(fname = "fig.png") ?(title = "PDF")
   let open Owl_plplot in
   let open Empirical.Discrete in
   (* let samples = take_k_samples n d in *)
+  let total = float_of_int n in
   let samples = from_dist d ~n in
   let xs = Array.of_list @@ support samples in
-  let ys = Array.map (fun (_, n) -> float_of_int n) @@ to_arr samples in
+  let ys =
+    Array.map (fun (_, n) -> float_of_int n /. total) @@ to_arr samples
+  in
   let pl = match h with None -> Plot.create ~m:1 ~n:1 fname | Some h -> h in
   Plot.set_title pl title;
   Plot.set_ylabel pl ylabel;

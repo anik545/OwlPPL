@@ -10,7 +10,7 @@
          ret# ~expr]
      (/ (double (- (. System (nanoTime)) start#)) 1000000.0)))
 
-(def n 10000)
+(def n 1000)
 
 (defn smc [model]
   (doall (->> (doquery :smc model [] :number-of-particles 1000)
