@@ -80,8 +80,6 @@ val mh'' : int -> 'a dist -> 'a dist
 
 val mh_sampler : int -> 'a dist -> 'a list dist
 
-val mh : burn:int -> 'a dist -> unit -> 'a
-
 val mh_transform : burn:int -> 'a dist -> 'a dist
 
 (** {2:inf_pmcmc Particle Independent Metropolis Hastings} *)
