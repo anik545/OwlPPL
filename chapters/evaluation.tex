@@ -64,7 +64,7 @@ The program in my PPL is shown in listing \ref{lst:coin}, and demonstrates setti
 		\clojurecode{code_snippets/anglican/coin.clj}
 		\captionof{listing}{Anglican}
 	\end{minipage}
-	\caption{The coin model in webPPL (js) and anglican (clojure) PPLs}
+	\caption{The coin model in WebPPL (JS) and Anglican (Clojure)}
 	\label{fig:compare-coin}
 \end{figure}
 
@@ -129,10 +129,10 @@ Table \ref{tab:chi-pvals} shows the results of carrying out the test on several 
 The Kolmogorov-Smirnov test is a non parametric test which is used to compare a set of samples with a distribution - this is the one-sample K-S test. There is also a two-sample K-S test, which compares two sets of samples against each other. I use the one-sample test here to compare samples taken from the inferred posteriors to their exact analytic solutions.
 
 The test statistic is as follows, with $F_n(x)$ being the empirical cumulative distribution of n samples, and $F(x)$ being the exact cumulative distribution.
-
-$$F_{n}(x)=\frac{1}{n}\sum_{i=1}^{n}I_{[-\infty ,x]}(X_{i})$$\\
-$$D_{n}=\sup_{x}|F_{n}(x)-F(x)|$$
-
+\begin{align*}
+	F_{n}(x) & =\frac{1}{n}\sum_{i=1}^{n}I_{[-\infty ,x]}(X_{i}) \\
+	D_{n}    & =\sup_{x}|F_{n}(x)-F(x)|                          
+\end{align*}
 This test statistic is compared against the critical values of the Kolmogorov distribution, rejecting the null hypothesis if $\sqrt{n}D_n > K_\alpha$, where $K_\alpha$ is the critical value at the significance level $\alpha$, and $n$ is the number of samples.
 
 \subsubsection{Results}
@@ -226,7 +226,7 @@ Figure \ref{fig:kl} shows the results of this. For each inference procedure, we 
 			\addplot table [x index=0, y index=1, col sep=comma] {data/kl/sprinkler_smc.csv};
 			\addlegendentry{smc}
 			% 
-																																																																																																																																																																																										
+																																																																																																																																																																																																																								
 			% \pgfplotsinvokeforeach{1,...,\numberofcols}{
 			% 	\addplot table [x index=0,y index=#1, col sep=comma] {data/kl/kl_sprinkler_all.csv};
 			% 	\pgfplotstablegetcolumnnamebyindex{#1}\of{\datatable}\to{\colname}
@@ -278,11 +278,12 @@ Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares aga
 	% \perfgraph{data/times_mh.csv}{Metropolis-Hastings}{time (ms)}
 	% \perfgraph{data/times_smc.csv}{Particle Filter}{time (ms)}
 	% \perfgraph{data/times_rej.csv}{Rejection Sampling}{time (ms)}
-											
+																					
 	\perfgraph{data/times_coin.csv}{Biased Coin}{time (ms)}
 	\perfgraph{data/times_linreg.csv}{Linear Regression}{time (ms)}
 	\perfgraph{data/times_hmm.csv}{Hidden Markov Model}{time (ms)}
-											
+	\perfgraph{data/times_sprinkler.csv}{Sprinkler}{time (ms)}
+																					
 	\caption{Performance of my ppl against other languages for different models and inference algorithms, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:time-perf}
 \end{figure}
@@ -293,12 +294,13 @@ Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares aga
 	% \perfgraph{data/mems_mh.csv}{Metropolis-Hastings}{memory usage (bytes)}
 	% \perfgraph{data/mems_smc.csv}{Particle Filter}{memory usage (bytes)}
 	% \perfgraph{data/mems_rej.csv}{Rejection Sampling}{memory usage (bytes)}
-													
+																							
 	\perfgraph{data/mems_coin.csv}{Biased Coin}{memory usage (bytes)}
 	\perfgraph{data/mems_linreg.csv}{Linear Regression}{memory usage (bytes)}
 	\perfgraph{data/mems_hmm.csv}{Hidden Markov Model}{memory usage (bytes)}
-													
-													
+	\perfgraph{data/mems_sprinkler.csv}{Sprinkler}{memory usage (bytes)}
+																							
+																							
 	\caption{Memory Usage of my ppl, compared against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:mem-perf}
 \end{figure}
