@@ -17,7 +17,11 @@ val kl_continuous : ?n:int -> float Primitive.t -> float dist -> float
 (** Find the KL divergence for two continuous distributions *)
 
 val kl_cum_discrete :
-  int array -> 'a Primitive.t -> 'a dist -> (int * float) array
+  int array -> bool Primitive.t -> bool dist -> (int * float) array
+(**  *)
+
+val kl_cum_continuous :
+  int array -> float Primitive.t -> float dist -> (int * float) array
 (**  *)
 
 (** {2:hyp_tests Hypothesis Tests} *)

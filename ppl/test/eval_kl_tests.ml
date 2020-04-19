@@ -9,14 +9,24 @@ let x_vals = Owl.Arr.to_array (Owl.Arr.logspace ~base:10. 2. 4. 5)
 
 let x_vals = Array.map x_vals ~f:(fun x -> int_of_float x)
 
-let root_dir = "/home/anik/Files/work/project/diss/data"
+let root_dir = "/home/anik/Files/work/project/diss/data/kl"
+
+type 'a kl_method =
+  | Not_Cumulative of (?n:int -> 'a Primitive.t -> 'a dist -> likelihood)
+  | Cumulative of
+      (int array -> 'a Primitive.t -> 'a dist -> (int * likelihood) array)
 
 (* For generating csv to be plotted *)
 (* create array of x,y pairs *)
-let gen_csv ?fname model exact infer_strat
-    (kl_method : ?n:int -> 'a Primitive.t -> 'a dist -> likelihood) =
+let gen_csv ?fname model exact infer_strat kl_method =
   let inferred = infer model infer_strat in
-  let arr = Array.map x_vals ~f:(fun n -> (n, kl_method ~n exact inferred)) in
+  let arr =
+    match kl_method with
+    | Cumulative kl_method -> kl_method x_vals exact inferred
+    | Not_Cumulative kl_method ->
+        Array.map x_vals ~f:(fun n -> (n, kl_method ~n exact inferred))
+  in
+  (* let arr = kl_method x_vals exact inferred in *)
   match fname with
   | Some name ->
       let name = sprintf "%s/%s" root_dir name in
@@ -67,20 +77,20 @@ open Models
 (* sprinkler *)
 let _ =
   gen_csv ~fname:"sprinkler_mh.csv" grass_model grass_model_exact (MH 500)
-    Evaluation.kl_discrete
+    (Cumulative Evaluation.kl_cum_discrete)
 
 let _ =
   gen_csv ~fname:"sprinkler_rej.csv" grass_model grass_model_exact
     (Rejection (300, Soft))
-    Evaluation.kl_discrete
+    (Cumulative Evaluation.kl_cum_discrete)
 
 let _ =
   gen_csv ~fname:"sprinkler_imp.csv" grass_model grass_model_exact
-    (Importance 500) Evaluation.kl_discrete
+    (Importance 500) (Cumulative Evaluation.kl_cum_discrete)
 
 let _ =
   gen_csv ~fname:"sprinkler_smc.csv" grass_model grass_model_exact (SMC 500)
-    Evaluation.kl_discrete
+    (Cumulative Evaluation.kl_cum_discrete)
 
 (* let is = [|MH 500;Rejection(300,Soft);Importance 500;SMC 500|] *)
 (* let _ = gen_csv' ~fname:"kl_sprinkler_all.csv" grass_model grass_model_exact is Evaluation.kl_discrete *)

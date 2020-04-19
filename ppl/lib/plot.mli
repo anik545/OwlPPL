@@ -78,7 +78,7 @@ val ecdf_discrete :
   Owl_plplot.Plot.handle
 (** *)
 
-val add_pdf :
+val add_exact_pdf :
   ?scale:float ->
   dist:float Primitive.t ->
   Owl_plplot.Plot.handle ->

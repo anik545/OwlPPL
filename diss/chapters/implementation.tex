@@ -67,7 +67,7 @@ However, there are many different underlying data structures which can be used t
 	\label{lst:monad_plist}
 \end{listing}
 
-A major problem with this approach is that in flattening distributions, we must make sure that duplicated values are combined, and this approach is $O(n^2)$ when using a list since we must scan up to the length of the entire list for every element. A better option is to use a map, which is provided in the Jane Street Core library, and implemented as a balanced tree, significantly improving the time complexity of combining distributions.
+A major problem with this approach is that in flattening distributions, we must make sure that duplicated values are combined, and this approach is $O(n^2)$ when using a list since we must scan up to the length of the entire list for every element. A better option is to use a map, which is provided in Core, and implemented as a balanced tree, significantly improving the time complexity of combining distributions.
 
 \begin{listing}[!ht]
 	\ocamlcode{code_snippets/probmonad_map.ml}	
@@ -75,11 +75,11 @@ A major problem with this approach is that in flattening distributions, we must 
 	\label{lst:monad_pmap}
 \end{listing}
 
-Although this is not the final data structure I chose for general probabilistic models, it is the one I used for discrete distributions. I also used a \texttt{Map} for the data structure that produced approximations to discrete posterior distributions.
+Although this is not the final data structure I chose for general probabilistic models, it is the one I used for discrete empirical distributions.
 
 \subsection{GADT} \label{sec:gadt}
 % TODO: check this
-The structure that I landed on to represent general models is a generalised algebraic data type. GADTs are often used to implement interpreters in functional languages, and have been used to represent probabilistic models. The GADT I implement here (and some inference algorithms) is based on (Scibior et al. 2015)\cite{scibior2015practical}. The GADT represents a model in a very general way, and can then be `interpreted' by a sampler or an inference algorithm. For sampling, I traverse the model, ignoring conditionals to enable forward sampling. For inference, I provide some inference functions as transforming the conditional distributions to distributions without any conditional statements, allowing sampling to be performed as normal. Some inference functions are also implemented by generating an empirical distribution that can be sampled from similarly. Primitive distributions also have a special variant (which takes a different \texttt{primitive} type). We can find the exact pdf/cdf of these distributions, unlike the \texttt{dist} type, which can only be sampled from. Listing \ref{lst:gadt1} shows each of the variants. The monad functions are also provided, which construct the corresponding variant in the GADT. \texttt{Return} represents a distribution with only one value, and \texttt{Bind} contains a distribution and a function, which represents that function being applied to the output from that distribution.
+The structure that I landed on to represent general models is a generalised algebraic data type. GADTs are often used to implement interpreters in functional languages, and have been used to represent probabilistic models. The GADT I implement here (and some inference algorithms) is based on (Scibior et al. 2015)\cite{scibior2015practical}. This represents a model in a very general way, and can then be `interpreted' by a sampler or an inference algorithm. For sampling, I traverse the model, ignoring conditionals to enable forward sampling from the prior. For inference, I provide some inference functions as transforming the conditional distributions to distributions without any conditional statements, allowing sampling to be performed as normal. Some inference functions are also implemented by generating an empirical distribution that can be sampled from similarly. Primitive distributions also have a special variant (which takes a different \texttt{primitive} type). We can find the exact pdf/cdf of these distributions, unlike the \texttt{dist} type, which can only be sampled from. Listing \ref{lst:gadt1} shows each of the variants. The monad functions are also provided, which construct the corresponding variant in the GADT. \texttt{Return} represents a distribution with only one value, and \texttt{Bind} contains a distribution and a function, which represents that function being applied to the output from that distribution.
 
 \begin{listing}[!ht]
 	\ocamlcode{code_snippets/gadt.ml}	
@@ -87,12 +87,12 @@ The structure that I landed on to represent general models is a generalised alge
 	\label{lst:gadt1}
 \end{listing}
 
-An important feature of this type is that it is polymorphic - this allows distributions to be defined over any type. Usually, this type is floats or integers, but polymorphism allows us to define distributions over anything, including distributions over distributions - a feature used in certain models such as a Dirichlet process.
+An important feature of this type is that it is polymorphic - this allows distributions to be defined over any type. Usually, this type is floats or integers, but this allows us to define distributions over anything, including distributions - a feature used in certain models such as a Dirichlet process.
 
 \subsection{Primitive Distributions}
 In PPLs, users build complex models by composing more simple elementary primitive distributions (ERP) \cite{pmlr-v15-wingate11a}. These primitive distributions need to have a few operations defined on them, namely \texttt{sample, pdf, cdf} and \texttt{support}.
 
-An extension goal achieved here is to allow users to define their own primitive distributions if they have not already been defined in the library. A concrete use case - I have not implemented the Poisson distribution as a primitive distribution, but you can imagine models which need to use the Poisson as a building block. To achieve this, the user simply has to write a function which takes the parameters of the distribution as arguments and return a first class module matching the primitive distribution signature. This method also allows users to use modules that they may have already defined, and constrain them to the required signature for use in the PPL.
+An extension goal achieved here is to allow users to define their own primitive distributions if they have not already been defined in the library. A concrete use case - I have not implemented the Poisson distribution as a primitive distribution, but you can imagine models which need to use the Poisson as a building block. To achieve this, the user simply has to write a function which takes the parameters of the distribution as arguments and return a first class module matching the primitive distribution signature. This technique also allows users to use modules that they may have already defined, and constrain them to the required signature for use in the PPL.
 
 The type of a primitive distribution is \texttt{type 'a prim\_dist = (module PRIM\_DIST with type t='a)}, with the \texttt{PRIM\_DIST} signature defined as in listing \ref{lst:prim-sig}. 
 
@@ -113,9 +113,10 @@ An example of this being used to add a new primitive distribution is given in li
 
 \subsection{Empirical Distributions}
 
-The output of Bayesian inference is a probability distribution over the variable we are concerned with. Ideally, we would be able to produce an exact posterior distribution, and be able to extract exact statistics from it. However, approximate inference only allows us to create functions to sample from this posterior. Since my inference procedures all produce an object of type \texttt{'a dist}, we can define a signature for a type of an empirical distribution. The type is abstract since there are different implementations for discrete and continuous distributions. For discrete distributions, we use a \texttt{Core.Map}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/base/Base/Map/index.html}}, whereas continuous distributions use a \texttt{Core.Set}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/base/Base/Set/index.html}}. Creating values with these types required passing a first class module representing the type of the keys - this is so that an appropriate compare function can be used in the internal tree data structure.
+The output of Bayesian inference is a probability distribution over the variable we are concerned with. Ideally, we would be able to produce an exact posterior distribution, and be able to extract exact statistics from it. However, approximate inference only allows us to create functions to sample from this posterior. We can define a signature for a type of an empirical distribution that is created from posterior distributions and can be used to calculate useful properties such as the pdf or cdf. The type is abstract to allow different implementations for discrete and continuous distributions. For discrete distributions, I use a \texttt{Core.Map}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/base/Base/Map/index.html}}. Continuous distributions use a dynamically resizing array - adding each sample is then $O(1)$ amortized, and statistics can be calculated using Owl's functions that operate on arrays. A constraint on continuous distributions of this type is that they are defined over floats, and only represent one dimension.
+% Creating values with these types required passing a first class module representing the type of the keys - this is so that an appropriate compare function can be used in the internal tree data structure.
 
-I also provide modules which are backed by the polymorphic versions of these data structures (\texttt{Core.Map.Poly}). These types don't require the use of first class modules to create objects, since the keys are compared using the polymorphic compare function. While this makes using the module simpler to use (no need to pass the first class module), it also makes them more inefficient due to the use of polymorphic comparison.
+% I also provide modules which are backed by the polymorphic versions of these data structures (\texttt{Core.Map.Poly}). These types don't require the use of first class modules to create objects, since the keys are compared using the polymorphic compare function. While this makes using the module simpler to use (no need to pass the first class module), it also makes them more inefficient due to the use of polymorphic comparison.
 
 \begin{listing}[ht]
 	\ocamlcode{code_snippets/empirical_sig.ml}
@@ -123,7 +124,7 @@ I also provide modules which are backed by the polymorphic versions of these dat
 	\label{lst:empirical}
 \end{listing}
 
-The signature given in listing \ref{lst:empirical} is implemented for both continuous and discrete distributions. In order to create the continuous case, I perform binning to approximate the continuous distribution by a discrete one - exemplified by figure \ref{fig:binning}. The number of bins used is calculated automatically from the range and shape of the samples drawn.
+The signature given in listing \ref{lst:empirical} is implemented for both continuous and discrete distributions. For the continuous case, I perform binning to approximate the continuous distribution by a discrete one - exemplified by figure \ref{fig:binning} - in order to approximate the pdf. The number of bins used is calculated automatically from the number of samples taken.
 
 \begin{figure}[!hb]
 	\centering
@@ -390,7 +391,7 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 	% \subfloat[Code that generated the plot]{{\inputminted{ocaml}{code_snippets/plotter.ml} }}%
 	% \qquad
 	% \subfloat[P-P plot]{{\includegraphics[width=0.4\textwidth]{figs/coin_compare.png} }}%
-													
+																											
 	\begin{minipage}{0.45\textwidth}
 		\centering
 		\inputminted{ocaml}{code_snippets/plotter.ml}	
@@ -401,7 +402,7 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 		\includegraphics[width=\linewidth]{figs/coin_compare.png}
 		\captionof{figure}{Output}
 	\end{minipage}
-													
+																											
 	\caption{The approximate and exact pdf of the output of inference for a biased coin model}
 	\label{fig:vis-samples}
 \end{figure}
@@ -409,7 +410,16 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 
 \section{Testing}
 
-Automated testing of PPLs is difficult for reasons outlines in the preparation. However, I still wrote basic unit tests. The test framework I used, Alcotest, lets me check that outputs of functions match expected values. This allows me to test all deterministic helper functions, e.g. normalise. It also lets me test the exact inference method, and very simple distributions and models which only contain a single value.
+Automated testing of PPLs is difficult for reasons outlines in the preparation. However, I still wrote basic unit tests. The test framework I used, Alcotest, lets me check that outputs of functions match expected values. This allows me to test all deterministic helper functions, e.g. normalise. It also lets me test the exact inference method, and very simple distributions and models which only contain a single value. I also used an additional library Quickcheck, to test that a specified invariant holds for a function - it uses randomly generated inputs to check the widest range of values. As an example, for the normalise functionwe expect that the output probabilities always sum to one, no matter the input array - the test is given below.
+
+% \begin{noindent}
+\begin{ocamlcode-in}
+let test_normalise_sum_to_1 =
+QCheck.Test.make ~count:1000 ~name:"test normalisation"
+QCheck.(list (pair int float)) (fun l ->
+((List.sum (module Float) ~f:snd @@ normalise l)) = 1.)
+\end{ocamlcode-in}
+% \end{noindent}
 
 The test output and code coverage output can be seen in figure \ref{fig:test-out}.
 \begin{figure}[!htb]

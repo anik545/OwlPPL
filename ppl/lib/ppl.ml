@@ -15,6 +15,8 @@ module Helpers = Helpers
 
 module Samples : Empirical.S = Empirical.Discrete
 
+module CSamples = Empirical.ContinuousArr
+
 (* */** *)
 include Dist
 include Inference

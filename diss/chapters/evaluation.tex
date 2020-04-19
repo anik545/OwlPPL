@@ -13,10 +13,10 @@
 % explain WHY in evaluation, how just what - e.g. explain why plot looks how it does, don't just describe
 
 % show some output from merlin to show the fact that type inference works and is good?
-So far, I have developed a PPL that can be used to define arbitrary probabilistic models and perform Bayesian inference on them. To evaluate the performance of my PPL, I will present some examples to show programs written in my PPL translated into equivalent programs in other PPLs, and then measure time and memory consumption of inference\footnote{All tests are carried out on a single core of an Intel\textsuperscript{(R)} Core\textsuperscript{(TM)} i5-7200U CPU @ 2.50GHz}. I will also determine the correctness of inference procedures by using hypothesis tests which use drawn samples to determine whether two distributions are the same or not. For all these tests, I will use simple models with analytic solutions to compare to.
+So far, I have developed a PPL that can be used to define arbitrary probabilistic models and perform Bayesian inference on them. To evaluate the performance of my PPL, I will present some examples to show programs written in my PPL translated into equivalent programs in other PPLs, and then measure time and memory consumption of inference\footnote{All tests are carried out on a single core of an Intel\textsuperscript{(R)} Core\textsuperscript{(TM)} i5-7200U CPU @ 2.50GHz}. I will also determine the correctness of inference procedures by using hypothesis tests which use drawn samples to determine whether two distributions are the same or not.
 
 \section{Examples}
-To show how my PPL would be used on real problems, I now outline a set of example problems. Several examples here will be simple, and have analytic solutions - this is so that I can then test the correctness of applying inference on them. Full derivations of the solutions as well as mathematical descriptions of the models are given in appendix \ref{app:examples}.
+To show how my PPL would be used on real problems, I now outline a set of example problems. Several examples here will be simple, and have analytic solutions - this is so that I can then test the correctness of applying inference on them. More complex realistic models are also included to test performance. Full derivations of the solutions as well as mathematical descriptions of the models are given in appendix \ref{app:examples}.
 
 \subsection{Sprinkler}
 % to show exact inference on discrete model
@@ -88,7 +88,7 @@ This example shows how to use multiple data points to infer a continuous distrib
 	\label{lst:linreg}
 \end{listing}
 
-\subsection{Mixture Model}
+\subsection{Infinite Mixture Model}
 This example demonstrates a model which cannot be expressed in some PPLs such as STAN or Infer.Net, since it is a non-parametric Bayesian model. This is a Dirichlet Process mixture model with an infinite number of Gaussians\cite{dpmm}. It is used for the common task of clustering a set of data points without knowledge of the number of clusters. This means the number of clusters is allowed to grow with the dataset size. We use a mixture of Gaussians, meaning the likelihood of a point belonging to each cluster is given by different normal distributions. The full code for this model, along with comparisons to other languages is given in appendix \ref{app:dp}.
 % Need to show examples which can't be done in graph based thing
 % Need to explain why these examples are actually difficult.
@@ -155,15 +155,29 @@ Table \ref{tab:ks-pvals} shows that for all the continuous models considered, th
 
 \section{Convergence of sampling}
 % TODO: add a few lines to show difference between 
-I also used the KL-divergence metric to determine the (dis)similarity of two distributions. The formula for KL Divergence of discrete distributions $P$ and $Q$ is
+I also used the KL-divergence metric to determine the (dis)similarity of two distributions. The formula for KL Divergence of discrete distributions $P$ and $Q$ is easy to calculate by \eqref{eq:kl_disc}
 
-$${D_{\text{KL}}(P\parallel Q)=\sum _{x\in {\mathcal {X}}}P(x)\log \left({\frac {P(x)}{Q(x)}}\right)}$$
+$${D_{\text{KL}}(P\parallel Q)=\sum _{x\in {\mathcal {X}}}P(x)\log \left({\frac {P(x)}{Q(x)}}\right)}$$ \label{eq:kl_disc}
 
-The continuous version is similar, with $p$ and $q$ now being density functions:
+The continuous version is similar, with $p$ and $q$ now being density functions as in \eqref{eq:kl_cont}. 
 
-$${D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx$$
+$${D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx$$ \label{eq:kl_cont}
 
-Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins to approximate $q(x)$. I then used Monte Carlo integration to compute the integral. Both the metrics (discrete and continuous) were computed with code written using the \texttt{EmpiricalDist} modules. 
+% Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins to approximate $q(x)$. I then used Monte Carlo integration to compute the integral. 
+Since I only have a set of samples from $q$, this integral can't be calculated exactly - there is no exact density function. However, there are ways to estimate density functions, as in (Perez 2008) \cite{perez2008kullback}. The first step is to approximate the cdf by finding the empirical cdf ($P_e$) then linearly interpolating between points to produce a continuous function ($P_c$). Estimating the derivative of $P_c$ then gives the pdf, $\hat{P}$. The final estimator \eqref{eq:final_kl_est} is given by using the exact pdf of $q$ and performing Monte Carlo integration.
+
+\begin{gather}
+	P_e(x) = \frac1{n}\sum_{i=1}^n U(x-x_i)\text{ where U is the step function}\\
+	P_c(x) = \begin{cases}
+	0    & x<x_0                  \\
+	a_ix+b_i & x_{i-1} \leq x \le x_i \\
+	1    & x_{n+1} \leq x         
+	\end{cases}\\
+	\hat{P}(x) = \frac{P_c(x+\delta) - P_c(x)}{\delta} \text{ for sufficiently small }\delta\\
+	\hat{D}_{KL}(P \| Q) = \frac1{n}\sum_{i=1}^n \log\left(\frac{\hat{P}(x_i)}{q(x_i)}\right)\\ \label{eq:final_kl_est}
+\end{gather}
+% 
+Both the metrics (discrete and continuous) were computed with code written using the \texttt{EmpiricalDist} modules.
 
 The idea behind conducting this test is ensuring that the KL divergence decreases as we take more samples from the posterior. This ensures that the solution converges to the correct distribution - a KL divergence of 0 implies the distributions are identical.
 
@@ -226,7 +240,7 @@ Figure \ref{fig:kl} shows the results of this. For each inference procedure, we 
 			\addplot table [x index=0, y index=1, col sep=comma] {data/kl/sprinkler_smc.csv};
 			\addlegendentry{smc}
 			% 
-																																																																																																																																																																																																																								
+																																																																																																																																																																																																																																																																																																						
 			% \pgfplotsinvokeforeach{1,...,\numberofcols}{
 			% 	\addplot table [x index=0,y index=#1, col sep=comma] {data/kl/kl_sprinkler_all.csv};
 			% 	\pgfplotstablegetcolumnnamebyindex{#1}\of{\datatable}\to{\colname}
@@ -278,12 +292,12 @@ Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares aga
 	% \perfgraph{data/times_mh.csv}{Metropolis-Hastings}{time (ms)}
 	% \perfgraph{data/times_smc.csv}{Particle Filter}{time (ms)}
 	% \perfgraph{data/times_rej.csv}{Rejection Sampling}{time (ms)}
-																					
+																																															
 	\perfgraph{data/times_coin.csv}{Biased Coin}{time (ms)}
 	\perfgraph{data/times_linreg.csv}{Linear Regression}{time (ms)}
 	\perfgraph{data/times_hmm.csv}{Hidden Markov Model}{time (ms)}
 	\perfgraph{data/times_sprinkler.csv}{Sprinkler}{time (ms)}
-																					
+																																															
 	\caption{Performance of my ppl against other languages for different models and inference algorithms, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:time-perf}
 \end{figure}
@@ -294,13 +308,13 @@ Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares aga
 	% \perfgraph{data/mems_mh.csv}{Metropolis-Hastings}{memory usage (bytes)}
 	% \perfgraph{data/mems_smc.csv}{Particle Filter}{memory usage (bytes)}
 	% \perfgraph{data/mems_rej.csv}{Rejection Sampling}{memory usage (bytes)}
-																							
+																																																	
 	\perfgraph{data/mems_coin.csv}{Biased Coin}{memory usage (bytes)}
 	\perfgraph{data/mems_linreg.csv}{Linear Regression}{memory usage (bytes)}
 	\perfgraph{data/mems_hmm.csv}{Hidden Markov Model}{memory usage (bytes)}
 	\perfgraph{data/mems_sprinkler.csv}{Sprinkler}{memory usage (bytes)}
-																							
-																							
+																																																	
+																																																	
 	\caption{Memory Usage of my ppl, compared against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:mem-perf}
 \end{figure}

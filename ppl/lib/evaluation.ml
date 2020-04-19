@@ -2,6 +2,7 @@ open Core
 open Dist
 open Helpers
 module D = Empirical.Discrete
+module C = Empirical.ContinuousArr
 module P = Primitive
 
 type 'a samples = 'a D.t
@@ -24,7 +25,7 @@ let kl_cum_discrete ns p q =
   (* ns is increasing array of sample numbers to storer *)
   let q_emp = ref D.empty in
   let pdf_p = Primitive.pdf p in
-  let total_n = ns.(Array.length ns - 1) in
+  let total_n = ns.(Array.length ns - 1) + 1 in
   let i = ref 0 in
   let arr = Array.create ~len:(Array.length ns) (0, 0.) in
   let j = ref 0 in
@@ -38,14 +39,81 @@ let kl_cum_discrete ns p q =
           let p_x = pdf_p x in
           match pdf_q x with
           | 0. -> raise Undefined
-          | q_x -> p_x *. log (p_x /. q_x)
+          | q_x ->
+              printf "for %b p=%f,q=%f\n" x p_x q_x;
+              p_x *. log (p_x /. q_x)
         in
         List.sum (module Float) ~f support_q
       in
-      arr.(!j) <- (!i, kl);
+      (* TODO: is this right - should i be dividing by i? *)
+      arr.(!j) <- (!i, kl /. float_of_int !i);
       j := !j + 1 )
     else ();
     i := !i + 1
+  done;
+  arr
+
+let samples_to_pdf samples =
+  let open Owl_stats in
+  let n = Array.length samples in
+  (* sturges rule *)
+  let num_bins = int_of_float (1. +. (3.3 *. log (float_of_int n))) in
+  let h = histogram (`N num_bins) samples |> normalise_density in
+  let pdf_q = Option.value h.density ~default:[||] in
+  let mps =
+    Array.mapi pdf_q ~f:(fun i _ -> (h.bins.(i + 1) +. h.bins.(i)) /. 2.)
+  in
+  (mps, pdf_q)
+
+let kl_helper ps qs =
+  let open Float in
+  Array.map2_exn ps qs ~f:(fun p_x q_x ->
+      if q_x = 0. then 0. else p_x * log (p_x / q_x))
+  |> Array.sum (module Float) ~f:ident
+  |> abs
+
+let kl_cont samples exact =
+  let n = float_of_int @@ Array.length samples in
+  let mps, q = samples_to_pdf samples in
+  let p = Array.map mps ~f:(Primitive.pdf exact) in
+  kl_helper p q /. n
+
+let kl_cum_continuous ns p q =
+  let q_emp = ref C.empty in
+  let total_n = ns.(Array.length ns - 1) + 1 in
+  let i = ref 0 in
+  let arr = Array.create ~len:(Array.length ns) (0, 0.) in
+  let j = ref 0 in
+  while !i < total_n do
+    q_emp := C.add_sample !q_emp (sample q);
+    if Array.mem ns !i ~equal:Int.equal then (
+      (* let kl =
+         let support_q = Array.to_list @@ C.values !q_emp in
+         let support_q = List.dedup_and_sort ~compare:Float.compare support_q in
+         let pdf_q = C.to_pdf !q_emp in
+         let k = ref 1. in
+         let f x =
+          let p_x = pdf_p x in
+          let ret =
+            match pdf_q x with
+            | 0. -> 0.
+            | q_x ->
+              p_x *. log (p_x /. q_x)
+          in
+          if Float.is_finite ret then (k:=!k+.1.; ret) else 0.
+         in
+         (* TODO: is this right - should I be dividing by i? *)
+         List.sum
+          (module Float)
+          ~f support_q /. !k
+         in *)
+      let kl = kl_cont (C.values !q_emp) p in
+      (* TODO: is this right - should I be dividing by i? *)
+      arr.(!j) <- (!i, kl);
+      (* arr.(!j) <- (!i, kl /. float_of_int !i); *)
+      incr j )
+    else ();
+    incr i
   done;
   arr
 
@@ -66,7 +134,7 @@ let kl_continuous ?(n = 10000) p q =
   let h =
     histogram (`N ((n / 10) + 10)) samples |> normalise |> normalise_density
   in
-  let pdf_q = match h.density with Some pdf_q -> pdf_q | None -> [||] in
+  let pdf_q = Option.value h.density ~default:[||] in
   let sum = ref 0. in
   for i = 0 to Array.length pdf_q - 1 do
     let mp = (h.bins.(i + 1) +. h.bins.(i)) /. 2. in

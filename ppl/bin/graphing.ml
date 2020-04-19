@@ -29,7 +29,7 @@ let binomcdf () =
 
 let coin_compare () =
   hist_dist_continuous ~fname ~title:"Coin model" coin_inferred
-  |> add_pdf ~dist:coin_exact ~scale:72.
+  |> add_exact_pdf ~dist:coin_exact ~scale:72.
   |> show
 
 let () =

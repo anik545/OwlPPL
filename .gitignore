@@ -9,6 +9,8 @@ _coverage/
 diss/wordcount.txt
 diss/linecount.txt
 
+anglican/target/
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

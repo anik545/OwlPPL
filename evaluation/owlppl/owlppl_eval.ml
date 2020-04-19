@@ -25,4 +25,4 @@ let inference_alg = match inference with
 
 let _,t = time (model inference_alg)
 
-let () = Printf.printf "%f\n" t
+let () = Printf.printf "%.15f\n" t

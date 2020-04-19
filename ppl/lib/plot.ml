@@ -92,7 +92,7 @@ let pp_plot ?h ?(n = 1000) ?(fname = "fig.png") ?(title = "")
   Plot.probplot ~h:pl ~dist:cdf_d (one_row_mat samples_d');
   pl
 
-let add_pdf ?(scale = 1.) ~dist h =
+let add_exact_pdf ?(scale = 1.) ~dist h =
   Owl_plplot.Plot.(
     plot_fun ~h
       ~spec:[ RGB (0, 0, 255); LineWidth 2. ]

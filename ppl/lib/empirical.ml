@@ -123,7 +123,7 @@ module Continuous = struct
 
   let from_dist ?(n = 300) d =
     (* sturges rule *)
-    let num_bins = int_of_float @@ (1. +. (3.3 *. log 3.3)) in
+    let num_bins = int_of_float @@ (1. +. (float_of_int n *. log 3.3)) in
     let samples = Helpers.take_k_samples n d in
     histogram (`N num_bins) samples
 
@@ -143,4 +143,142 @@ module Continuous = struct
      let print_map = raise Not_found
      let to_arr samples = raise Not_found 
      let to_norm_arr samples = raise Not_found *)
+end
+
+module ContinuousSet = struct
+  type 'a t = {
+    samples : (float, Float.comparator_witness) Set.t;
+    min : float;
+    max : float;
+    n : int;
+  }
+
+  (* open Owl_stats *)
+
+  let empty = { samples = Set.empty (module Float); min = 0.; max = 0.; n = 0 }
+
+  let from_dist ?(n = 300) d =
+    let samples = Set.of_array (module Float) @@ Helpers.take_k_samples n d in
+    let max = Set.max_elt_exn samples in
+    let min = Set.min_elt_exn samples in
+    { samples; min; max; n }
+
+  let add_sample { samples; min; max; n } x =
+    let min = Float.min min x in
+    let max = Float.max max x in
+    let n = n + 1 in
+    let samples = Set.add samples x in
+    { samples; min; max; n }
+
+  let to_cdf d =
+    let open Float in
+    let cdf x =
+      let lt = Set.count d.samples ~f:(fun x' -> x' < x) in
+      float_of_int lt /. float_of_int d.n
+    in
+    cdf
+
+  let to_pdf d =
+    let cdf = to_cdf d in
+    let delta = 0.00001 in
+    let pdf x = (cdf x -. cdf (x +. delta)) /. delta in
+    pdf
+
+  (* let print (type a) printer ~ppf map = 
+     let (module P: Pretty_printer.S with type t = a) = printer in
+     failwith "-"
+
+     let print_map = failwith "-"
+     let to_arr samples = failwith "-"
+     let to_norm_arr samples = failwith "-" *)
+end
+
+module ContinuousArr = struct
+  type 'a t = { samples : float array; n : int; max_length : int }
+
+  (* open Owl_stats *)
+
+  let empty = { samples = Array.create ~len:100 0.; n = 0; max_length = 100 }
+
+  let from_dist ?(n = 300) d =
+    let samples = Helpers.take_k_samples n d in
+    { samples; n; max_length = n }
+
+  let add_sample { samples; n; max_length } x =
+    let n = n + 1 in
+    if n > max_length then (
+      let new_length = max_length * 2 in
+      let new_arr = Array.create ~len:new_length 0. in
+      Array.blit ~src:samples ~src_pos:0 ~dst:new_arr ~dst_pos:0 ~len:(n - 1);
+      new_arr.(n) <- x;
+      { samples = new_arr; n; max_length = new_length } )
+    else (
+      samples.(n - 1) <- x;
+      { samples; n; max_length } )
+
+  let to_cdf_arr d = Owl_stats.ecdf d.samples
+
+  let to_pdf_arr d =
+    let cdf = Owl_stats.ecdf d.samples in
+    let vals = fst cdf in
+    let f = snd cdf in
+    let arr = Array.create ~len:(Array.length (fst cdf)) 0. in
+    for i = 0 to Array.length arr - 2 do
+      (* gradients at each point *)
+      arr.(i) <- (f.(i + 1) -. f.(i)) /. (vals.(i + 1) -. vals.(i))
+    done;
+    (vals, arr)
+
+  (* interpolated ecdf *)
+  let to_cdf d =
+    let e = Owl_stats.ecdf d.samples in
+    let x' = fst e in
+    let f = snd e in
+    let cdf x =
+      match Float.(Array.findi ~f:(fun _ el -> el >= x) x') with
+      | Some (idx, _) ->
+          let open Int in
+          if idx = 0 then 0.
+          else
+            let lowx = x'.(idx - 1) in
+            let lowy = f.(idx - 1) in
+            let highx = x'.(idx) in
+            let highy = f.(idx) in
+            Float.(lowy + ((highy - lowy) * ((x - lowx) / (highx - lowx))))
+      | None -> 1.
+    in
+    cdf
+
+  let to_pdf d =
+    let open Float in
+    let cdf = to_cdf d in
+    let max = Option.value ~default:1. @@ Array.max_elt ~compare d.samples in
+    let min = Option.value ~default:0. @@ Array.min_elt ~compare d.samples in
+    let delta = (max -. min) /. 20. in
+    let pdf x = (cdf (x +. delta) -. cdf x) /. delta in
+    pdf
+
+  let values d = Array.sub d.samples ~pos:0 ~len:(d.n - 2)
+
+  let print d =
+    printf "Samples: ";
+    Array.iter ~f:(printf "%f,") d.samples;
+    printf "\nn: %d\n" d.n
+
+  (* 
+  open Ppl
+  open Core
+  open Empirical.ContinuousArr
+  let test = 
+    let open Owl_plplot in
+    let emp = from_dist (normal 0. 1.) in
+    Plot.plot_fun (to_pdf emp) (-.3.) 3.
+ *)
+  (* let print (type a) printer ~ppf map = 
+         let (module P: Pretty_printer.S with type t = a) = printer in
+         failwith "-"
+
+         let print_map = failwith "-"
+         let to_arr samples = failwith "-"
+         let to_norm_arr samples = failwith "-" *)
 end
