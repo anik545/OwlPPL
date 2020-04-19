@@ -591,7 +591,9 @@ Find the KL divergence for two discrete distributions
 Find the KL divergence for two continuous distributions
 \end{description}
 
-\protect\hyperlink{val-klux5fcumux5fdiscrete}{}\texttt{val\ kl\_cum\_discrete\ :\ int\ array\ -\textgreater{}\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ (int\ *\ float)\ array}
+\protect\hyperlink{val-klux5fcumux5fdiscrete}{}\texttt{val\ kl\_cum\_discrete\ :\ int\ array\ -\textgreater{}\ bool\ Primitive.t\ -\textgreater{}\ bool\ dist\ -\textgreater{}\ (int\ *\ float)\ array}
+
+\protect\hyperlink{val-klux5fcumux5fcontinuous}{}\texttt{val\ kl\_cum\_continuous\ :\ int\ array\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ float\ dist\ -\textgreater{}\ (int\ *\ float)\ array}
 
 \hypertarget{hypux5ftests}{\subsubsection{\texorpdfstring{\protect\hyperlink{hypux5ftests}{}Hypothesis
 Tests}{Hypothesis Tests}}\label{hypux5ftests}}
@@ -644,7 +646,7 @@ Plots}{Other Plots}}\label{otherux5fplots}}
 
 \protect\hyperlink{val-ecdfux5fdiscrete}{}\texttt{val\ ecdf\_discrete\ :\ ?⁠h:Owl\_plplot.Plot.handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ ?⁠title:string\ -\textgreater{}\ ?⁠xlabel:string\ -\textgreater{}\ ?⁠ylabel:string\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ Owl\_plplot.Plot.handle}
 
-\protect\hyperlink{val-addux5fpdf}{}\texttt{val\ add\_pdf\ :\ ?⁠scale:float\ -\textgreater{}\ dist:float\ Primitive.t\ -\textgreater{}\ Owl\_plplot.Plot.handle\ -\textgreater{}\ Owl\_plplot.Plot.handle}
+\protect\hyperlink{val-addux5fexactux5fpdf}{}\texttt{val\ add\_exact\_pdf\ :\ ?⁠scale:float\ -\textgreater{}\ dist:float\ Primitive.t\ -\textgreater{}\ Owl\_plplot.Plot.handle\ -\textgreater{}\ Owl\_plplot.Plot.handle}
 
 \protect\hyperlink{val-show}{}\texttt{val\ show\ :\ Owl\_plplot.Plot.handle\ -\textgreater{}\ unit}
 
@@ -662,6 +664,12 @@ Plots}{Other Plots}}\label{otherux5fplots}}
 
 \hypertarget{module-Continuous}{}
 \protect\hyperlink{module-Continuous}{}\texttt{module\ Continuous\ :\ sig\ ...\ end}
+
+\hypertarget{module-ContinuousSet}{}
+\protect\hyperlink{module-ContinuousSet}{}\texttt{module\ ContinuousSet\ :\ sig\ ...\ end}
+
+\hypertarget{module-ContinuousArr}{}
+\protect\hyperlink{module-ContinuousArr}{}\texttt{module\ ContinuousArr\ :\ sig\ ...\ end}
 
 \href{../index.html}{Up} -- \href{../../../index.html}{ppl} »
 \href{../../index.html}{Ppl} » \href{../index.html}{Empirical} »
