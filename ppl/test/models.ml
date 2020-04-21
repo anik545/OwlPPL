@@ -1,11 +1,20 @@
 open Ppl
 open Core
 
+let list_gen =
+  memo (fun n ->
+      List.init n ~f:(fun n ->
+          let n = float_of_int n in
+          (n, (n *. 2.) +. 1.)))
+
 (* BIASED COIN *)
 (* coin, see 9 heads out of 10 flips *)
 let single_coin =
   let pr = continuous_uniform 0. 1. in
-  let toss t = condition' (fun p -> Primitive.(pdf @@ binomial 10 p) t) in
+  let toss t =
+    condition' (fun p ->
+        Ppl.Dist.Prob.of_float @@ Primitive.(pdf @@ binomial 10 p) t)
+  in
   let obs = 9 in
   (* we see x=9 heads *)
   let posterior = toss obs pr in

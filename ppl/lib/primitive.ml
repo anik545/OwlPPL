@@ -56,7 +56,9 @@ let categorical (type a) xs =
   ( module struct
     type t = a
 
-    let sample () = xs_arr.(Owl_stats.categorical_rvs ps)
+    let sample () =
+      List.iter xs ~f:(fun (_, b) -> printf "%f\n%!" b);
+      xs_arr.(Owl_stats.categorical_rvs ps)
 
     let pdf x =
       let rec lookup l = function

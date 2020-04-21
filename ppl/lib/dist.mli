@@ -5,36 +5,40 @@
 
 exception Undefined
 
-type prob = float
+module Prob : Sigs.Prob
+
+type prob = Prob.t
 (** A type for which values need to sum to 1  *)
 
-type likelihood = float
+type likelihood = Prob.t
 (** A type for which values don't need to sum to 1  *)
 
 type 'a samples = ('a * prob) list
 (** A set of weighted samples, summing to one *)
 
 (** Type for representing distributions *)
-type _ dist =
+type _ dist = private
   | Return : 'a -> 'a dist  (** distribution with a single value *)
   (* bind is lazy since it contains a function *)
   | Bind : 'a dist * ('a -> 'b dist) -> 'b dist  (** monadic bind *)
   (* | Bind_var: 'a var_dist * ('a -> 'b dist) -> 'b dist *)
   | Primitive : 'a Primitive.t -> 'a dist  (** primitive exact distribution *)
-  | Conditional : ('a -> float) * 'a dist -> 'a dist
+  | Conditional : ('a -> likelihood) * 'a dist -> 'a dist
       (** variant that defines likelihood model *)
 
 (* | Conditional: ('a -> float) * 'a var_dist -> 'a dist *)
 
 (** {2:dist_monad Condition Operators} *)
 
-val condition' : ('a -> likelihood) -> 'a dist -> 'a dist
+val condition' : ('a -> prob) -> 'a dist -> 'a dist
 
 val condition : bool -> 'a dist -> 'a dist
 
-val score : likelihood -> 'a dist -> 'a dist
+val score : float -> 'a dist -> 'a dist
 
 val observe : 'a -> 'a Primitive.t -> 'b dist -> 'b dist
+
+val from_primitive : 'a Primitive.t -> 'a dist
 
 (** {2:dist_monad Monad Fsunctions} *)
 
@@ -48,9 +52,9 @@ include
   Sigs.Primitive_Distributions with type 'a primitive := 'a dist
 (** @inline *)
 
-val bernoulli : likelihood -> bool dist
+val bernoulli : float -> bool dist
 
-val choice : likelihood -> 'a dist -> 'a dist -> 'a dist
+val choice : float -> 'a dist -> 'a dist -> 'a dist
 
 (** {2:dist_sample Sampling} *)
 

@@ -22,7 +22,7 @@ val unduplicate : ('a * float) list -> ('a * float) list
 val flatten : (('a * float) list * float) list -> ('a * float) list
 (**  *)
 
-val normalise : ('a * float) list -> ('a * float) list
+val normalise : ('a * Dist.prob) list -> ('a * Dist.prob) list
 (** *)
 
 val weighted_dist : ?n:int -> 'a dist -> ('a, int) Core.Map.Poly.t

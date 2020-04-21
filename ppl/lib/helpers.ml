@@ -7,8 +7,8 @@ let unduplicate xs =
   Map.Poly.to_alist map
 
 let normalise xs =
-  let norm = List.sum (module Float) ~f:snd xs in
-  List.map ~f:(fun (v, p) -> (v, p /. norm)) xs
+  let norm = Prob.to_float @@ List.sum (module Prob) ~f:snd xs in
+  List.map ~f:(fun (v, p) -> (v, Prob.of_float @@ (Prob.to_float p /. norm))) xs
 
 let flatten xss =
   let mul_likelihood xs p = List.map ~f:(fun (x, q) -> (x, p *. q)) xs in

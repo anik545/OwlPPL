@@ -1,18 +1,22 @@
 module type ExactDist = sig
   type 'a t
 
-  val pdf : 'a t -> float
+  val pdf : 'a t -> float -> float
 
-  val cdf : 'a t -> float
+  val cdf : 'a t -> float -> float
 
-  val logpdf : 'a t -> float
+  val logpdf : 'a t -> float -> float
 
-  val logcdf : 'a t -> float
+  val logcdf : 'a t -> float -> float
 end
 
 (* A distribution that can have inference applied *)
 module type ApproximateDist = sig
   type 'a t
+
+  val pdf : 'a t -> float -> float
+
+  val cdf : 'a t -> float -> float
 end
 
 (* A distribution that can be directly sampled from (i.e. result of inference, or a primitive) *)
@@ -94,4 +98,67 @@ module type Ops = sig
   val not : bool dist -> bool dist
 
   val ( ^~ ) : string dist -> string dist -> string dist
+end
+
+module type Prob = sig
+  type t
+
+  (* type t =  float *)
+
+  val to_float : t -> float
+
+  val of_float : float -> t
+
+  val ( *. ) : t -> t -> t
+
+  val ( /. ) : t -> t -> t
+
+  val ( + ) : t -> t -> t
+
+  val one : t
+
+  val zero : t
+end
+
+module LogProb : Prob = struct
+  type t = float
+
+  let to_float p = exp p
+
+  let of_float p = log p
+
+  let ( *. ) = ( +. )
+
+  let ( /. ) = ( -. )
+
+  let ( + ) x y =
+    if x = -.Float.infinity && y = -.Float.infinity then -.Float.infinity
+    else
+      (* https://en.wikipedia.org/wiki/Log_probability *)
+      let x' = Float.max x y in
+      let y' = Float.min x y in
+      (* log1p = log(1+x) *)
+      x' +. log1p (exp (y' -. x'))
+
+  let one = 0. (* log 1 *)
+
+  let zero = -.Float.infinity (* log 0 *)
+end
+
+module FloatProb : Prob = struct
+  type t = float
+
+  let to_float p = p
+
+  let of_float p = p
+
+  let ( *. ) = ( *. )
+
+  let ( /. ) = ( /. )
+
+  let ( + ) = ( +. )
+
+  let one = 1.
+
+  let zero = 0.
 end

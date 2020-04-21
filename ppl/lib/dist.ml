@@ -2,9 +2,13 @@ open Monad
 
 exception Undefined
 
-type prob = float
+module Prob = Sigs.FloatProb
 
-type likelihood = float
+type prob = Prob.t
+
+type likelihood = Prob.t
+
+open Prob
 
 type 'a samples = ('a * prob) list
 
@@ -16,7 +20,7 @@ type _ dist =
   | Bind : 'a dist * ('a -> 'b dist) -> 'b dist
   (* | Bind_var: 'a var_dist * ('a -> 'b dist) -> 'b dist *)
   | Primitive : 'a Primitive.t -> 'a dist
-  | Conditional : ('a -> float) * 'a dist -> 'a dist
+  | Conditional : ('a -> prob) * 'a dist -> 'a dist
 
 (* | Conditional: ('a -> float) * 'a var_dist -> 'a dist *)
 (* | Observe: 'a Primitive.primitive * 'a * 'a dist -> 'a dist *)
@@ -24,13 +28,15 @@ type _ dist =
 (* | Independent: 'a dist * 'b dist -> ('a * 'b) dist
    let (and+) d1 d2 = Independent(d1,d2) *)
 (* let observe x dst d = Observe(dst,x,d) *)
-let condition' (c : 'a -> likelihood) d = Conditional (c, d)
+let condition' c d = Conditional (c, d)
 
-let condition b d = Conditional ((fun _ -> if b then 1. else 0.), d)
+let condition b d = Conditional ((fun _ -> if b then one else zero), d)
 
-let score s d = Conditional ((fun _ -> s), d)
+let score s d = Conditional ((fun _ -> of_float s), d)
 
-let observe x dst d = Conditional ((fun _ -> Primitive.pdf dst x), d)
+let observe x dst d = Conditional ((fun _ -> of_float @@ Primitive.pdf dst x), d)
+
+let from_primitive p = Primitive p
 
 (* TODO: *)
 (* let observe_list lst dst d = Core.List.fold_left ~f:(observe) *)
@@ -45,7 +51,9 @@ end)
 
 let discrete_uniform xs = Primitive (Primitive.discrete_uniform xs)
 
-let categorical xs = Primitive (Primitive.categorical xs)
+let categorical xs =
+  (* let xs = Core.List.filter ~f:(fun (_,x) -> Float.is_finite x) @@ Core.List.map ~f:(fun (x,p) -> x, to_float p) xs in *)
+  Primitive (Primitive.categorical xs)
 
 let bernoulli p = categorical [ (true, p); (false, 1. -. p) ]
 
@@ -83,14 +91,14 @@ let rec sample_n : 'a. int -> 'a dist -> 'a array =
 
 (* same as sample (prior_with_score d) *)
 let rec sample_with_score : 'a. 'a dist -> 'a * likelihood = function
-  | Return x -> (x, 1.)
+  | Return x -> (x, one)
   | Bind (d, f) ->
       let y, s = sample_with_score d in
       let a, s1 = sample_with_score (f y) in
       (a, s *. s1)
   | Primitive d ->
       let x = Primitive.sample d in
-      (x, Primitive.pdf d x)
+      (x, of_float @@ Primitive.pdf d x)
   (* this instead?? *)
   (* this is how its done in prior - is it right??? *)
   (* | Primitive d -> let x  = Primitive.sample d in (x, 1.)  *)
@@ -113,7 +121,7 @@ let rec prior : 'a. 'a dist -> ('a * prob) dist = function
       return (y, s)
   | d ->
       let* x = d in
-      return (x, 1.)
+      return (x, one)
 
 (* same as sample_with_score *)
 let rec prior_with_score : 'a. 'a dist -> ('a * prob) dist = function
@@ -126,8 +134,8 @@ let rec prior_with_score : 'a. 'a dist -> ('a * prob) dist = function
       return (y, s *. s1)
   | Primitive d ->
       let* x = Primitive d in
-      return (x, Primitive.pdf d x)
-  | Return x -> return (x, 1.)
+      return (x, of_float @@ Primitive.pdf d x)
+  | Return x -> return (x, one)
 
 (* | Independent(d1,d2) -> 
    let* x,s1 = prior_with_score d1 
