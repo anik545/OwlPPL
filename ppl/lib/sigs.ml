@@ -127,7 +127,9 @@ end
 module LogProb : Prob = struct
   type t = float
 
-  let to_float p = exp p
+  let to_float p =
+    let e = exp p in
+    if Float.is_finite e then e else 1.
 
   let of_float p = log p
 

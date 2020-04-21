@@ -58,10 +58,9 @@ let by_data_length_linreg () =
   let ns = Owl.Arr.to_array @@ Owl.Arr.linspace 1. 1000. 5 in
   let infs =
     [|
-      Rejection (100, Soft);
-      Importance 100
-      (* MH 500;  *)
-      (* SMC 100  *);
+      (* Rejection (100, Soft); *)
+      Importance 100 (* MH 500  *)
+                     (* SMC 100; *);
     |]
   in
 
