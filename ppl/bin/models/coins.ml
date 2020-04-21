@@ -2,7 +2,7 @@ open Ppl
 open Core
 
 let coin_tossing =
-  let weight : prob dist =
+  let weight =
     let* isFair = bernoulli 0.8 in
     if isFair then return 0.5 else beta 5. 1.
   in

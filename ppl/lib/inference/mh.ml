@@ -12,11 +12,11 @@ open Dist.Prob
 let mh n d =
   let proposal = prior_with_score d in
   let rec iterate ?(n = n) (x, s) =
-    if n = 0 then return []
+    if Int.(n = 0) then return []
     else
       let* y, r = proposal in
-      let ratio = if Float.(s = zero) then one else r /. s in
-      let* accept = bernoulli @@ Float.min one ratio in
+      let ratio = if s = zero then one else r /. s in
+      let* accept = bernoulli @@ to_float (min one ratio) in
       let next = if accept then (y, r) else (x, s) in
       let* rest = iterate ~n:(n - 1) next in
       return (next :: rest)
@@ -31,11 +31,11 @@ let mh' n d = fmap (fun x -> List.nth_exn x (n - 1)) (mh n d)
 let mh'' n d =
   let proposal = prior_with_score d in
   let rec iterate ?(n = n) (x, s) =
-    if n = 0 then return (x, s)
+    if Int.(n = 0) then return (x, s)
     else
       let* y, r = proposal in
-      let ratio = if Float.(s = zero) then one else r /. s in
-      let* accept = bernoulli @@ Float.min one ratio in
+      let ratio = if s = zero then one else r /. s in
+      let* accept = bernoulli @@ to_float (min one ratio) in
       let next = if accept then (y, r) else (x, s) in
       let* final = iterate ~n:(n - 1) next in
       return final
@@ -47,11 +47,11 @@ let mh'' n d =
 let mh_sampler n d =
   let proposal = prior_with_score d in
   let rec iterate ?(n = n) (x, s) =
-    if n = 0 then return []
+    if Int.(n = 0) then return []
     else
       let* y, r = proposal in
-      let ratio = if Float.(s = zero) then one else r /. s in
-      let* accept = bernoulli @@ Float.min one ratio in
+      let ratio = if s = zero then one else r /. s in
+      let* accept = bernoulli @@ to_float (min one ratio) in
       let next = if accept then (y, r) else (x, s) in
       let* rest = iterate ~n:(n - 1) next in
       return (next :: rest)
@@ -70,8 +70,8 @@ let mh_sampler' ~burn d =
   let proposal = prior_with_score d in
   let iterate (x, s) =
     let y, r = sample proposal in
-    let ratio = if Float.(s = zero) then one else r /. s in
-    let accept = sample @@ bernoulli @@ Float.min one ratio in
+    let ratio = if s = zero then one else r /. s in
+    let accept = sample @@ bernoulli @@ to_float (min one ratio) in
     let next = if accept then (y, r) else (x, s) in
     Yield (next, next)
   in
@@ -92,8 +92,8 @@ let mh_transform ~burn d =
   let proposal = prior_with_score d in
   let iterate (x, s) =
     let y, r = sample proposal in
-    let ratio = if Float.(s = zero) then one else r /. s in
-    let accept = sample @@ bernoulli @@ Float.min one ratio in
+    let ratio = if s = zero then one else r /. s in
+    let accept = sample @@ bernoulli @@ to_float (min one ratio) in
     let next = if accept then (y, r) else (x, s) in
     Yield (next, next)
   in

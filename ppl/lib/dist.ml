@@ -2,7 +2,7 @@ open Monad
 
 exception Undefined
 
-module Prob = Sigs.FloatProb
+module Prob = Sigs.LogProb
 
 type prob = Prob.t
 
@@ -28,7 +28,7 @@ type _ dist =
 (* | Independent: 'a dist * 'b dist -> ('a * 'b) dist
    let (and+) d1 d2 = Independent(d1,d2) *)
 (* let observe x dst d = Observe(dst,x,d) *)
-let condition' c d = Conditional (c, d)
+let condition' c d = Conditional (Core.Fn.compose of_float c, d)
 
 let condition b d = Conditional ((fun _ -> if b then one else zero), d)
 
@@ -157,7 +157,7 @@ let rec support : 'a. 'a dist -> 'a list = function
   | Return x -> [ x ]
 
 module PplOps = struct
-  let ( +~ ) = liftM2 ( + )
+  let ( +~ ) = liftM2 Base.Int.( + )
 
   let ( -~ ) = liftM2 ( - )
 
@@ -165,13 +165,13 @@ module PplOps = struct
 
   let ( /~ ) = liftM2 ( / )
 
-  let ( +.~ ) = liftM2 ( +. )
+  let ( +.~ ) = liftM2 Base.Float.( + )
 
-  let ( -.~ ) = liftM2 ( -. )
+  let ( -.~ ) = liftM2 Base.Float.( - )
 
-  let ( *.~ ) = liftM2 ( *. )
+  let ( *.~ ) = liftM2 Base.Float.( * )
 
-  let ( /.~ ) = liftM2 ( /. )
+  let ( /.~ ) = liftM2 Base.Float.( / )
 
   let ( &~ ) = liftM2 ( && )
 

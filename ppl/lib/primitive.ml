@@ -57,7 +57,7 @@ let categorical (type a) xs =
     type t = a
 
     let sample () =
-      List.iter xs ~f:(fun (_, b) -> printf "%f\n%!" b);
+      (* List.iter xs ~f:(fun (_, b) -> printf "%f\n%!" b); *)
       xs_arr.(Owl_stats.categorical_rvs ps)
 
     let pdf x =

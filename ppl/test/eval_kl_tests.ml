@@ -39,9 +39,9 @@ let x_vals = Array.map x_vals ~f:(fun x -> int_of_float x)
 let root_dir = "/home/anik/Files/work/project/diss/data/kl"
 
 type 'a kl_method =
-  | Not_Cumulative of (?n:int -> 'a Primitive.t -> 'a dist -> likelihood)
+  | Not_Cumulative of (?n:int -> 'a Primitive.t -> 'a dist -> float)
   | Cumulative of
-      (int array -> 'a Primitive.t -> 'a dist -> (int * likelihood) array)
+      (int array -> 'a Primitive.t -> 'a dist -> (int * float) array)
 
 (* For generating csv to be plotted *)
 (* create array of x,y pairs *)

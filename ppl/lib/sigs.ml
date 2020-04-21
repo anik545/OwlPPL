@@ -109,11 +109,15 @@ module type Prob = sig
 
   val of_float : float -> t
 
+  val ( = ) : t -> t -> bool
+
   val ( *. ) : t -> t -> t
 
   val ( /. ) : t -> t -> t
 
   val ( + ) : t -> t -> t
+
+  val min : t -> t -> t
 
   val one : t
 
@@ -126,6 +130,8 @@ module LogProb : Prob = struct
   let to_float p = exp p
 
   let of_float p = log p
+
+  let ( = ) = Float.equal
 
   let ( *. ) = ( +. )
 
@@ -140,6 +146,8 @@ module LogProb : Prob = struct
       (* log1p = log(1+x) *)
       x' +. log1p (exp (y' -. x'))
 
+  let min = Float.min
+
   let one = 0. (* log 1 *)
 
   let zero = -.Float.infinity (* log 0 *)
@@ -152,11 +160,15 @@ module FloatProb : Prob = struct
 
   let of_float p = p
 
+  let ( = ) = Float.equal
+
   let ( *. ) = ( *. )
 
   let ( /. ) = ( /. )
 
   let ( + ) = ( +. )
+
+  let min = Float.min
 
   let one = 1.
 

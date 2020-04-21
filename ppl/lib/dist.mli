@@ -30,7 +30,7 @@ type _ dist = private
 
 (** {2:dist_monad Condition Operators} *)
 
-val condition' : ('a -> prob) -> 'a dist -> 'a dist
+val condition' : ('a -> float) -> 'a dist -> 'a dist
 
 val condition : bool -> 'a dist -> 'a dist
 

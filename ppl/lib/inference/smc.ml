@@ -9,11 +9,12 @@ let rec smc : 'a. int -> 'a dist -> 'a samples dist =
   | Conditional (c, d) ->
       let updated =
         fmap normalise
-        @@ condition' (List.sum (module Prob) ~f:snd)
+        @@ condition' (fun l ->
+               Prob.to_float @@ (List.sum (module Prob) ~f:snd) l)
         @@ let* last_particles = smc n d in
            let new_particles =
              List.map (* update particles by weight given by condition *)
-               ~f:(fun (x, w) -> (x, c x *. w))
+               ~f:(fun (x, w) -> Prob.(x, c x *. w))
                last_particles
            in
            return new_particles
@@ -30,12 +31,17 @@ let rec smc : 'a. int -> 'a dist -> 'a samples dist =
   (* initialise n particles wih weights from the pdf *)
   | Primitive d ->
       List.init n ~f:(fun _ ->
-          fmap (fun x -> (x, Primitive.pdf d x)) (from_primitive d))
+          fmap
+            (fun x -> (x, Prob.of_float @@ Primitive.pdf d x))
+            (from_primitive d))
       |> sequence
   (* initialise n particles with the same value and weight *)
-  | Return x -> List.init n ~f:(fun _ -> return (x, 1.)) |> sequence
+  | Return x -> List.init n ~f:(fun _ -> return (x, Prob.one)) |> sequence
 
-let smc' n d = smc n d >>= categorical
+let smc' n d =
+  let* l = smc n d in
+  let l = List.map ~f:(fun (x, y) -> (x, Dist.Prob.to_float y)) l in
+  categorical l
 
 let smcStandard n d = prior' (smc n d)
 
