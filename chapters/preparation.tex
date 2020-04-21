@@ -28,7 +28,7 @@ Before starting to write any code, I made sure to set out the features I aimed t
 
 I adopted several best practices in order to ensure the project was successful. This includes performing regular testing, splitting code into separate modules designing signatures first, and ensuring my code follows a consistent style (Jane Street)\footnote{\url{https://opensource.janestreet.com/standards/}}.
 
-\subsection{Testing}
+\subsection{Testing} \label{sec:prep-testing}
 
 Testing systems which are linked to randomness can be quite tricky, as it is difficult to test behaviour that is expected to change from one execution to the next. One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. Even with a fixed random seed, a change in code may cause new outputs even though the fundamental statistical property desired hasn't changed. Another approach is to perform some statistical test such as kolmogorov-smirnov \cite{massey1951kolmogorov}, to ensure distributions produced by my library are equal to what is expected. A problem with tests of this kind is that they are expected to fail sometimes, meaning unit tests will provide limited utility due to their inherent flakiness with random programs. In fact, since we expect these tests to fail a certain percentage of the time, if they do not sometimes fail there is a problem with our program.
 
@@ -75,7 +75,7 @@ Using OCaml 4.08 allows me to use new features of OCaml, in particular the abili
 I have chosen to use the OCaml language to implement my PPL. There are many features of OCaml which make it suitable for writing a DSL. Using OCaml, I can make sure that expressions in the DSL are well-typed, so that programs don't fail to run. OCaml's algebraic datatypes also make it easy to represent probabilistic programs as trees, and pattern matching makes it easy to 'interpret' and transform these trees. The module system also makes sure that certain types are hidden from the user, which can ensure only valid structures are created by the user.
 
 \subsection{GADTs}
-The main data structure I use to represent distributions is GADT - a generalised algebraic data type. GADTs are similar to ADTs (sum types), in that they have a set of constructors, but the main difference is that these constructors can have their output types annotated. The fact that the return types of constructors can vary is what makes GADTs more general than normal ADTs, whose return types are all the same. In OCaml, the syntax for this is \mintinline{ocaml}|type \_ t = Constructor : type' -> type' t ...| . Since we can now know which constructors produce which concrete types of t (e.g. an \texttt{int t} or a \texttt{float t}, etc.), functions can be defined to only accept certain constructors, and we can make sure the whole structure is well typed.
+The main data structure I use to represent distributions is GADT - a generalised algebraic data type. GADTs are similar to ADTs (sum types), in that they have a set of constructors, but the main difference is that these constructors can have their output types annotated. The fact that the return types of constructors can vary is what makes GADTs more general than normal ADTs, whose return types are all the same. In OCaml, the syntax for this is \mintinline{ocaml}|type _ t = Constructor : a_type' -> a_type' t ...| . Since we can now know which constructors produce which concrete types of t (e.g. an \texttt{int t} or a \texttt{float t}, etc.), functions can be defined to only accept certain constructors, and we can make sure the whole structure is well typed.
 
 Type inference for GADTs is undecidable, and so type inference often fails when pattern matching on GADTs, especially for recursive functions. I often need to annotate functions as being explicitly polymorphic using the syntax \mintinline{ocaml}|let f: 'a.'a t -> 'a t = fun x -> ...|.
 
@@ -90,9 +90,35 @@ It has been shown that probability distributions form a monad, \cite{giry1982cat
 
 \subsubsection{Custom let operators}
 Ocaml 4.08 allows me to define definitions for custom let operators. This is used to provide syntactic sugar for working with monads, and is similar to do-notation in Haskell. The reference documentation \footnote{\url{http://caml.inria.fr/pub/distrib/ocaml-4.08/ocaml-4.08-refman.html}} outlines this, and a monad should provide a module which implements the (let*) and (and*) operators. The (let*) operator is the standard bind function - here it takes the identifier bound to as the first argument to the function in bind. The (and*) operator is the product operation, it takes two monads and returns the monad pair - it has signature \texttt{'a m -> 'b m -> ('a*'b) m}, where m is the monad type. An example, using the Option monad is given below to show the transformation that takes place. This syntax allows the user to not have to use the bind (or the alias \texttt{>>=}) explicitly, and offers a more intuitive syntax.
-	
-% TODO: split into two side by side panes
-\ocamlcode{code_snippets/let_syntax.ml}
+
+% \begin{noindent}
+\begin{figure}[!htb]
+	\centering														
+	\begin{minipage}{0.45\textwidth}
+		\centering
+		\begin{ocamlcode-in}
+open Option
+(* new syntax *)
+let add_options x y = 
+  let* a = x in
+  let* b = y in
+  x+y
+		\end{ocamlcode-in}
+	\end{minipage}
+	\begin{minipage}{0.45\textwidth}
+		\centering
+\begin{ocamlcode-in}
+open Option
+(* old syntax *)
+let add_options x y = 
+  x >>= (fun a -> 
+      y >>= (fun b ->
+          a+b))
+\end{ocamlcode-in}
+	\end{minipage}
+	\captionof{listing}{New let syntax which makes monadic binds easier to express}
+\end{figure}
+% \end{noindent}
 
 \subsection{Modules}
 The module system is a key feature of the OCaml language. Every function in OCaml is in a module, by default the name of the file it resides in. Modules can also have signatures, which define what code is visible to a user, and constrain the module. This allows modules to hide types and implementations to provide a clean API. Modules are often used to wrap a particular type, for example a list or map. This means that to create or manipulate that type, the user must go through the modules API, ensuring only permitted operations are carried out. This is a feature I've used in designing distribution types. Modules can also be dynamically created from other modules, using functors, which are functions from modules to modules. This technique is used extensively in the Core library, and it allows modules to be customised and extended.
@@ -158,7 +184,7 @@ For discrete posterior distributions it can be thought of as calculating the pro
 	
 Since exact inference is too difficult in practice, we usually have to resort to \textit{Monte Carlo} \cite{monte-carlo} methods.
 	
-One such method, rejection sampling, is a very simple inference method which uses another distribution which \textit{can} be sampled from. We take samples from this proposal distribution, and either accept or reject them. How likely we are to accept or reject a sample depends on the pdf of this proposal distribution. It can be shown that samples taken using this method converge to the required distribution \cite{}.
+One such method, rejection sampling, is a very simple inference method which uses another distribution which \textit{can} be sampled from. We take samples from this proposal distribution, and either accept or reject them. How likely we are to accept or reject a sample depends on the pdf of this proposal distribution. It can be shown that samples taken using this method converge to the required distribution \cite{flury1990acceptance}. 
 	
 \subsection{Importance Sampling}
 	
@@ -180,10 +206,10 @@ MCMC algorithms have the same basic structure - to first `run' the chain for a b
 SMC methods are algorithms which are based on using large numbers of weighted samples (`particles') to represent a posterior distribution. SMC methods are also known as particle filters. A particle is a value paired with an unnormalised weight which represents the likelihood of that value in the distribution. These particles are updated when data is observed and re-sampled from in order to converge the set of particles to the posterior.
 	
 For a set of weighted particles, 
-$${\{(x^{[i]}, w^{[i]})\}}_{1=1..N}$$
-the pdf of the posterior is represented by
+$${\{(x^{[i]}, w^{[i]})\}}_{i=1..N}$$
+the pdf of this distribution is represented by
 
-\[ \scalebox{2}
+\[
 	p(x) = \sum_{i=1}^{N}w^{[i]}\delta_{x^{[i]}}(x)
 \]
 where $\delta$ is the Dirac distribution

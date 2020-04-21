@@ -21,25 +21,54 @@ To show how my PPL would be used on real problems, I now outline a set of exampl
 \subsection{Sprinkler}
 % to show exact inference on discrete model
 The sprinkler model is a commonly used example in Bayesian inference due to it's simplicity. It is an example of a \textit{Bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}. The code in listing \ref{lst:sprinkler} shows the model in the diagram encoded as a program. This particular program can be used (by applying an inference function) to find the probability of rain given that the grass is wet.
-	
 
-\begin{listing}[!ht]
-	\ocamlcode{code_snippets/sprinkler.ml}	
-	\caption{Sprinkler model}
-	\label{lst:sprinkler}
-\end{listing}
-
-\begin{figure}[!htb]
+% \begin{noindent}
+\begin{figure*}[!htb]
 	\centering
-	\includegraphics[width=0.5\textwidth]{figs/sprinkler-network.png}
-	\caption{Bayesian Network example}
-	\label{fig:sprinkler-network}
-\end{figure}
+	\begin{minipage}{0.47\linewidth}
+		\ocamlcode{code_snippets/sprinkler.ml}	
+		\captionof{listing}{Sprinkler model in code}
+		\label{lst:sprinkler}						
+	\end{minipage}
+	\begin{minipage}{0.47\linewidth}
+		\includegraphics[width=\linewidth]{figs/sprinkler-network.png}
+		\captionof{figure}{Sprinkler model as a network}
+		\label{fig:sprinkler-network}
+		\vspace{0.3cm}
+		\begin{ocamlcode-in}
+let () =
+  exact_inference sprinkler_model
+  |> print_exact_bool
+(*false: 0.13706 true: 0.86294*)
+		\end{ocamlcode-in}
+		\captionof{listing}{Output of inference}
+		\label{lst:inf-output}					
+	\end{minipage}
+	\begin{minipage}{0.47\linewidth}
+	\end{minipage}
+	
+	% \caption{}
+	% \label{}
+\end{figure*}
+% \end{noindent}
+
+% \begin{listing}[!ht]
+% 	\ocamlcode{code_snippets/sprinkler.ml}	
+% 	\caption{Sprinkler model}
+% 	\label{lst:sprinkler}
+% \end{listing}
+
+% \begin{figure}[!htb]
+% 	\centering
+% 	\includegraphics[width=0.5\textwidth]{figs/sprinkler-network.png}
+% 	\caption{Bayesian Network example}
+% 	\label{fig:sprinkler-network}
+% \end{figure}
 
 \subsection{Biased Coin} \label{sec:coin} 
 % to show analytically solvable continuous distribution
 % include graph of beta compared to computed posterior
-Modelling a biased coin shows an example of a very simple model with a continuous posterior that can be calculated analytically\cite{datasci}. 
+Modelling a biased coin shows an example of a very simple model with a continuous posterior that can be calculated analytically \cite{datasci}. 
 % 
 The model is of a coin that is tossed $n$ times to give $x$ heads. We do not know if the coin is biased or not, and would like to find out the bias, $p$ of the coin, where $p$ is the probability of heads, with $p=0.5$ being an unbiased coin.
 % 
@@ -52,6 +81,7 @@ The program in my PPL is shown in listing \ref{lst:coin}, and demonstrates setti
 	\caption{Coin model}
 	\label{lst:coin}
 \end{listing}
+
 
 \begin{figure}[!htb]
 	\begin{minipage}{0.5\textwidth}
@@ -107,9 +137,7 @@ $H_1:$ The sample data do not follow the exact distribution
 
 \subsection{Chi-squared}
 
-The $\chi^2$ test is a simple goodness-of-fit test which can test whether or not a given discrete distribution 
-
-The test statistic is as follows, with each $i$ being a distinct element in the distribution, $x_i$ is the observed number of samples with the value $i$, and $m_i$ is the expected number of samples for the value $i$.
+The $\chi^2$ test is a simple goodness-of-fit test which can test whether or not a given discrete distribution. The test statistic is as follows, with each $i$ being a distinct element in the distribution, $x_i$ is the observed number of samples with the value $i$, and $m_i$ is the expected number of samples for the value $i$.
 
 $$X^{2}=\sum _{i=1}^{k}{\frac {(x_{i}-m_{i})^{2}}{m_{i}}}$$
 
@@ -164,90 +192,36 @@ The continuous version is similar, with $p$ and $q$ now being density functions 
 $${D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx$$ \label{eq:kl_cont}
 
 % Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins to approximate $q(x)$. I then used Monte Carlo integration to compute the integral. 
-Since I only have a set of samples from $q$, this integral can't be calculated exactly - there is no exact density function. However, there are ways to estimate density functions, as in (Perez 2008) \cite{perez2008kullback}. The first step is to approximate the cdf by finding the empirical cdf ($P_e$) then linearly interpolating between points to produce a continuous function ($P_c$). Estimating the derivative of $P_c$ then gives the pdf, $\hat{P}$. The final estimator \eqref{eq:final_kl_est} is given by using the exact pdf of $q$ and performing Monte Carlo integration.
+Since I only have a set of samples from $q$, this integral can't be calculated exactly - there is no exact density function. However, there are ways to estimate density functions, as in (Perez 2008) \cite{perez2008kullback}. The first step is to approximate the cdf by finding the empirical cdf, $P_e$ \eqref{eq:pe} then linearly interpolating between points to produce a continuous function $P_c$ \eqref{eq:pc}. Estimating the derivative of $P_c$ then gives the pdf, $\hat{P}$ \eqref{eq:phat}. 
 
-\begin{gather}
-	P_e(x) = \frac1{n}\sum_{i=1}^n U(x-x_i)\text{ where U is the step function}\\
-	P_c(x) = \begin{cases}
-	0    & x<x_0                  \\
-	a_ix+b_i & x_{i-1} \leq x \le x_i \\
-	1    & x_{n+1} \leq x         
-	\end{cases}\\
-	\hat{P}(x) = \frac{P_c(x+\delta) - P_c(x)}{\delta} \text{ for sufficiently small }\delta\\
-	\hat{D}_{KL}(P \| Q) = \frac1{n}\sum_{i=1}^n \log\left(\frac{\hat{P}(x_i)}{q(x_i)}\right)\\ \label{eq:final_kl_est}
-\end{gather}
+\begin{align}
+	P_e(x)     & = \frac1{n}\sum_{i=1}^n U(x-x_i) ,        & \text{ where U is the step function}\label{eq:pe}      \\ 
+	P_c(x)     & = \begin{cases}                                                                                
+	0          & x<x_0                                                                                          \\
+	a_ix+b_i   & x_{i-1} \leq x \le x_i                                                                         \\
+	1          & x_{n+1} \leq x                                                                                 
+	\end{cases} \label{eq:pc} ,& \text{$a_i$ and $b_i$ chosen to make $P_c$ continuous }\\ 
+	\hat{P}(x) & = \frac{P_c(x+\delta) - P_c(x)}{\delta} , & \text{ for sufficiently small }\delta  \label{eq:phat} 
+\end{align}
 % 
+The final estimator \eqref{eq:final_kl_est} is given by using the exact pdf of $q$ and performing Monte Carlo integration.
+
+\begin{equation}
+	\label{eq:final_kl_est}
+	\hat{D}_{KL}(P \| Q) = \frac1{n}\sum_{i=1}^n \log\left(\frac{\hat{P}(x_i)}{q(x_i)}\right) 
+\end{equation}
+
 Both the metrics (discrete and continuous) were computed with code written using the \texttt{EmpiricalDist} modules.
 
 The idea behind conducting this test is ensuring that the KL divergence decreases as we take more samples from the posterior. This ensures that the solution converges to the correct distribution - a KL divergence of 0 implies the distributions are identical.
 
-Figure \ref{fig:kl} shows the results of this. For each inference procedure, we can see that the KL-divergence for each model decreases as we take more samples. In the case of the sprinkler model, there is a rise near the end, but this can be attributed to noise since the KL-divergence is actually lowest for that model, implying that inference performed best for it.
+Figure \ref{fig:kl} shows the results of this test. For each inference procedure, we can see that the KL-divergence for each model generally decreases as we take more samples. Rejection sampling is consistently the worst performing inference procedure, with particle based methods such as smc or importance sampling generating more accurate distributions.
+
+In the case of the sprinkler model, there is a rise near the end, but this can be attributed to noise since the KL-divergence is actually lowest for that model, implying that inference performed best for it. 
 
 \begin{figure}[!ht]
 	\centering
-	\begin{tikzpicture}
-		\pgfplotstableread[col sep = comma]{data/kl/kl_coin_all.csv}\datatable
-		\pgfplotstablegetcolsof{\datatable}
-		\pgfmathtruncatemacro\numberofcols{\pgfplotsretval-1}
-		\begin{loglogaxis}[
-				title={Coin model}, 
-				xlabel={number of samples}, 
-				ylabel={KL divergence},
-				width=0.45\textwidth,
-				legend style={at={(0.5,-0.28)},
-					anchor=north,legend columns=-1}
-			]
-			\addplot table [x index=0, y index=1, col sep=comma] {data/kl/coin_mh.csv};
-			\addlegendentry{mh}
-			% 
-			% \addplot table [x index=0, y index=1, col sep=comma] {data/kl/coin_rej.csv};
-			% \addlegendentry{rejection}
-			% 
-			\addplot table [x index=0, y index=1, col sep=comma] {data/kl/coin_imp.csv};
-			\addlegendentry{importance}
-			% 
-			\addplot table [x index=0, y index=1, col sep=comma] {data/kl/coin_smc.csv};
-			\addlegendentry{smc}
-			% 
-			% \pgfplotsinvokeforeach{1,...,\numberofcols}{
-			% 	\addplot table [x index=0,y index=#1, col sep=comma] {data/kl/kl_coin_all.csv};
-			% 	\pgfplotstablegetcolumnnamebyindex{#1}\of{\datatable}\to{\colname}
-			% 	\addlegendentryexpanded{\colname}
-			% }
-		\end{loglogaxis}
-	\end{tikzpicture}
-	\begin{tikzpicture}
-		\pgfplotstableread[col sep = comma]{data/kl/kl_sprinkler_all.csv}\datatable
-		\pgfplotstablegetcolsof{\datatable}
-		\pgfmathtruncatemacro\numberofcols{\pgfplotsretval-1}
-		\begin{loglogaxis}[
-				title={Sprinkler model}, 
-				xlabel={number of samples}, 
-				ylabel={KL divergence},
-				width=0.45\textwidth,
-				legend style={at={(0.5,-0.28)},
-					anchor=north,legend columns=-1}
-			]
-			\addplot table [x index=0, y index=1, col sep=comma] {data/kl/sprinkler_mh.csv};
-			\addlegendentry{mh}
-			% 
-			% \addplot table [x index=0, y index=1, col sep=comma] {data/kl/sprinkler_rej.csv};
-			% \addlegendentry{rejection}
-			% 
-			\addplot table [x index=0, y index=1, col sep=comma] {data/kl/sprinkler_imp.csv};
-			\addlegendentry{importance}
-			% 
-			\addplot table [x index=0, y index=1, col sep=comma] {data/kl/sprinkler_smc.csv};
-			\addlegendentry{smc}
-			% 
-																																																																																																																																																																																																																																																																																																						
-			% \pgfplotsinvokeforeach{1,...,\numberofcols}{
-			% 	\addplot table [x index=0,y index=#1, col sep=comma] {data/kl/kl_sprinkler_all.csv};
-			% 	\pgfplotstablegetcolumnnamebyindex{#1}\of{\datatable}\to{\colname}
-			% 	\addlegendentryexpanded{\colname}
-			% }
-		\end{loglogaxis}
-	\end{tikzpicture}
+	\input{chapters/tikz/kl_plot.tex}
 	\caption{Plot of KL-divergence with increasing number of samples for different models and inference procedures}
 	\label{fig:kl}
 \end{figure}
@@ -261,66 +235,58 @@ I evaluated the performance of my ppl against Anglican, WebPPL, and Pyro. All of
 
 Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares against these languages for a range of models and inference procedures. All the models have been introduced previously, and have been shown to produce correct results in my PPL when using the given inference procedures. I measure both running time and peak memory usage.
 
-\newcommand{\perfgraph}[3]{
-	\begin{tikzpicture}
-		\pgfplotstableread[col sep = comma]{#1}\datatable
-		\pgfplotstablegetcolsof{\datatable}
-		\pgfmathtruncatemacro\numberofcols{(\pgfplotsretval-1)*0.5}
-		\begin{axis}[
-				ylabel={#3},
-				ymin=0,
-				legend style={at={(0.5,-0.15)},
-					anchor=north,legend columns=-1},
-				ybar,
-				xtick=data,
-				xticklabels from table={\datatable}{model},
-				title={#2},
-				width=0.45\textwidth
-			]
-			\pgfplotsinvokeforeach{1,...,\numberofcols}{
-				\pgfmathtruncatemacro\e{##1 + \numberofcols}
-				\pgfplotstablegetcolumnnamebyindex{##1}\of{\datatable}\to{\colname}
-				\addplot+[error bars/.cd, y dir=both, y explicit,  error bar style={color=black}] table [x expr=\coordindex,y index=##1, col sep=comma, y error index=\e] {#1};
-				\addlegendentryexpanded{\colname}
-			}
-		\end{axis}
-	\end{tikzpicture}%
-}
+% \newcommand{\perfgraph}[3]{
+% 	\begin{tikzpicture}
+% 		\pgfplotstableread[col sep = comma]{#1}\datatable
+% 		\pgfplotstablegetcolsof{\datatable}
+% 		\pgfmathtruncatemacro\numberofcols{(\pgfplotsretval-1)*0.5}
+% 		\begin{axis}[
+% 				ylabel={#3},
+% 				ymin=0,
+% 				legend style={at={(0.5,-0.15)},
+% 					anchor=north,legend columns=-1},
+% 				ybar,
+% 				xtick=data,
+% 				xticklabels from table={\datatable}{model},
+% 				enlarge x limits={abs=0.3},
+% 				title={#2},
+% 				width=0.45\textwidth
+% 			]
+% 			\pgfplotsinvokeforeach{1,...,\numberofcols}{
+% 				\pgfmathtruncatemacro\e{##1 + \numberofcols}
+% 				\pgfplotstablegetcolumnnamebyindex{##1}\of{\datatable}\to{\colname}
+% 				\addplot+[error bars/.cd, y dir=both, y explicit,  error bar style={color=black}] table [x expr=\coordindex,y index=##1, col sep=comma, y error index=\e] {#1};
+% 				\addlegendentryexpanded{\colname}
+% 			}
+% 		\end{axis}
+% 	\end{tikzpicture}%
+% }
 			
 \begin{figure}[!ht]
-	\centering
-	% \perfgraph{data/times_mh.csv}{Metropolis-Hastings}{time (ms)}
-	% \perfgraph{data/times_smc.csv}{Particle Filter}{time (ms)}
-	% \perfgraph{data/times_rej.csv}{Rejection Sampling}{time (ms)}
-																																															
-	\perfgraph{data/times_coin.csv}{Biased Coin}{time (ms)}
-	\perfgraph{data/times_linreg.csv}{Linear Regression}{time (ms)}
-	\perfgraph{data/times_hmm.csv}{Hidden Markov Model}{time (ms)}
-	\perfgraph{data/times_sprinkler.csv}{Sprinkler}{time (ms)}
-																																															
+	\centering																									
+	\input{chapters/tikz/times_plot.tex}
 	\caption{Performance of my ppl against other languages for different models and inference algorithms, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:time-perf}
 \end{figure}
 			
 \begin{figure}[!ht]
 	\centering
-	% TODO: ADD ERROR BARS for maybe 95% confidence interval - use ppl to generate confidence interval 
-	% \perfgraph{data/mems_mh.csv}{Metropolis-Hastings}{memory usage (bytes)}
-	% \perfgraph{data/mems_smc.csv}{Particle Filter}{memory usage (bytes)}
-	% \perfgraph{data/mems_rej.csv}{Rejection Sampling}{memory usage (bytes)}
-																																																	
-	\perfgraph{data/mems_coin.csv}{Biased Coin}{memory usage (bytes)}
-	\perfgraph{data/mems_linreg.csv}{Linear Regression}{memory usage (bytes)}
-	\perfgraph{data/mems_hmm.csv}{Hidden Markov Model}{memory usage (bytes)}
-	\perfgraph{data/mems_sprinkler.csv}{Sprinkler}{memory usage (bytes)}
-																																																	
-																																																	
+	\input{chapters/tikz/mems_plot.tex}																									
 	\caption{Memory Usage of my ppl, compared against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:mem-perf}
 \end{figure}
 			
 These graphs show that my PPL performs reasonably well compared to webPPL in both memory and time. It is less efficient for some models, but not excessively so. In particular, my implementation of a particle filter performs relatively poorly. This is possibly because when using a large number of particles, a large number of small memory allocations are made by OCaml, which introduced overhead both to my program and the garbage collector. The languages I compare with are both also garbage collected, but may be more optimised for this use case. Anglican is a Clojure library, which runs on the JVM, whereas WebPPL is run using nodejs, a JavaScript interpreter. It is possible there is an interpretive overhead with webPPL, explaining slower running times - however based on my results, it is not significant.
-			
+
+I also measured the running time of inference with increased data used - I test the clustering and linear regression models, increasing the length of the arrays used as input. Models which are conditioned on more data are expected to give more accurate results, and my results show that running time increases linearly with the size of data. 
+
+\begin{figure}[!ht]
+	\centering
+	\input{chapters/tikz/linreg_by_datasize.tex}
+	\caption{Time taken for inference as a function of input data length}
+	\label{fig:mem-perf}
+\end{figure}
+
 % For sequential Monte Carlo algorithms, I compared running times with regards to the number of particles used.
 			
 % don't have just one subsection

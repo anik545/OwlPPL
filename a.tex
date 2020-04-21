@@ -1,0 +1,39 @@
+\documentclass[12pt,notitlepage,a4paper]{report}
+
+\usepackage[outputdir=out]{minted}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{verbatim}
+\usepackage{csvsimple}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepackage{tikz}
+\usepackage[hidelinks]{hyperref}
+\usepackage[parfill]{parskip}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{upquote}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage[margin=2cm,headheight=13.6pt]{geometry}
+\usepackage{microtype}
+\usepackage{longtable,booktabs}
+\usepackage{amssymb,amsmath}
+\usepackage{subfig}
+% \usepackage{tikzscale}
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.13}
+
+%TC:ignore
+\begin{document}
+\begin{figure}[]
+	\centering
+	\input{chapters/tikz/linreg_by_datasize.tex}
+	% \input{chapters/tikz/kl_plot.tex}
+	% \includegraphics[width=\textwidth]{chapters/tikz/kl_plot.tikz}
+	\caption{}
+	\label{}
+\end{figure}
+\end{document}

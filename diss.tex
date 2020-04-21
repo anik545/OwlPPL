@@ -15,24 +15,25 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{upquote}
-\usepackage{subfig}
 \usepackage{amsmath}
 \usepackage{xcolor}
 \usepackage[margin=2cm,headheight=13.6pt]{geometry}
 \usepackage{microtype}
+\usepackage[margin=10pt,font=small,labelfont=bf,labelsep=endash,textfont=it]{caption}
 \usepackage{longtable,booktabs}
 \usepackage{amssymb,amsmath}
+\usepackage{subfig}
+\usepackage{dirtree}
+\usepackage{wrapfig}
+\usepgfplotslibrary{groupplots}
 \pgfplotsset{compat=1.13}
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
-\newmintedfile[ocamlcode]{ocaml}{frame=single,framesep=10pt}
-\newmintedfile[jscode]{javascript}{frame=single,framesep=10pt}
-\newmintedfile[clojurecode]{javascript}{frame=single,framesep=10pt}
-% \newcommand{\ocamlcode}[1]{}
-\newminted[ocamlcode-in]{ocaml}{frame=single,framesep=10pt}
+\setminted{fontsize=\small}
+\newmintedfile[ocamlcode]{ocaml}{frame=single,framesep=7pt}
+
+\newmintedfile[jscode]{js}{frame=single,framesep=7pt}
+\newmintedfile[clojurecode]{clj}{frame=single,framesep=7pt}
+\newminted[ocamlcode-in]{ocaml}{frame=single,framesep=7pt,autogobble}
 
 \DeclareUnicodeCharacter{2060}{\nolinebreak}
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
