@@ -1,65 +1,61 @@
 open Ppl
 open Core
-open Single_coin
 
-(* open Sprinkler *)
-
-open Ppl
-open Core
+let moving_average n arr =
+  let l = Array.to_list arr in
+  let n = float_of_int n in
+  let open Float in
+  if float_of_int (List.length l) < n then failwith "List is too small"
+  else
+    let rec aux2 acc i = function
+      | hd :: tl when i < n -> aux2 (acc + hd) (i + 1.) tl
+      | _ -> acc / n
+    in
+    let rec aux acc l =
+      match l with
+      | [] -> List.rev acc
+      | _ :: tl ->
+          let avgn = aux2 0. 0. l in
+          if float_of_int (List.length tl) < n then List.rev (avgn :: acc)
+          else aux (avgn :: acc) tl
+    in
+    List.to_array @@ aux [] l
 
 let one_col_mat xs = Owl.(Mat.of_array xs (Array.length xs) 1)
 
 let one_row_mat xs = Owl.(Mat.of_array xs 1 (Array.length xs))
 
-(* let test =
-   let open Owl_plplot in
-   let h = Plot.create ~m:1 ~n:2 "a.png" in
-   let d = infer Single_coin.single_coin (MH(100)) in
-   (* let d = beta 10. 2. in *)
-   let d' = Primitive.beta 10. 2. in
-
-   let emp = CSamples.from_dist ~n:100000 d in
-   Plot.subplot h 0 0;
-   Plot.plot_fun ~h (CSamples.to_pdf emp) (0.) 1.;
-   Plot.plot_fun ~h (Primitive.(pdf d')) (0.) 1.;
-
-   Plot.subplot h 0 1;
-   Plot.plot_fun ~h (CSamples.to_cdf emp) (0.) 1.;
-   Plot.plot_fun ~h (Primitive.(cdf d')) (0.) 1.;
-
-   Plot.output h
-
-   let () = exit 0 *)
-
-(* let x_vals = Array.init 3 ~f:(fun i->50*i+10) *)
-
 let x_vals =
   Array.map ~f:int_of_float
-  @@ Owl.Arr.to_array (Owl.Arr.logspace ~base:10. 2. 4. 50)
-
-(* let xs =
-   Evaluation.kl_cum_continuous x_vals exact_coin (infer single_coin (MH 1000)) *)
+  @@ Owl.Arr.to_array (Owl.Arr.logspace ~base:10. 2. 4.2 100)
 
 let xs =
   Evaluation.kl_cum_discrete x_vals Sprinkler.grass_model_exact
-    (infer Sprinkler.grass_model'' (MH 1000))
+    (infer Sprinkler.grass_model'' (RejectionTrans (100, Soft)))
 
 let () = Array.iter ~f:(fun (x, y) -> printf "%d,%f\n" x y) xs
 
 let ( @@@ ) = Fn.compose
 
+let mov len xs =
+  let xs = Array.map ~f:fst xs in
+  let xs' = Array.sub xs ~pos:0 ~len:(Array.length xs - (len - 1)) in
+  let ys = Array.map ~f:snd xs in
+  let ys' = moving_average len ys in
+  (Array.zip_exn xs', ys')
+
 let () =
   let open Owl_plplot in
   let h = Plot.create "b.png" in
-  Plot.loglog ~h
-    ~x:(one_col_mat (Array.map ~f:(fun x -> float_of_int (fst x)) xs))
-    (one_col_mat (Array.map ~f:(abs_float @@@ snd) xs));
+  let x =
+    one_col_mat
+      ( Array.sub ~pos:0 ~len:(Array.length xs - (10 - 1))
+      @@ Array.map ~f:(float_of_int @@@ fst) xs )
+  in
+  let y =
+    one_col_mat (moving_average 10 @@ Array.map ~f:(Float.abs @@@ snd) xs)
+  in
+  Plot.loglog ~h ~x y;
   Plot.output h
 
 let () = printf "\n"
-
-(* let xs =
-   Evaluation.kl_cum_discrete x_vals grass_model_exact
-    (infer grass_model'' (SMC(100)))
-
-   let () = Array.iter ~f:(fun (x, y) -> printf "%d,%f\n" x y) xs *)

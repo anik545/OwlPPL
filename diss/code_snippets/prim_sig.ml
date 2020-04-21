@@ -3,5 +3,4 @@ module type PRIM_DIST = sig
   val sample: unit -> t
   val pdf: t -> float
   val cdf: t -> float 
-  val support: t support
 end

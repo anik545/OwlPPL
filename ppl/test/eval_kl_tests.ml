@@ -3,9 +3,36 @@
 open Ppl
 open Core
 
+let moving_average n arr =
+  let l = Array.to_list arr in
+  let n = float_of_int n in
+  let open Float in
+  if float_of_int (List.length l) < n then failwith "List is too small"
+  else
+    let rec aux2 acc i = function
+      | hd :: tl when i < n -> aux2 (acc + hd) (i + 1.) tl
+      | _ -> acc / n
+    in
+    let rec aux acc l =
+      match l with
+      | [] -> List.rev acc
+      | _ :: tl ->
+          let avgn = aux2 0. 0. l in
+          if float_of_int (List.length tl) < n then List.rev (avgn :: acc)
+          else aux (avgn :: acc) tl
+    in
+    List.to_array @@ aux [] l
+
+let mov len xs =
+  let xs = Array.map ~f:fst xs in
+  let xs' = Array.sub xs ~pos:0 ~len:(Array.length xs - (len - 1)) in
+  let ys = Array.map ~f:snd xs in
+  let ys' = moving_average len ys in
+  (Array.zip_exn xs', ys')
+
 (* This stuff runs kl divergence function on models *)
 (* let x_vals = [|100;500;1000;10000|] *)
-let x_vals = Owl.Arr.to_array (Owl.Arr.logspace ~base:10. 2. 4. 5)
+let x_vals = Owl.Arr.to_array (Owl.Arr.logspace ~base:10. 2. 5. 1000)
 
 let x_vals = Array.map x_vals ~f:(fun x -> int_of_float x)
 
@@ -36,15 +63,31 @@ let gen_csv ?fname model exact infer_strat kl_method =
       arr
   | None -> arr
 
-let gen_csv' ?fname model exact infer_strats
-    (kl_method : ?n:int -> 'a Primitive.t -> 'a dist -> likelihood) =
+let gen_csv' ?fname ?(window = 1) model exact infer_strats kl_method =
+  let x_vals =
+    Owl.Arr.to_array (Owl.Arr.logspace ~base:10. 2. 5. 100)
+    |> Array.map ~f:(fun x -> int_of_float x)
+  in
+
   let inferreds = Array.map ~f:(fun i -> infer model i) infer_strats in
   let arr =
-    Array.transpose
-    @@ Array.map inferreds ~f:(fun inf ->
-           Array.map x_vals ~f:(fun n -> kl_method ~n exact inf))
+    Array.transpose_exn
+    @@ Array.mapi inferreds ~f:(fun i inf ->
+           printf "\n%s%!" (show_infer_strat infer_strats.(i));
+           match kl_method with
+           | Cumulative kl_method ->
+               moving_average window
+               @@ Array.map ~f:(fun (a, b) ->
+                      printf "%d\n" a;
+                      b)
+               @@ kl_method x_vals exact inf
+           | Not_Cumulative kl_method ->
+               Array.map x_vals ~f:(fun n -> kl_method ~n exact inf)
+           (* Array.map x_vals ~f:(fun n -> kl_method ~n exact inf) *))
   in
-  let arr = Option.value_exn arr in
+  let x_vals =
+    Array.sub x_vals ~pos:0 ~len:(Array.length x_vals - (window - 1))
+  in
   match fname with
   | Some name ->
       let name = sprintf "%s/%s" root_dir name in
@@ -71,29 +114,31 @@ open Models
 (* let _ = gen_csv ~fname:"coin_imp.csv" single_coin single_coin_exact (Importance 500) Evaluation.kl_continuous *)
 (* let _ = gen_csv ~fname:"coin_smc.csv" single_coin single_coin_exact (SMC 500) Evaluation.kl_continuous *)
 
-(* let is = [|MH 500;Rejection(300,Soft);Importance 500;SMC 500|] *)
-(* let _ = gen_csv' ~fname:"kl_coin_all.csv" single_coin single_coin_exact is Evaluation.kl_continuous *)
+let is = [| MH 500; Rejection (300, Soft); Importance 500; SMC 100 |]
+
+let _ =
+  gen_csv' ~fname:"kl_coin_all.csv" ~window:5 single_coin single_coin_exact is
+    (Cumulative Evaluation.kl_cum_continuous)
 
 (* sprinkler *)
-let _ =
-  gen_csv ~fname:"sprinkler_mh.csv" grass_model grass_model_exact (MH 500)
+(* let _ =
+   gen_csv ~fname:"sprinkler_mh.csv" grass_model grass_model_exact (MH 500)
     (Cumulative Evaluation.kl_cum_discrete)
 
-let _ =
-  gen_csv ~fname:"sprinkler_rej.csv" grass_model grass_model_exact
+   let _ =
+   gen_csv ~fname:"sprinkler_rej.csv" grass_model grass_model_exact
     (Rejection (300, Soft))
     (Cumulative Evaluation.kl_cum_discrete)
 
-let _ =
-  gen_csv ~fname:"sprinkler_imp.csv" grass_model grass_model_exact
+   let _ =
+   gen_csv ~fname:"sprinkler_imp.csv" grass_model grass_model_exact
     (Importance 500) (Cumulative Evaluation.kl_cum_discrete)
 
-let _ =
-  gen_csv ~fname:"sprinkler_smc.csv" grass_model grass_model_exact (SMC 500)
-    (Cumulative Evaluation.kl_cum_discrete)
+   let _ =
+   gen_csv ~fname:"sprinkler_smc.csv" grass_model grass_model_exact (SMC 500)
+    (Cumulative Evaluation.kl_cum_discrete) *)
 
-(* let is = [|MH 500;Rejection(300,Soft);Importance 500;SMC 500|] *)
-(* let _ = gen_csv' ~fname:"kl_sprinkler_all.csv" grass_model grass_model_exact is Evaluation.kl_discrete *)
+(* let _ = gen_csv' ~fname:"kl_sprinkler_all.csv" ~window:10 grass_model grass_model_exact is (Cumulative Evaluation.kl_cum_discrete) *)
 
 (* This stuff tests that the kl divergence function works *)
 let test_kl_function () =

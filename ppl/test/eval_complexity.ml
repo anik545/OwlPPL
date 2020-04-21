@@ -1,13 +1,13 @@
 open Ppl
 open Core
 
-let root_dir = "/home/anik/Files/work/project/diss/data"
+let root_dir = "/home/anik/Files/work/project/diss/data/"
 
 let string_of_float f = sprintf "%.15f" f
 
 (* save a string matrix (2d array) as a csv file *)
 let write_to_csv ~fname data =
-  let oc = Out_channel.create fname in
+  let oc = Out_channel.create (root_dir ^ fname) in
   Array.iter data ~f:(fun line ->
       Array.iter line ~f:(fprintf oc "%s,");
       fprintf oc "\n");
@@ -46,10 +46,24 @@ let by_particles model inf =
 
 let map_2d arr ~f = Array.map arr ~f:(fun a -> Array.map a ~f)
 
+(* generate data to condition on, memoise to ensure same lists are used *)
+let list_gen =
+  memo (fun n ->
+      List.init n ~f:(fun n ->
+          let n = float_of_int n in
+          (n, (n *. 2.) +. 1.)))
+
 let by_data_length_linreg () =
   (* lengths of data *)
-  let ns = Owl.Arr.to_array @@ Owl.Arr.logspace ~base:10. 2. 4. 5 in
-  let infs = [| Rejection (100, Soft); Importance 100; MH 500; SMC 100 |] in
+  let ns = Owl.Arr.to_array @@ Owl.Arr.linspace 1. 1000. 5 in
+  let infs =
+    [|
+      Rejection (100, Soft);
+      Importance 100
+      (* MH 500;  *)
+      (* SMC 100  *);
+    |]
+  in
 
   let header =
     Array.append [| "n" |] (Array.map infs ~f:print_infer_strat_short)
@@ -88,4 +102,9 @@ let by_data_length_linreg () =
    by_particles Models.single_coin (fun n -> PIMH n)
    |> write_to_csv ~fname:"pimh_by_particles" *)
 
-let () = by_data_length_linreg () |> write_to_csv ~fname:"linreg_by_data_length"
+(* let x = sample_mean ~n:20 @@ fmap fst3 @@ infer (Models.linreg (list_gen(100000))) (MH 500) *)
+(* let x = sample_mean ~n:20000 @@ infer (Models.single_coin) (MH 10000) *)
+(* let ()  = printf "%f\n" @@ x *)
+
+let () =
+  by_data_length_linreg () |> write_to_csv ~fname:"linreg_by_data_length.csv"

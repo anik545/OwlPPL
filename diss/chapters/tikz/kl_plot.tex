@@ -1,0 +1,52 @@
+% !TeX root = ../../a.tex
+
+\newcommand{\kls}[1]{
+																			
+	\pgfplotstableread[col sep = comma]{#1}\datatable
+	\pgfplotstablegetcolsof{\datatable}
+	\pgfmathtruncatemacro\numberofcols{\pgfplotsretval-1}
+	\pgfplotsinvokeforeach{1,...,\numberofcols}{
+		\addplot table [x index=0,y index=##1, col sep=comma] {#1};
+		\pgfplotstablegetcolumnnamebyindex{##1}\of{\datatable}\to{\colname}
+		\addlegendentryexpanded{\colname}
+	}
+}
+
+\begin{tikzpicture}
+	\begin{groupplot}[			
+			group style={
+				group name=my plots,
+				group size=2 by 1,
+				ylabels at=edge left,
+				xlabels at=edge bottom, 
+				vertical sep=1.8cm,
+				horizontal sep=1.1cm,
+			},
+			no markers,
+			every axis plot/.append style={thick},
+			width=0.5\textwidth,
+			height=8cm,
+			ylabel={KL divergence},
+			xlabel={Number of samples},
+			ymode=log, 
+			xmode=log
+		]
+		%
+		\nextgroupplot[title=Coin model, legend to name=leg1]
+		\coordinate (c1) at (rel axis cs:0,1);
+		\kls{data/kl/kl_coin_all.csv}
+		% \addplot table [x index=0, y index=1, col sep=comma] {data/kl/coin_mh.csv};
+		% \addlegendentry{mh}
+		\nextgroupplot[title=Sprinkler model,
+			legend style={at={($(0,0)+(2cm,2cm)$)}, legend columns=4},
+		legend to name=leg1]
+		\coordinate (c2) at (rel axis cs:1,1);
+		\kls{data/kl/kl_sprinkler_all.csv}																									
+		% \addplot table [x index=0, y index=1, col sep=comma] {data/kl/sprinkler_mh.csv};
+		% \addlegendentry{mh}
+	\end{groupplot}
+	\coordinate (c3) at ($(c1)!.5!(c2)$);
+	\node[below] at (c3 |- current bounding box.south)
+	{\pgfplotslegendfromname{leg1}};
+																																																																	
+\end{tikzpicture}

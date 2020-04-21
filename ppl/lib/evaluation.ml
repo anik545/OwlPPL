@@ -40,13 +40,13 @@ let kl_cum_discrete ns p q =
           match pdf_q x with
           | 0. -> raise Undefined
           | q_x ->
-              printf "for %b p=%f,q=%f\n" x p_x q_x;
+              (* printf "for %b p=%f,q=%f\n" x p_x q_x; *)
               p_x *. log (p_x /. q_x)
         in
         List.sum (module Float) ~f support_q
       in
       (* TODO: is this right - should i be dividing by i? *)
-      arr.(!j) <- (!i, kl /. float_of_int !i);
+      arr.(!j) <- (!i, kl);
       j := !j + 1 )
     else ();
     i := !i + 1

@@ -44,3 +44,11 @@
  (deps
   (alias texdoc)
   (alias pdfdoc)))
+
+; (rule
+;  (alias coverage)
+;  (target coverage.html)
+;  (deps
+;   (alias test/runtest))
+;  (action
+;   (bash "bisect-ppx-html html")))
