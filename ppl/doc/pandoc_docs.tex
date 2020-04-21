@@ -72,7 +72,7 @@ A type for which values don't need to sum to 1
 A set of weighted samples, summing to one
 \end{description}
 
-\protect\hyperlink{type-dist}{}\texttt{type\ \_\ dist}\texttt{\ =\ }
+\protect\hyperlink{type-dist}{}\texttt{type\ \_\ dist}\texttt{\ =\ private\ }
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule
@@ -115,6 +115,8 @@ Operators}{Condition Operators}}\label{distux5fmonad}}
 \protect\hyperlink{val-score}{}\texttt{val\ score\ :\ likelihood\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
 
 \protect\hyperlink{val-observe}{}\texttt{val\ observe\ :\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}b\ dist\ -\textgreater{}\ \textquotesingle{}b\ dist}
+
+\protect\hyperlink{val-fromux5fprimitive}{}\texttt{val\ from\_primitive\ :\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}a\ dist}
 
 \hypertarget{distux5fmonad}{\subsubsection{\texorpdfstring{\protect\hyperlink{distux5fmonad}{}Monad
 Fsunctions}{Monad Fsunctions}}\label{distux5fmonad}}
@@ -662,12 +664,6 @@ Plots}{Other Plots}}\label{otherux5fplots}}
 \hypertarget{module-Discrete}{}
 \protect\hyperlink{module-Discrete}{}\texttt{module\ Discrete\ :\ S}
 
-\hypertarget{module-Continuous}{}
-\protect\hyperlink{module-Continuous}{}\texttt{module\ Continuous\ :\ sig\ ...\ end}
-
-\hypertarget{module-ContinuousSet}{}
-\protect\hyperlink{module-ContinuousSet}{}\texttt{module\ ContinuousSet\ :\ sig\ ...\ end}
-
 \hypertarget{module-ContinuousArr}{}
 \protect\hyperlink{module-ContinuousArr}{}\texttt{module\ ContinuousArr\ :\ sig\ ...\ end}
 
@@ -725,31 +721,40 @@ Get the set of values for the distribution
 
 \href{../index.html}{Up} -- \href{../../../index.html}{ppl} »
 \href{../../index.html}{Ppl} » \href{../index.html}{Empirical} »
-Continuous
+ContinuousArr
 
 \section{\texorpdfstring{Module
-\texttt{Empirical.Continuous}}{Module Empirical.Continuous}}\label{module-empirical.continuous}
+\texttt{Empirical.ContinuousArr}}{Module Empirical.ContinuousArr}}\label{module-empirical.continuousarr}
 
-\protect\hyperlink{type-bin}{}\texttt{type\ bin}\texttt{\ =\ float\ *\ float}
-
-\protect\hyperlink{type-element}{}\texttt{type\ element}\texttt{\ =\ float}
-
-\protect\hyperlink{type-endpoints}{}\texttt{type\ endpoints}\texttt{\ =\ }\texttt{\{}
+\protect\hyperlink{type-t}{}\texttt{type\ \textquotesingle{}a\ t}\texttt{\ =\ }\texttt{\{}
 
 \begin{longtable}[c]{@{}l@{}}
 \toprule
-\protect\hyperlink{type-endpoints.start}{}\texttt{start\ :\ float;}\tabularnewline
-\protect\hyperlink{type-endpoints.finish}{}\texttt{finish\ :\ float;}\tabularnewline
+\protect\hyperlink{type-t.samples}{}\texttt{samples\ :\ float\ array;}\tabularnewline
+\protect\hyperlink{type-t.n}{}\texttt{n\ :\ int;}\tabularnewline
+\protect\hyperlink{type-t.maxux5flength}{}\texttt{max\_length\ :\ int;}\tabularnewline
 \bottomrule
 \end{longtable}
 
 \texttt{\}}
 
-\protect\hyperlink{type-t}{}\texttt{type\ \textquotesingle{}a\ t}\texttt{\ =\ Owl\_stats.histogram}
+\protect\hyperlink{val-empty}{}\texttt{val\ empty\ :\ \textquotesingle{}a\ t}
 
-\protect\hyperlink{val-empty}{}\texttt{val\ empty\ :\ Owl\_stats.histogram}
+\protect\hyperlink{val-fromux5fdist}{}\texttt{val\ from\_dist\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ t}
 
-\protect\hyperlink{val-fromux5fdist}{}\texttt{val\ from\_dist\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ Owl\_stats.histogram}
+\protect\hyperlink{val-addux5fsample}{}\texttt{val\ add\_sample\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ float\ -\textgreater{}\ \textquotesingle{}b\ t}
+
+\protect\hyperlink{val-toux5fcdfux5farr}{}\texttt{val\ to\_cdf\_arr\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ float\ array\ *\ float\ array}
+
+\protect\hyperlink{val-toux5fpdfux5farr}{}\texttt{val\ to\_pdf\_arr\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ float\ array\ *\ float\ Core.Array.t}
+
+\protect\hyperlink{val-toux5fcdf}{}\texttt{val\ to\_cdf\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ Core.Float.t\ -\textgreater{}\ Core.Float.t}
+
+\protect\hyperlink{val-toux5fpdf}{}\texttt{val\ to\_pdf\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ Core.Float.t\ -\textgreater{}\ float}
+
+\protect\hyperlink{val-values}{}\texttt{val\ values\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ float\ Core.Array.t}
+
+\protect\hyperlink{val-print}{}\texttt{val\ print\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ Base.unit}
 
 \href{../index.html}{Up} -- \href{../../../index.html}{ppl} »
 \href{../../index.html}{Ppl} » \href{../index.html}{Empirical} » S

@@ -15,7 +15,7 @@ type 'a samples = ('a * prob) list
 (** A set of weighted samples, summing to one *)
 
 (** Type for representing distributions *)
-type _ dist =
+type _ dist = private
   | Return : 'a -> 'a dist  (** distribution with a single value *)
   (* bind is lazy since it contains a function *)
   | Bind : 'a dist * ('a -> 'b dist) -> 'b dist  (** monadic bind *)
@@ -35,6 +35,8 @@ val condition : bool -> 'a dist -> 'a dist
 val score : likelihood -> 'a dist -> 'a dist
 
 val observe : 'a -> 'a Primitive.t -> 'b dist -> 'b dist
+
+val from_primitive : 'a Primitive.t -> 'a dist
 
 (** {2:dist_monad Monad Fsunctions} *)
 
