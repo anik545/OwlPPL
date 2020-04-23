@@ -194,13 +194,26 @@ The \texttt{condition} operator is used for hard conditioning, which conditions 
 		
 % TODO: put this inline minted (not file) 
 % Also not a huge box
-\ocamlcode{code_snippets/dice_sum.ml}	
-			
+% \begin{noindent}
+\begin{ocamlcode-in}
+let* dice1 = discrete_uniform [1;2;3;4;5;6] in
+let* dice2 = discrete_uniform [1;2;3;4;5;6] in
+condition (dice1+dice2 = 4)
+	(return dice1)
+\end{ocamlcode-in}
+% \end{noindent}
+				
 This function is mostly useful for discrete models when using equality in this manner, since the probability of observing any given value in a continuous distribution is zero. However, if we are dealing with ranges, then we can use hard conditioning as in the model below, which constrains the standard normal distribution to be positive.
 
 % TODO: put this inline minted (not file) 
 % Also not a huge box
-\ocamlcode{code_snippets/half_normal.ml}
+% \begin{noindent}
+\begin{ocamlcode-in}
+	let* x = normal 0. 1. in
+	condition x > 0.
+		(return x)		
+\end{ocamlcode-in}
+% \end{noindent}
 
 For soft conditioning, for example an observation that we know comes from a certain distribution, there is an \texttt{observe} function. This function is essential for continuous distributions, since the probability of observing any one value is 0, making hard conditioning since it will just reject every trace. Instead, we can use the pdf function of the distribution to determine how likely that observation is in the model.
 
