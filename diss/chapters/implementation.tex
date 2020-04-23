@@ -92,8 +92,7 @@ let d = (normal 0. 1.) +~ (normal 0. 1.)
 % \end{noindent}
 	
 However, there are many different underlying data structures which can be used to represent distributions. The simplest is a list of pairs representing a set of values and corresponding probabilities, \texttt{('a * float) list}. This is a very convenient and natural way to represent discrete distributions, with return and bind defined as in listing \ref{lst:monad_plist}. Here, \texttt{return} gives us the distribution with just one value, and bind combines a distribution with a function that takes every element from the initial distribution and applies a function that creates a set of new distributions. The new distributions are then `flattened' and normalised. This approach has been used to create functional probabilistic languages \cite{erwig}, but has several drawbacks, primarily the fact that it cannot be used to represent continuous distributions, and that inference is not efficient - there is no information from the model encoded in this representation, such as how random variables are combined or from what distributions they came from.
-	
-% TODO: finish the snippet, write unduplicate properly
+
 \begin{listing}[!ht]
 	\ocamlcode{code_snippets/probmonad_list.ml}	
 	\caption{Simple Probability Monad}

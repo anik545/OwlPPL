@@ -1,3 +1,42 @@
 (documentation
  (package ppl)
  (mld_files index))
+
+(rule
+ (alias pdfdoc)
+ (target htmldoc_docs.pdf)
+ (mode (promote))
+ (deps
+  (alias %{workspace_root}/doc)
+  include_docs)
+ (action
+  (progn
+   (chdir
+    %{workspace_root}
+    (bash "htmldoc $(cat doc/include_docs) -t pdf -f %{target} "))
+   (bash "cp %{target} /home/anik/Files/work/project/diss/htmldocs.pdf"))))
+
+(rule
+ (alias texdoc)
+ (target pandoc_docs.tex)
+ (deps
+  (alias %{workspace_root}/doc)
+  include_docs)
+ (mode (promote))
+ (action
+  (progn
+   (chdir
+    %{workspace_root}
+    (bash "pandoc $(cat doc/include_docs) -o %{target}"))
+   (bash "cp %{target} /home/anik/Files/work/project/diss/chapters/docs.tex"))))
+
+(alias
+ (name alldocs)
+ (deps
+  (alias texdoc)
+  (alias pdfdoc)))
+
+(alias
+ (name doc)
+ (deps
+  (alias %{workspace_root}/doc)))

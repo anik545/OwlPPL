@@ -1,11 +1,13 @@
-type 'a dist = ('a, float) Core.Map.Poly.t
+type 'a dist = ('a, float) Map.Poly.t
 
 let normalize map = (* omitted *)_
+let merge_maps = (* omitted *)_
 
 let bind d f = 
-  let new_map = mapi d ~f:(fun ~key ~data -> data *. f key) in
-  normalize new_map
+  fold d ~init:empty ~f:(fun ~key ~data sofar -> 
+      Map.merge sofar (f key)) 
+      ~combine:(fun ~key -> ( *. ))
+  |> normalize
 
-let return x = 
-  let m = empty in  
-  add m x 1.
+(* create a map with a single pair, x:1 *)
+let return x = add (empty) x 1.
