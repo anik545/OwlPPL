@@ -4,7 +4,7 @@
 	\pgfplotstableread[col sep = comma]{#1}\datatable
 	\pgfplotstablegetcolsof{\datatable}
 	\pgfmathtruncatemacro\numberofcols{(\pgfplotsretval-1)*0.5}
-																																																									    
+																																																										    
 	\pgfplotsinvokeforeach{1,...,\numberofcols}{
 		\pgfmathtruncatemacro\e{##1 + \numberofcols}
 		\pgfplotstablegetcolumnnamebyindex{##1}\of{\datatable}\to{\colname}
@@ -14,7 +14,7 @@
 }
 
 \begin{tikzpicture}
-	\pgfplotstableread[col sep = comma]{data/times_coin.csv}\t														
+	\pgfplotstableread[col sep = comma]{data/perf/time/times_coin.csv}\t														
 	\begin{groupplot}[
 			group style={
 				group name=my plots,
@@ -37,19 +37,19 @@
 			legend to name=leg
 		]
 		\coordinate (c1) at (rel axis cs:0,1);
-		\perfgrapht{data/times_coin.csv}
+		\perfgrapht{data/perf/time/times_coin.csv}
 		\nextgroupplot[title=Linear Regression,
 			legend to name=leg
 		]
 		\coordinate (c2) at (rel axis cs:1,1);% I moved this to the upper right corner
-		\perfgrapht{data/times_linreg.csv}
+		\perfgrapht{data/perf/time/times_linreg.csv}
 		\nextgroupplot[title=Hidden Markov Model,
 		legend to name=leg]
-		\perfgrapht{data/times_hmm.csv}
+		\perfgrapht{data/perf/time/times_hmm.csv}
 		\nextgroupplot[title=Sprinkler,
 			legend style={at={($(0,0)+(1cm,1cm)$)},legend columns=4,fill=none,draw=black,anchor=center,align=center},
 		legend to name=leg]
-		\perfgrapht{data/times_sprinkler.csv}
+		\perfgrapht{data/perf/time/times_sprinkler.csv}
 	\end{groupplot}
 	\coordinate (c3) at ($(c1)!.5!(c2)$);
 	\node[below] at (c3 |- current bounding box.south)

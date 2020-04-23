@@ -26,6 +26,7 @@
 \usepackage{dirtree}
 \usepackage{wrapfig}
 \usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{fillbetween}
 \pgfplotsset{compat=1.13}
 
 \setminted{fontsize=\small}
@@ -94,7 +95,7 @@ I, Anik Roy of Christ's College, being a candidate for Part II of the Computer S
 I, Anik Roy of Christ's College, am content for my dissertation to be made available to the students and staff of the University. 
 
 \bigskip
-\leftline{Signed [signature]}
+\noindent Signed \raisebox{-1ex}{\includegraphics[trim=0 0cm 0 0,height=1.5\baselineskip]{figs/signature.png}}
 
 \medskip
 \leftline{Date:  \today}
@@ -170,7 +171,8 @@ We then use Bayes' rule to calculate the posterior.
 	                          & = \frac{1}{\kappa}\binom{n}{x}\theta^x(1-\theta)^{n-x} \\
 	                          & = \frac{1}{\kappa'}\theta^x(1-\theta)^{n-x}            
 \end{align*}
-$$\kappa'=\int_{\phi=0}^1\phi^x(1-\phi)^{n-x}~d\phi$$
+
+\[\kappa'=\int_{\phi=0}^1\phi^x(1-\phi)^{n-x}~d\phi\]
 This is the beta distribution - Beta()
 \section{Linear Regression} \label{app:linreg}
 \section{Hidden Markov Model} \label{app:hmm}
