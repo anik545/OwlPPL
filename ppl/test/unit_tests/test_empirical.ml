@@ -55,6 +55,6 @@ let tests : unit Alcotest.test list =
         ("pdf", `Quick, c_pdf);
         ("cdf", `Quick, c_cdf);
         ("support", `Quick, todo);
-        ("adding samples", `Quick, c_more_samples);
+        (* ("adding samples", `Quick, c_more_samples); *)
       ] );
   ]

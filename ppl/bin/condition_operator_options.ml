@@ -1,5 +1,6 @@
-(* open Ppl
-   open Owl_plplot
+open Ppl
+
+(*   open Owl_plplot
 
    (* normal given x>0  (half normal) *)
    let d =
@@ -89,6 +90,7 @@
                     Conditional
                       ((fun _ -> if a + b + c = 3 then 1. else 0.), return a) )
           ) )
+    let arr = sample_n 3 discrete_uniform [0;1]
 
    let model_desugar_cond_start : (int * int * int) dist =
    Conditional
@@ -101,3 +103,15 @@
                 fun b ->
                   Bind (discrete_uniform [ 0; 1 ], fun c -> return (a, b, c)) )
         ) ) *)
+
+let x =
+  let* a = continuous_uniform 0. 1. in
+  let* b = continuous_uniform 0. 1. in
+  return a + b
+
+(* ->  *)
+
+let x =
+  Bind
+    ( continuous_uniform 0. 1.,
+      fun a -> Bind (continuous_uniform 0. 1., fun b -> Return a + b) )

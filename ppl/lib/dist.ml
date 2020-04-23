@@ -52,8 +52,8 @@ end)
 let discrete_uniform xs = Primitive (Primitive.discrete_uniform xs)
 
 let categorical xs =
-  Core.List.iter ~f:(fun (_, y) -> Printf.printf "%f," y) xs;
-  Printf.printf "\n";
+  (* Core.List.iter ~f:(fun (_, y) -> Printf.printf "%f," y) xs;
+  Printf.printf "\n"; *)
   let xs =
     Core.List.filter
       ~f:(fun (_, x) -> Float.is_finite (exp x) || Float.equal x 0.)
@@ -69,8 +69,8 @@ let categorical xs =
     else List.map ~f:(fun (v, p) -> (v, p /. norm)) xs
   in
   let xs = normalise xs in
-  Core.List.iter ~f:(fun (_, y) -> Printf.printf "%f," y) xs;
-  Printf.printf "\n";
+  (* Core.List.iter ~f:(fun (_, y) -> Printf.printf "%f," y) xs;
+  Printf.printf "\n"; *)
   Primitive (Primitive.categorical xs)
 
 let bernoulli p = categorical [ (true, p); (false, 1. -. p) ]

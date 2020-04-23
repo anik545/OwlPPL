@@ -8,6 +8,10 @@ DISS = diss.tex refs.bib propbody.tex figs/diagram.eps makefile.txt
 
 PROP = proposal.tex propbody.tex
 
+ALL_TEX = $(shell find data code_snippets chapters -type f) $(wilcard *.tex *.txt *.bib)
+
+OUTDIR = out
+
 help:
 	@echo
 	@echo "USAGE:"
@@ -22,49 +26,44 @@ help:
 	@echo "make count    display an estimated word count"
 	@echo "make pub      put demodiss.tar on my homepage"
 	@echo "make clean    remove all remakeable files"
-	@echo "make pr       print the dissertation"
 	@echo
 
-prop:	proposal.dvi
-	xdvi proposal.dvi
+# diss.ps:	$(DISS)
 
-diss.ps:	$(DISS)
-	latex diss
-	bibtex diss
-	latex diss
-	bibtex diss
-	latex diss
-	bibtex diss
-	dvips -Ppdf -G0 -t a4 -pp 0-200 -o diss.ps diss.dvi
+LATEXMK_ARGS = -synctex=1 -interaction=nonstopmode -file-line-error -pdf --shell-escape -output-directory=$(OUTDIR) -aux-directory=$(OUTDIR)
 
-diss.pdf:	diss.ps
-	ps2pdf diss.ps
+.PHONY: diss
+diss: diss.pdf
+diss.pdf: diss.tex $(ALL_TEX)
+	latexmk $(LATEXMK_ARGS) diss.tex
 
-makefile.txt:	Makefile
-	expand Makefile >makefile.txt
+.PHONY: proposal
+proposal: proposal.pdf
+proposal.pdf: propbody.tex proposal.tex
+	latexmk $(LATEXMK_ARGS) proposal.tex
+
 count:
 	detex diss.tex | tr -cd '0-9A-Za-z \n' | wc -w
+	texcount -inc -sum -1 diss.tex
 
-proposal.dvi: $(PROP)
-	latex proposal
+linecount:
+	cloc  --yaml `git ls-files ..` | grep 'code: ' | tail -n 1 | sed  's/  code://g'
 
-all:	proposal.dvi diss.ps
+CODE_TO_SUBMIT = $(shell echo `git ls-files ../evaluation` `git ls-files ../ppl`)
 
-pub:	diss.pdf
-	cp diss.pdf /homes/mr/public_html/demodiss.pdf
-	make clean
-	(cd ..; tar cfv /homes/mr/public_html/demodiss.tar demodiss)
+.PHONY: code
+code: ar899.tar.gz
+ar899.tar.gz: $(CODE_TO_SUBMIT)
+	echo $(CODE_TO_SUBMIT)
+	tar -cvzf ar899.tar.gz $(CODE_TO_SUBMIT)
+
+.PHONY: submit
+submit: diss.pdf ar899.tar.gz
+	cp diss.pdf ../ar899.pdf
+	cp ar899.tar.gz ../ar899.tar.gz
+
+.PHONY: clean
 
 clean:
-	rm -f diss.ps *.dvi *.aux *.log *.err
-	rm -f core *~ *.lof *.toc *.blg *.bbl
-	rm -f makefile.txt
-
-gv:	diss.ps
-	ghostview diss.ps
-
-gs:	diss.ps
-	gs diss.ps
-
-pr:	diss.ps
-	lpr diss.ps
+	# echo $(OUTDIR)
+	rm -r out/*

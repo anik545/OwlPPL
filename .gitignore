@@ -10,7 +10,7 @@ diss/wordcount.txt
 diss/linecount.txt
 
 anglican/target/
-
+.lein-repl-history
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

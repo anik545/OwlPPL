@@ -4,7 +4,7 @@
 	\pgfplotstableread[col sep = comma]{#1}\datatable
 	\pgfplotstablegetcolsof{\datatable}
 	\pgfmathtruncatemacro\numberofcols{(\pgfplotsretval-1)*0.5}
-																																																										    
+																																																														    
 	\pgfplotsinvokeforeach{1,...,\numberofcols}{
 		\pgfmathtruncatemacro\e{##1 + \numberofcols}
 		\pgfplotstablegetcolumnnamebyindex{##1}\of{\datatable}\to{\colname}
@@ -35,17 +35,17 @@
 		]
 		\nextgroupplot[title=Biased Coin, legend to name=leg]
 		\coordinate (c1) at (rel axis cs:0,1);
-		\perfgraphm{data/mems_coin.csv}
+		\perfgraphm{data/perf/memory/mems_coin.csv}
 		\nextgroupplot[title=Linear Regression,legend to name=leg]
 		\coordinate (c2) at (rel axis cs:1,1);% I moved this to the upper right corner
-		\perfgraphm{data/mems_linreg.csv}
+		\perfgraphm{data/perf/memory/mems_linreg.csv}
 		\nextgroupplot[title=Hidden Markov Model,
 		legend to name=leg]
-		\perfgraphm{data/mems_hmm.csv}
+		\perfgraphm{data/perf/memory/mems_hmm.csv}
 		\nextgroupplot[title=Sprinkler,
 			legend style={at={($(0,0)+(1cm,1cm)$)},legend columns=4,fill=none,draw=black,anchor=center,align=center},
 		legend to name=leg]
-		\perfgraphm{data/mems_sprinkler.csv}
+		\perfgraphm{data/perf/memory/mems_sprinkler.csv}
 	\end{groupplot}
 	\coordinate (c3) at ($(c1)!.5!(c2)$);
 	\node[below] at (c3 |- current bounding box.south)
