@@ -38,8 +38,6 @@ let observe x dst d = Conditional ((fun _ -> of_float @@ Primitive.pdf dst x), d
 
 let from_primitive p = Primitive p
 
-let from_primitive p = Primitive p
-
 (* TODO: *)
 (* let observe_list lst dst d = Core.List.fold_left ~f:(observe) *)
 

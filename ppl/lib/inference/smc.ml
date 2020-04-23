@@ -31,13 +31,9 @@ let rec smc : 'a. int -> 'a dist -> 'a samples dist =
   (* initialise n particles wih weights from the pdf *)
   | Primitive d ->
       List.init n ~f:(fun _ ->
-<<<<<<< HEAD
-          fmap (fun x -> (x, Primitive.pdf d x)) (from_primitive d))
-=======
           fmap
             (fun x -> (x, Prob.of_float @@ Primitive.pdf d x))
             (from_primitive d))
->>>>>>> log-probs
       |> sequence
   (* initialise n particles with the same value and weight *)
   | Return x -> List.init n ~f:(fun _ -> return (x, Prob.one)) |> sequence

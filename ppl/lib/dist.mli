@@ -40,7 +40,7 @@ val observe : 'a -> 'a Primitive.t -> 'b dist -> 'b dist
 
 val from_primitive : 'a Primitive.t -> 'a dist
 
-(** {2:dist_monad Monad Fsunctions} *)
+(** {2:dist_monad Monad Functions} *)
 
 include Monad.Monad with type 'a t := 'a dist
 

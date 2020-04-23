@@ -8,6 +8,27 @@ doc.zip
 _coverage/
 diss/wordcount.txt
 diss/linecount.txt
+evaluation/profiling/out/
+diss/out/
+diss/*.pdf
+dirtree.*
+diss/test.tex
+
+#clojure
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/lib/
+/classes/
+/target/
+/checkouts/
+.lein-deps-sum
+.lein-repl-history
+.lein-plugins/
+.lein-failures
+.nrepl-port
+.cpcache/
 
 anglican/target/
 .lein-repl-history

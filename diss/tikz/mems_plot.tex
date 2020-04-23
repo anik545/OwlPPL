@@ -4,7 +4,7 @@
 	\pgfplotstableread[col sep = comma]{#1}\datatable
 	\pgfplotstablegetcolsof{\datatable}
 	\pgfmathtruncatemacro\numberofcols{(\pgfplotsretval-1)*0.5}
-																																																														    
+																																																															    
 	\pgfplotsinvokeforeach{1,...,\numberofcols}{
 		\pgfmathtruncatemacro\e{##1 + \numberofcols}
 		\pgfplotstablegetcolumnnamebyindex{##1}\of{\datatable}\to{\colname}
@@ -14,7 +14,7 @@
 }
 
 \begin{tikzpicture}
-	\pgfplotstableread[col sep = comma]{data/mems_coin.csv}\t														
+	\pgfplotstableread[col sep = comma]{data/perf/memory/mems_coin.csv}\t														
 	\begin{groupplot}[
 			group style={
 				group name=my plots,

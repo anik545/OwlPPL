@@ -1,4 +1,4 @@
-open Ppl
+(* open Ppl *)
 
 (*   open Owl_plplot
 
@@ -104,14 +104,14 @@ open Ppl
                   Bind (discrete_uniform [ 0; 1 ], fun c -> return (a, b, c)) )
         ) ) *)
 
-let x =
+(* let x =
   let* a = continuous_uniform 0. 1. in
   let* b = continuous_uniform 0. 1. in
-  return a + b
+  return a + b *)
 
 (* ->  *)
 
-let x =
+(* let x =
   Bind
     ( continuous_uniform 0. 1.,
-      fun a -> Bind (continuous_uniform 0. 1., fun b -> Return a + b) )
+      fun a -> Bind (continuous_uniform 0. 1., fun b -> Return a + b) ) *)

@@ -221,7 +221,7 @@ In the case of the sprinkler model, there is a rise near the end, but this can b
 
 \begin{figure}[!ht]
 	\centering
-	\input{chapters/tikz/kl_plot.tex}
+	\input{tikz/kl_plot.tex}
 	\caption{Plot of KL-divergence with increasing number of samples for different models and inference procedures}
 	\label{fig:kl}
 \end{figure}
@@ -264,14 +264,14 @@ Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares aga
 			
 \begin{figure}[!ht]
 	\centering																									
-	\input{chapters/tikz/times_plot.tex}
+	\input{tikz/times_plot.tex}
 	\caption{Performance of my ppl against other languages for different models and inference algorithms, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:time-perf}
 \end{figure}
 			
 \begin{figure}[!ht]
 	\centering
-	\input{chapters/tikz/mems_plot.tex}																									
+	\input{tikz/mems_plot.tex}																									
 	\caption{Memory Usage of my ppl, compared against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:mem-perf}
 \end{figure}
@@ -283,7 +283,7 @@ I also measured the running time of inference with increased data used - I teste
 
 \begin{figure}[!ht]
 	\centering
-	\input{chapters/tikz/linreg_by_datasize.tex}
+	\input{tikz/linreg_by_datasize.tex}
 	\caption{Time taken for inference as a function of input data length as the mean of 10 runs each taking 1,000 samples from the posterior, shaded areas are the 95\% confidence interval ($\pm 2\sigma$)}
 	\label{fig:time-datasize}
 \end{figure}
