@@ -9,7 +9,7 @@ type param = float * float
 let obs =
   List.init 10 ~f:(fun x ->
       let x = float_of_int x in
-      (x, (x *. 5.) +. 4.))
+      (x, (x *. 2.) +. 4.))
 
 let linreg =
   let linear =
@@ -35,13 +35,34 @@ let linreg' =
     ~init:(return (m, c))
     ~f:(fun d (x, y) -> observe y Primitive.(normal ((m * x) + c) 1.) d)
 
-let m' = fmap fst linreg'
+let linreg'' =
+  let linear =
+    let* a = normal 0. 2. in
+    let* b = normal 0. 2. in
+    return (a, b)
+  in
+  let open Float in
+  let summer l a b =
+    List.sum
+      ~f:(fun (x, y) -> Primitive.(pdf @@ normal ((a * x) + b) 1.) y)
+      (module Float)
+      l
+  in
+  let points d obs = condition' (fun (a, b) -> summer obs a b) d in
+  (* let points ps d = List.fold ~f:point ~init:d ps in *)
+  (* let obs = List.init 10 ~f:(fun x -> let x = float_of_int x in (x,x*.2.)) in *)
+  let posterior = points linear obs in
+  posterior
 
-let c' = fmap snd linreg'
+let m' = fmap fst linreg''
 
-let d' = mh' 10000 m'
+let c' = fmap snd linreg''
 
-let d'' = mh' 10000 c'
+let d' = infer (fmap fst3 linreg) (MH 2000)
+
+let d'' = infer (fmap snd3 linreg) (MH 10)
+
+(* let d'' = mh' 10000 c' *)
 
 let () =
-  Printf.printf "y=%f*x+%f\n" (sample_mean ~n:100 d') (sample_mean ~n:100 d'')
+  Printf.printf "y=%f*x+%f\n" (sample_mean ~n:1000 d') (sample_mean ~n:100 d'')

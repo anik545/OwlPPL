@@ -2,9 +2,13 @@ open Monad
 
 exception Undefined
 
-type prob = float
+module Prob = Sigs.LogProb
 
-type likelihood = float
+type prob = Prob.t
+
+type likelihood = Prob.t
+
+open Prob
 
 type 'a samples = ('a * prob) list
 
@@ -16,7 +20,7 @@ type _ dist =
   | Bind : 'a dist * ('a -> 'b dist) -> 'b dist
   (* | Bind_var: 'a var_dist * ('a -> 'b dist) -> 'b dist *)
   | Primitive : 'a Primitive.t -> 'a dist
-  | Conditional : ('a -> float) * 'a dist -> 'a dist
+  | Conditional : ('a -> prob) * 'a dist -> 'a dist
 
 (* | Conditional: ('a -> float) * 'a var_dist -> 'a dist *)
 (* | Observe: 'a Primitive.primitive * 'a * 'a dist -> 'a dist *)
@@ -24,13 +28,15 @@ type _ dist =
 (* | Independent: 'a dist * 'b dist -> ('a * 'b) dist
    let (and+) d1 d2 = Independent(d1,d2) *)
 (* let observe x dst d = Observe(dst,x,d) *)
-let condition' (c : 'a -> likelihood) d = Conditional (c, d)
+let condition' c d = Conditional (Core.Fn.compose of_float c, d)
 
-let condition b d = Conditional ((fun _ -> if b then 1. else 0.), d)
+let condition b d = Conditional ((fun _ -> if b then one else zero), d)
 
-let score s d = Conditional ((fun _ -> s), d)
+let score s d = Conditional ((fun _ -> of_float s), d)
 
-let observe x dst d = Conditional ((fun _ -> Primitive.pdf dst x), d)
+let observe x dst d = Conditional ((fun _ -> of_float @@ Primitive.pdf dst x), d)
+
+let from_primitive p = Primitive p
 
 let from_primitive p = Primitive p
 
@@ -47,7 +53,27 @@ end)
 
 let discrete_uniform xs = Primitive (Primitive.discrete_uniform xs)
 
-let categorical xs = Primitive (Primitive.categorical xs)
+let categorical xs =
+  (* Core.List.iter ~f:(fun (_, y) -> Printf.printf "%f," y) xs;
+  Printf.printf "\n"; *)
+  let xs =
+    Core.List.filter
+      ~f:(fun (_, x) -> Float.is_finite (exp x) || Float.equal x 0.)
+      xs
+  in
+  (* let xs = Core.List.map ~f:(fun (a, x) -> (a, exp x)) xs in *)
+  let normalise xs =
+    let open Core in
+    let norm = List.sum (module Float) ~f:snd xs in
+    if Float.(norm = 0.) then
+      let p' = 1. /. float_of_int (List.length xs) in
+      List.map ~f:(fun (v, _) -> (v, p')) xs
+    else List.map ~f:(fun (v, p) -> (v, p /. norm)) xs
+  in
+  let xs = normalise xs in
+  (* Core.List.iter ~f:(fun (_, y) -> Printf.printf "%f," y) xs;
+  Printf.printf "\n"; *)
+  Primitive (Primitive.categorical xs)
 
 let bernoulli p = categorical [ (true, p); (false, 1. -. p) ]
 
@@ -85,14 +111,14 @@ let rec sample_n : 'a. int -> 'a dist -> 'a array =
 
 (* same as sample (prior_with_score d) *)
 let rec sample_with_score : 'a. 'a dist -> 'a * likelihood = function
-  | Return x -> (x, 1.)
+  | Return x -> (x, one)
   | Bind (d, f) ->
       let y, s = sample_with_score d in
       let a, s1 = sample_with_score (f y) in
       (a, s *. s1)
   | Primitive d ->
       let x = Primitive.sample d in
-      (x, Primitive.pdf d x)
+      (x, of_float @@ Primitive.pdf d x)
   (* this instead?? *)
   (* this is how its done in prior - is it right??? *)
   (* | Primitive d -> let x  = Primitive.sample d in (x, 1.)  *)
@@ -115,7 +141,7 @@ let rec prior : 'a. 'a dist -> ('a * prob) dist = function
       return (y, s)
   | d ->
       let* x = d in
-      return (x, 1.)
+      return (x, one)
 
 (* same as sample_with_score *)
 let rec prior_with_score : 'a. 'a dist -> ('a * prob) dist = function
@@ -128,8 +154,8 @@ let rec prior_with_score : 'a. 'a dist -> ('a * prob) dist = function
       return (y, s *. s1)
   | Primitive d ->
       let* x = Primitive d in
-      return (x, Primitive.pdf d x)
-  | Return x -> return (x, 1.)
+      return (x, of_float @@ Primitive.pdf d x)
+  | Return x -> return (x, one)
 
 (* | Independent(d1,d2) -> 
    let* x,s1 = prior_with_score d1 
@@ -151,7 +177,7 @@ let rec support : 'a. 'a dist -> 'a list = function
   | Return x -> [ x ]
 
 module PplOps = struct
-  let ( +~ ) = liftM2 ( + )
+  let ( +~ ) = liftM2 Base.Int.( + )
 
   let ( -~ ) = liftM2 ( - )
 
@@ -159,13 +185,13 @@ module PplOps = struct
 
   let ( /~ ) = liftM2 ( / )
 
-  let ( +.~ ) = liftM2 ( +. )
+  let ( +.~ ) = liftM2 Base.Float.( + )
 
-  let ( -.~ ) = liftM2 ( -. )
+  let ( -.~ ) = liftM2 Base.Float.( - )
 
-  let ( *.~ ) = liftM2 ( *. )
+  let ( *.~ ) = liftM2 Base.Float.( * )
 
-  let ( /.~ ) = liftM2 ( /. )
+  let ( /.~ ) = liftM2 Base.Float.( / )
 
   let ( &~ ) = liftM2 ( && )
 

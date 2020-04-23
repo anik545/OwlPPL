@@ -5,11 +5,19 @@ let root_dir = "/home/anik/Files/work/project/diss/data/"
 
 let string_of_float f = sprintf "%.15f" f
 
+let print_2d arr =
+  Array.iter
+    ~f:(fun r ->
+      Array.iter ~f:(printf "%f,") r;
+      printf "\n")
+    arr
+
 (* save a string matrix (2d array) as a csv file *)
 let write_to_csv ~fname data =
   let oc = Out_channel.create (root_dir ^ fname) in
   Array.iter data ~f:(fun line ->
-      Array.iter line ~f:(fprintf oc "%s,");
+      printf "%s" @@ String.concat ~sep:"," (Array.to_list line);
+      (* Array.iter line ~f:(fprintf oc "%s,"); *)
       fprintf oc "\n");
   (* for i = 1 to Array.length data do
      for j = 1 to Array.length data.(i) do
@@ -55,15 +63,8 @@ let list_gen =
 
 let by_data_length_linreg () =
   (* lengths of data *)
-  let ns = Owl.Arr.to_array @@ Owl.Arr.linspace 1. 1000. 5 in
-  let infs =
-    [|
-      Rejection (100, Soft);
-      Importance 100
-      (* MH 500;  *)
-      (* SMC 100  *);
-    |]
-  in
+  let ns = Owl.Arr.to_array @@ Owl.Arr.linspace 1. 10000. 20 in
+  let infs = [| Rejection (100, Soft); Importance 100; MH 500; SMC 50 |] in
 
   let header =
     Array.append [| "n" |] (Array.map infs ~f:print_infer_strat_short)
@@ -93,6 +94,40 @@ let by_data_length_linreg () =
   let data = Array.transpose_exn @@ Array.append [| ns |] d in
   Array.append [| header |] (map_2d data ~f:string_of_float)
 
+let by_data_length_linreg_single_inf ?(num_times = 3) ?(num_x = 20) inf :
+    string array array =
+  (* lengths of data *)
+  let ns = Owl.Arr.to_array @@ Owl.Arr.linspace 1. 10000. num_x in
+
+  let header = [| "n"; print_infer_strat_short inf; "err" |] in
+
+  (* generate data to condition on, memoise to ensure same lists are used *)
+  let list_gen =
+    memo (fun n ->
+        List.init n ~f:(fun n ->
+            let n = float_of_int n in
+            (n, (n *. 2.) +. 1.)))
+  in
+
+  let model : (float * float) list -> (float * float * float) dist =
+    Models.linreg
+  in
+
+  let mean_std_of_times n f =
+    let arr = Array.init n ~f:(fun _ -> snd @@ time f) in
+    let mean = Owl_stats.mean arr in
+    [| mean; 1.96 *. Owl_stats.std ~mean arr |]
+  in
+  let d =
+    Array.map ns ~f:(fun n ->
+        printf "inf: %s, datasize: %f\n" (print_infer_strat_short inf) n;
+        let f = use_model (model (list_gen (int_of_float n))) inf in
+        mean_std_of_times num_times f)
+  in
+  (print_2d @@ Array.(transpose_exn @@ append [| ns |] @@ transpose_exn d));
+  let data = Array.(transpose_exn @@ append [| ns |] @@ transpose_exn d) in
+  Array.append [| header |] (map_2d data ~f:string_of_float)
+
 (* let () =
    by_particles Models.single_coin (fun n -> SMC n)
    |> write_to_csv ~fname:"smc_by_particles"
@@ -106,5 +141,20 @@ let by_data_length_linreg () =
 (* let x = sample_mean ~n:20000 @@ infer (Models.single_coin) (MH 10000) *)
 (* let ()  = printf "%f\n" @@ x *)
 
-let () =
-  by_data_length_linreg () |> write_to_csv ~fname:"linreg_by_data_length.csv"
+(* let () =
+  by_data_length_linreg ()
+  |> write_to_csv ~fname:"linreg_by_data_length_smc.csv" *)
+
+(* let () =
+  let inf = Importance 10 in
+  by_data_length_linreg_single_inf inf
+  |> write_to_csv
+       ~fname:("linreg_by_data_length_" ^ print_infer_strat_short inf ^ ".csv") *)
+
+let _ =
+  let infs = [| Rejection (100, Soft); MH 500; SMC 50; Importance 50 |] in
+  Array.map infs ~f:(fun inf ->
+      by_data_length_linreg_single_inf inf
+      |> write_to_csv
+           ~fname:
+             ("linreg_by_data_length_" ^ print_infer_strat_short inf ^ ".csv"))

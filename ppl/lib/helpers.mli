@@ -16,13 +16,13 @@ val sample_variance : ?n:int -> float dist -> float
 val take_k_samples : int -> 'a dist -> 'a array
 (** *)
 
-val unduplicate : ('a * float) list -> ('a * float) list
+val unduplicate : ('a * prob) list -> ('a * prob) list
 (** Removes duplicates and sums the probabilities associated so that each value appears once *)
 
-val flatten : (('a * float) list * float) list -> ('a * float) list
+val flatten : (('a * prob) list * prob) list -> ('a * prob) list
 (**  *)
 
-val normalise : ('a * float) list -> ('a * float) list
+val normalise : ('a * prob) list -> ('a * prob) list
 (** *)
 
 val weighted_dist : ?n:int -> 'a dist -> ('a, int) Core.Map.Poly.t

@@ -74,10 +74,19 @@ let infer_strats =
 
 let inf_with_desc = List.map infer_strats ~f:(fun x -> (x, show_infer_strat x))
 
+let inferred = sample @@ mh_sampler 100 Unit_test_models.single_coin
+
+(* let inferred' = mh_sampler 100 Unit_test_models.single_coin *)
+let inferred' = sample @@ mh'' 100 Unit_test_models.single_coin
+
 type model = F of float dist | B of bool dist
 
 let models =
   Unit_test_models.[ (B grass_model, "sprinkler"); (F single_coin, "coin") ]
+
+let isf = function F _ -> true | _ -> false
+
+let isb = function B _ -> true | _ -> false
 
 let inference_tests =
   List.map models ~f:(fun (model, model_desc) ->
@@ -85,18 +94,28 @@ let inference_tests =
           ( desc ^ ",model:" ^ model_desc,
             `Quick,
             fun () ->
-              match model with
-              | B m ->
-                  Alcotest.(check pass)
-                    desc
-                    (take_k_samples 50 (infer m inf))
-                    [||]
-              | F m ->
-                  Alcotest.(check pass)
-                    desc
-                    (take_k_samples 50 (infer m inf))
-                    [||] )))
+              if Poly.((isf model && inf = Enum) || (isb model && inf = PC 100))
+              then printf "---"
+              else
+                match model with
+                | B m ->
+                    Alcotest.(check pass)
+                      desc
+                      (take_k_samples 50 (infer m inf))
+                      [||]
+                | F m ->
+                    Alcotest.(check pass)
+                      desc
+                      (take_k_samples 50 (infer m inf))
+                      [||] )))
   |> List.concat
+
+let test_print () =
+  Alcotest.(check pass)
+    "printing"
+    (List.map infer_strats ~f:(fun i ->
+         (print_infer_strat i, print_infer_strat_short i)))
+    []
 
 let tests : unit Alcotest.test list =
   [
@@ -107,4 +126,5 @@ let tests : unit Alcotest.test list =
         ("no conditioning", `Quick, test_exact_inference_no_condition);
       ] );
     ("inference is sampleable", [] @ inference_tests);
+    ("printing", [ ("all", `Quick, test_print) ]);
   ]

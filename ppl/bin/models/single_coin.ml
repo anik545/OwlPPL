@@ -17,12 +17,12 @@ let single_coin =
     (return coinweight) *)
 
 (* let post_single_coin = mh' 700 @@ single_coin *)
-let post_single_coin = importance' 100 @@ single_coin
+let post_single_coin = smcStandard' 100 @@ single_coin
 
 let exact_coin = Primitive.beta 10. 2.
 
 (* 0.833 *)
-let mn = sample_mean ~n:100 post_single_coin
+let mn = sample_mean ~n:1000 post_single_coin
 
 let () = Printf.printf "%f\n" mn
 

@@ -6,32 +6,35 @@ exception Undefined
 
 let fsts = List.map ~f:fst
 
-type score = float
-
+(* open Dist.Prob *)
 (* 'a. 'a dist -> ('a * score list) -> ('a * prob list)  *)
 (* produces a list of value,score, not prob (i.e. unnormalised) *)
 (* depth-first search *)
 (* todo produce a map instead *)
-let rec enumerate : type a. a dist -> score -> (a * score) list =
+let rec enumerate : type a. a dist -> float -> (a * prob) list =
  fun d multiplier ->
-  if Float.(multiplier = 0.) then []
+  if Float.(multiplier = zero) then []
   else
     match d with
     | Bind (d, f) ->
         let c = enumerate d multiplier in
-        List.concat_map c ~f:(fun (opt, p) -> enumerate (f opt) p)
+        List.concat_map c ~f:(fun (opt, p) ->
+            enumerate (f opt) (Prob.to_float p))
     | Conditional (c, d) ->
         let ch = enumerate d multiplier in
-        List.map ch ~f:(fun (x, p) -> (x, p *. c x))
+        List.map ch ~f:(fun (x, p) -> (x, Prob.(p *. c x)))
     | Primitive p -> (
         match Primitive.support p with
         | DiscreteFinite xs ->
-            List.map xs ~f:(fun x -> (x, multiplier *. Primitive.pdf p x))
+            List.map xs ~f:(fun x ->
+                (x, Prob.of_float @@ (multiplier *. Primitive.pdf p x)))
         | _ -> raise Undefined )
-    | Return x -> [ (x, multiplier) ]
+    | Return x -> [ (x, Prob.of_float multiplier) ]
 
 let exact_inference d =
-  enumerate d 1. |> unduplicate |> normalise |> categorical
+  enumerate d 1. |> unduplicate |> normalise
+  |> List.map ~f:(fun (x, y) -> (x, Dist.Prob.to_float y))
+  |> categorical
 
 let test =
   let* x = discrete_uniform [ 0; 1 ] in

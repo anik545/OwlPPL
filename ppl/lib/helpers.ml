@@ -3,15 +3,16 @@ open Core
 
 (** [unduplicate xs] takes a list of particles and collapses particles with the same value **)
 let unduplicate xs =
-  let map = Map.Poly.of_alist_fold xs ~f:( +. ) ~init:0. in
+  let f = Prob.( + ) in
+  let map = Map.Poly.of_alist_fold xs ~f ~init:Prob.zero in
   Map.Poly.to_alist map
 
 let normalise xs =
-  let norm = List.sum (module Float) ~f:snd xs in
-  List.map ~f:(fun (v, p) -> (v, p /. norm)) xs
+  let norm = Prob.to_float @@ List.sum (module Prob) ~f:snd xs in
+  List.map ~f:(fun (v, p) -> (v, Prob.of_float @@ (Prob.to_float p /. norm))) xs
 
 let flatten xss =
-  let mul_likelihood xs p = List.map ~f:(fun (x, q) -> (x, p *. q)) xs in
+  let mul_likelihood xs p = List.map ~f:(fun (x, q) -> (x, Prob.(p *. q))) xs in
   (* let rec flat_map xss = match xss with
       (xs, p)::xs' -> (mul_likelihood xs p) @ flatten' xs'
      | [] -> []

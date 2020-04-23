@@ -1,6 +1,12 @@
 open Ppl
 open Core
 
+let list_gen =
+  memo (fun n ->
+      List.init n ~f:(fun n ->
+          let n = float_of_int n in
+          (n, (n *. 2.) +. 1.)))
+
 (* BIASED COIN *)
 (* coin, see 9 heads out of 10 flips *)
 let single_coin =
@@ -42,7 +48,7 @@ let grass_model_exact =
 
 (* linear regression *)
 
-let linreg obs =
+(* let linreg obs =
   let linear =
     let* a = normal 0. 2. in
     let* b = normal 0. 2. in
@@ -54,6 +60,23 @@ let linreg obs =
     condition' (fun (a, b, c) -> Primitive.(pdf @@ normal ((a * x) + b) c) y) d
   in
   let points ps d = List.fold ~f:point ~init:d ps in
-  (* let obs = List.init 10 ~f:(fun x -> let x = float_of_int x in (x,x*.2.)) in *)
   let posterior = points obs linear in
+  posterior *)
+
+let linreg obs =
+  let linear =
+    let* a = normal 0. 2. in
+    let* b = normal 0. 2. in
+    let* c = gamma 1. 1. in
+    return (a, b, c)
+  in
+  let open Float in
+  let summer l a b c =
+    List.sum
+      ~f:(fun (x, y) -> Primitive.(pdf @@ normal ((a * x) + b) c) y)
+      (module Float)
+      l
+  in
+  let points d obs = condition' (fun (a, b, c) -> summer obs a b c) d in
+  let posterior = points linear obs in
   posterior

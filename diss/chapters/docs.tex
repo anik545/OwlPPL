@@ -57,13 +57,16 @@ used to represent probabilistic models.
 
 \protect\hyperlink{exception-Undefined}{}\texttt{exception\ }\texttt{Undefined}
 
+\hypertarget{module-Prob}{}
+\protect\hyperlink{module-Prob}{}\texttt{module\ Prob\ :\ Ppl\_\_.Sigs.Prob}
+
 \begin{description}
-\item[{\protect\hyperlink{type-prob}{}\texttt{type\ prob}\texttt{\ =\ float}}]
+\item[{\protect\hyperlink{type-prob}{}\texttt{type\ prob}\texttt{\ =\ Prob.t}}]
 A type for which values need to sum to 1
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{type-likelihood}{}\texttt{type\ likelihood}\texttt{\ =\ float}}]
+\item[{\protect\hyperlink{type-likelihood}{}\texttt{type\ likelihood}\texttt{\ =\ Prob.t}}]
 A type for which values don't need to sum to 1
 \end{description}
 
@@ -95,7 +98,7 @@ monadic bind
 primitive exact distribution
 \strut\end{minipage}\tabularnewline
 \begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-\protect\hyperlink{type-dist.Conditional}{}\texttt{\textbar{}\ }\texttt{Conditional\ :\ (\textquotesingle{}a\ -\textgreater{}\ float)\ *\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
+\protect\hyperlink{type-dist.Conditional}{}\texttt{\textbar{}\ }\texttt{Conditional\ :\ (\textquotesingle{}a\ -\textgreater{}\ likelihood)\ *\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
 \strut\end{minipage} &
 \begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
 variant that defines likelihood model
@@ -108,11 +111,11 @@ Type for representing distributions
 \hypertarget{distux5fmonad}{\subsubsection{\texorpdfstring{\protect\hyperlink{distux5fmonad}{}Condition
 Operators}{Condition Operators}}\label{distux5fmonad}}
 
-\protect\hyperlink{val-conditionux27}{}\texttt{val\ condition\textquotesingle{}\ :\ (\textquotesingle{}a\ -\textgreater{}\ likelihood)\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
+\protect\hyperlink{val-conditionux27}{}\texttt{val\ condition\textquotesingle{}\ :\ (\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
 
 \protect\hyperlink{val-condition}{}\texttt{val\ condition\ :\ bool\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
 
-\protect\hyperlink{val-score}{}\texttt{val\ score\ :\ likelihood\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
+\protect\hyperlink{val-score}{}\texttt{val\ score\ :\ float\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
 
 \protect\hyperlink{val-observe}{}\texttt{val\ observe\ :\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}b\ dist\ -\textgreater{}\ \textquotesingle{}b\ dist}
 
@@ -169,9 +172,9 @@ from n independent trials with probability of success p
 
 \protect\hyperlink{val-continuousux5funiform}{}\texttt{val\ continuous\_uniform\ :\ float\ -\textgreater{}\ float\ -\textgreater{}\ float\ primitive}
 
-\protect\hyperlink{val-bernoulli}{}\texttt{val\ bernoulli\ :\ likelihood\ -\textgreater{}\ bool\ dist}
+\protect\hyperlink{val-bernoulli}{}\texttt{val\ bernoulli\ :\ float\ -\textgreater{}\ bool\ dist}
 
-\protect\hyperlink{val-choice}{}\texttt{val\ choice\ :\ likelihood\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
+\protect\hyperlink{val-choice}{}\texttt{val\ choice\ :\ float\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
 
 \hypertarget{distux5fsample}{\subsubsection{\texorpdfstring{\protect\hyperlink{distux5fsample}{}Sampling}{Sampling}}\label{distux5fsample}}
 
@@ -235,7 +238,7 @@ Inference algorithms to be called on probabilistic models defined using
 
 \protect\hyperlink{exception-Undefined}{}\texttt{exception\ }\texttt{Undefined}
 
-\protect\hyperlink{type-samples}{}\texttt{type\ \textquotesingle{}a\ samples}\texttt{\ =\ (\textquotesingle{}a\ *\ float)\ list}
+\protect\hyperlink{type-samples}{}\texttt{type\ \textquotesingle{}a\ samples}\texttt{\ =\ (\textquotesingle{}a\ *\ Dist.prob)\ list}
 
 \hypertarget{infux5fhelpers}{\subsubsection{\texorpdfstring{\protect\hyperlink{infux5fhelpers}{}Helpers}{Helpers}}\label{infux5fhelpers}}
 
@@ -245,7 +248,7 @@ Inference algorithms to be called on probabilistic models defined using
 
 \protect\hyperlink{val-normalise}{}\texttt{val\ normalise\ :\ \textquotesingle{}a\ samples\ -\textgreater{}\ \textquotesingle{}a\ samples}
 
-\protect\hyperlink{val-flatten}{}\texttt{val\ flatten\ :\ (\textquotesingle{}a\ samples\ *\ float)\ list\ -\textgreater{}\ \textquotesingle{}a\ samples}
+\protect\hyperlink{val-flatten}{}\texttt{val\ flatten\ :\ (\textquotesingle{}a\ samples\ *\ Dist.prob)\ list\ -\textgreater{}\ \textquotesingle{}a\ samples}
 
 \hypertarget{infux5fexact}{\subsubsection{\texorpdfstring{\protect\hyperlink{infux5fexact}{}Exact
 Inference}{Exact Inference}}\label{infux5fexact}}
@@ -281,17 +284,17 @@ Sampling}{Rejetion Sampling}}\label{rejux5fhelpers}}
 
 \protect\hyperlink{val-create}{}\texttt{val\ create\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ option\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ list}
 
-\protect\hyperlink{val-rejectux5ftransformux5fhard}{}\texttt{val\ reject\_transform\_hard\ :\ ?⁠threshold:float\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ Dist.dist}
+\protect\hyperlink{val-rejectux5ftransformux5fhard}{}\texttt{val\ reject\_transform\_hard\ :\ ?⁠threshold:float\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ Dist.dist}
 
 \protect\hyperlink{val-rejectux27ux27}{}\texttt{val\ reject\textquotesingle{}\textquotesingle{}\ :\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ option\ Dist.dist}
 
-\protect\hyperlink{val-rejectux5ftransformux5fsoft}{}\texttt{val\ reject\_transform\_soft\ :\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ Dist.dist}
+\protect\hyperlink{val-rejectux5ftransformux5fsoft}{}\texttt{val\ reject\_transform\_soft\ :\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ Dist.dist}
 
 \protect\hyperlink{val-rejectionux5ftransform}{}\texttt{val\ rejection\_transform\ :\ ?⁠n:int\ -\textgreater{}\ rejection\_type\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist}
 
-\protect\hyperlink{val-rejectionux5fsoft}{}\texttt{val\ rejection\_soft\ :\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ option\ Dist.dist}
+\protect\hyperlink{val-rejectionux5fsoft}{}\texttt{val\ rejection\_soft\ :\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ option\ Dist.dist}
 
-\protect\hyperlink{val-rejectionux5fhard}{}\texttt{val\ rejection\_hard\ :\ ?⁠threshold:Core.Float.t\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ option\ Dist.dist}
+\protect\hyperlink{val-rejectionux5fhard}{}\texttt{val\ rejection\_hard\ :\ ?⁠threshold:Core.Float.t\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ option\ Dist.dist}
 
 \protect\hyperlink{val-rejection}{}\texttt{val\ rejection\ :\ ?⁠n:int\ -\textgreater{}\ rejection\_type\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist}
 
@@ -332,7 +335,7 @@ Hastings}{Particle Independent Metropolis Hastings}}\label{infux5fpmcmc}}
 \hypertarget{infux5fpc}{\subsubsection{\texorpdfstring{\protect\hyperlink{infux5fpc}{}Particle
 Cascade}{Particle Cascade}}\label{infux5fpc}}
 
-\protect\hyperlink{val-resamplePC}{}\texttt{val\ resamplePC\ :\ \textquotesingle{}a\ samples\ -\textgreater{}\ int\ -\textgreater{}\ \textquotesingle{}a\ samples\ Dist.dist}
+\protect\hyperlink{val-resamplePC}{}\texttt{val\ resamplePC\ :\ (\textquotesingle{}a\ *\ float)\ list\ -\textgreater{}\ int\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ list\ Dist.dist}
 
 \protect\hyperlink{val-cascade}{}\texttt{val\ cascade\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ samples\ Dist.dist}
 
@@ -528,14 +531,14 @@ A set of utilities for generating statistics and printing distributions
 \item[{\protect\hyperlink{val-sampleux5fmean}{}\texttt{val\ sample\_mean\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}\\
 \protect\hyperlink{val-sampleux5fvariance}{}\texttt{val\ sample\_variance\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}\\
 \protect\hyperlink{val-takeux5fkux5fsamples}{}\texttt{val\ take\_k\_samples\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ array}\\
-\protect\hyperlink{val-unduplicate}{}\texttt{val\ unduplicate\ :\ (\textquotesingle{}a\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ list}}]
+\protect\hyperlink{val-unduplicate}{}\texttt{val\ unduplicate\ :\ (\textquotesingle{}a\ *\ Dist.prob)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ list}}]
 Removes duplicates and sums the probabilities associated so that each
 value appears once
 \end{description}
 
-\protect\hyperlink{val-flatten}{}\texttt{val\ flatten\ :\ ((\textquotesingle{}a\ *\ float)\ list\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ list}
+\protect\hyperlink{val-flatten}{}\texttt{val\ flatten\ :\ ((\textquotesingle{}a\ *\ Dist.prob)\ list\ *\ Dist.prob)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ list}
 
-\protect\hyperlink{val-normalise}{}\texttt{val\ normalise\ :\ (\textquotesingle{}a\ *\ float)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ list}
+\protect\hyperlink{val-normalise}{}\texttt{val\ normalise\ :\ (\textquotesingle{}a\ *\ Dist.prob)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ list}
 
 \protect\hyperlink{val-weightedux5fdist}{}\texttt{val\ weighted\_dist\ :\ ?⁠n:int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ (\textquotesingle{}a,~int)\ Core.Map.Poly.t}
 

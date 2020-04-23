@@ -9,25 +9,26 @@
 \usepackage{fullpage}
 \usepackage{enumitem}
 \usepackage{hyperref}
-
+\usepackage{graphicx}
 
 \begin{document}
 
 
 \begin{center}
-      {\Large Computer Science Tripos -- Part II -- Project Progress Report} \\
-      \vspace{0.2in}
-      {\huge \bf A probabilistic programming language in OCaml } \\
-      \vspace{0.4in}
-      {\large Anik Roy, Christ's College, ar899@cam.ac.uk} \\
-      \vspace{0.1in}
-      {\large \today} \\
-
+	{\Large Computer Science Tripos -- Part II -- Project Progress Report} \\
+	\vspace{0.2in}
+	{\huge \bf A probabilistic programming language in OCaml } \\
+	\vspace{0.4in}
+	{\large Anik Roy, Christ's College, ar899@cam.ac.uk} \\
+	\vspace{0.1in}
+	{\large \today} \\
+																																					
 \end{center}
 \vspace{0.4in}
 
 
 \vfil
+
 
 
 \textbf{Project Supervisor:} Dr R. Mortier
@@ -37,7 +38,9 @@
 \textbf{Project Overseers:} Dr~Jon~A.~Crowcroft  \& Dr~Thomas~Sauerwald
 
 \vfil
-    
+
+\noindent\textbf{Signed} \raisebox{-1ex}{\includegraphics[trim=0 0cm 0 0,height=1.5\baselineskip]{figs/signature.png}}
+
 \section*{Work Completed}
 
 So far, I have managed to complete the bulk of my core implementation. This includes designing a simple DSL, which is shallowly embedded in OCaml. I have designed the main data structures for representing distributions, and defined the ways in which they can be manipulated and composed. This allows for generative models to be written using my ppl, which can represent both continuous or discrete distributions. 
@@ -50,7 +53,6 @@ I have also implemented 5 main inference algorithms (more than single one requir
 The main next steps for this project will be to perform more evaluation, comparing against writing inference procedures by hand (e.g. in python), as well as against other ppls (such as webppl or anglican). I'll also work to optimise inference and sampling procedures to make sure they are comparable to similar systems
 
 I will also consider more extensions, for example around the visualisation of programs. Since they are represented in a tree structure internally, it should be possible to visualise the different intermediate variables in a graph.
-
 
 \end{document}
 

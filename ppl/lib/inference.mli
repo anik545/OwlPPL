@@ -7,7 +7,7 @@ open Dist
 
 exception Undefined
 
-type 'a samples = ('a * float) list
+type 'a samples = ('a * prob) list
 
 (** {2:inf_helpers Helpers} *)
 
@@ -17,7 +17,7 @@ val resample : 'a samples -> 'a samples dist
 
 val normalise : 'a samples -> 'a samples
 
-val flatten : ('a samples * float) list -> 'a samples
+val flatten : ('a samples * prob) list -> 'a samples
 
 (** {2:inf_exact Exact Inference} *)
 
@@ -43,18 +43,18 @@ val create' : int -> 'a option dist -> 'a list -> 'a list
 
 val create : int -> 'a option dist -> 'a list
 
-val reject_transform_hard : ?threshold:float -> 'a dist -> ('a * float) dist
+val reject_transform_hard : ?threshold:float -> 'a dist -> ('a * prob) dist
 
 val reject'' : 'a dist -> 'a option dist
 
-val reject_transform_soft : 'a dist -> ('a * float) dist
+val reject_transform_soft : 'a dist -> ('a * prob) dist
 
 val rejection_transform : ?n:int -> rejection_type -> 'a dist -> 'a dist
 
-val rejection_soft : 'a dist -> ('a * float) option dist
+val rejection_soft : 'a dist -> ('a * prob) option dist
 
 val rejection_hard :
-  ?threshold:Core.Float.t -> 'a dist -> ('a * float) option dist
+  ?threshold:Core.Float.t -> 'a dist -> ('a * prob) option dist
 
 val rejection : ?n:int -> rejection_type -> 'a dist -> 'a dist
 
@@ -90,7 +90,7 @@ val pimh' : int -> int -> 'a dist -> 'a dist
 
 (** {2:inf_pc Particle Cascade} *)
 
-val resamplePC : 'a samples -> int -> 'a samples dist
+val resamplePC : ('a * float) list -> int -> ('a * prob) list dist
 
 val cascade : int -> 'a dist -> 'a samples dist
 

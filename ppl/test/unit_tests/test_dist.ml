@@ -36,7 +36,7 @@ let test_sample_score () =
   Alcotest.(check pass)
     ""
     (sample_with_score Unit_test_models.grass_model)
-    (true, 0.2)
+    (true, Prob.of_float 0.2)
 
 open Alcotest
 
