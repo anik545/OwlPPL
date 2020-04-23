@@ -10,6 +10,7 @@ I will be using an existing OCaml numerical computation library (Owl). This libr
 
 I have experience with the core SML language, which will aid in learning basic OCaml due to similarities in the languages, however I will still have to learn the modules system. 1B Foundations of Data Science also gives me a basic understanding of Bayesian inference. I did not have experience with domain specific languages in OCaml, although the 1B compilers course did implement a compiler and interpreter in OCaml.
 
+
 \section{Requirements}
 
 Before starting to write any code, I made sure to set out the features I aimed to implement for my DSL. The main goal was to produce a usable language, which was defined by the following criteria:
@@ -134,12 +135,12 @@ Existing PPLs take several different forms, both as standalone and embedded lang
 	
 \section{Bayesian Inference}
 Inference is the key motivating feature of probabilistic programming, and is a way to infer a distribution over the parameters based on the data we observe. The main feature of Bayesian inference is that we assign every model some prior belief. Often this prior is chosen based on our knowledge of the problem, but the prior can also be uninformative. The goal of Bayesian inference is to calculate the posterior distribution, which can be represented by Bayes' formula,
-$$P(A\mid B)={\frac {P(B\mid A)P(A)}{P(B)}}$$
+\[P(A\mid B)={\frac {P(B\mid A)P(A)}{P(B)}}\]
 with $P(A)$ being the prior, and $P(B\mid A)$ being the likelihood model we define. In the PPL setting, the prior is the generative model we define, with condition statements defining the likelihood. Running inference on the program then produces a sampler for the posterior.
 
 This formula holds for the continuous case too, using probability density functions ($f_X$),
 % 
-$$ f_{X\mid Y=y}(x)={\frac {f_{Y\mid X=x}(y)f_{X}(x)}{f_{Y}(y)}} $$
+\[ f_{X\mid Y=y}(x)={\frac {f_{Y\mid X=x}(y)f_{X}(x)}{f_{Y}(y)}} \]
 % 
 % Unfortunately, exact Bayesian inference is usually computationally infeasible, especially when the number of random variables we consider is large. 
 
@@ -152,9 +153,9 @@ Unfortunately, exact Bayesian inference is usually computationally infeasible, e
 % 
 Alternatively, in the continuous case the formula is
 % 
-$$P(\theta\mid x)=\frac{P(x\mid\theta)P(\theta)}{P(x)}$$
+\[P(\theta\mid x)=\frac{P(x\mid\theta)P(\theta)}{P(x)}\]
 with 
-$$P(x)=\int_{\Theta}P(x,\theta)~d\theta $$
+\[P(x)=\int_{\Theta}P(x,\theta)~d\theta\]
 % 
 The normalizing constant here is an integral that often does not have an analytic solution, and so must be approximated. Another issue is that directly sampling from a distribution requires that we also invert this formula (in order to use inversion sampling).
 % 
@@ -166,7 +167,7 @@ The normalizing constant here is an integral that often does not have an analyti
 % http://www.robots.ox.ac.uk/~fwood/anglican/assets/pdf/Wood-AISTATS-2014.pdf
 Inference algorithms are ways to systematically generate samples from posterior distributions given a likelihood function and a prior distribution. In probabilistic programming, a model consists of latent variables and observed variables, and a single execution of a model (a program) can be thought of as an assignment to each of these variables, known as an \textit{execution trace}. This can be defined mathematically as below, by Bayes' rule:
 % 
-$$p(x_{1:N}|y_{1:N})\propto \tilde{p}(y_{1:N},x_{1:N})$$ 
+\[p(x_{1:N}|y_{1:N})\propto \tilde{p}(y_{1:N},x_{1:N})\]
 % 
 Note that the trace may have a different number of variables each time a model is run, due to the fact that we allow general models which allow for unbounded recursion. 
 
@@ -206,7 +207,7 @@ MCMC algorithms have the same basic structure - to first `run' the chain for a b
 SMC methods are algorithms which are based on using large numbers of weighted samples (`particles') to represent a posterior distribution. SMC methods are also known as particle filters. A particle is a value paired with an unnormalised weight which represents the likelihood of that value in the distribution. These particles are updated when data is observed and re-sampled from in order to converge the set of particles to the posterior.
 	
 For a set of weighted particles, 
-$${\{(x^{[i]}, w^{[i]})\}}_{i=1..N}$$
+\[{\{(x^{[i]}, w^{[i]})\}}_{i=1..N}\]
 the pdf of this distribution is represented by
 
 \[

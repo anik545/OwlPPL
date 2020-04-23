@@ -139,13 +139,13 @@ $H_1:$ The sample data do not follow the exact distribution
 
 The $\chi^2$ test is a simple goodness-of-fit test which can test whether or not a given discrete distribution. The test statistic is as follows, with each $i$ being a distinct element in the distribution, $x_i$ is the observed number of samples with the value $i$, and $m_i$ is the expected number of samples for the value $i$.
 
-$$X^{2}=\sum _{i=1}^{k}{\frac {(x_{i}-m_{i})^{2}}{m_{i}}}$$
+\[X^{2}=\sum _{i=1}^{k}{\frac {(x_{i}-m_{i})^{2}}{m_{i}}}\]
 
 This test statistic is compared against the critical value (at the significance level) of the chi-squared distribution, with the degrees of freedom being $k-1$, where k is the number of possible values of the distribution.
 \subsubsection{Results}
 \begin{table}[!ht]
 	\centering
-	\csvautotabular{data/hypothesis-chi.csv}
+	\csvautotabular{data/hypothesis/hypothesis-chi.csv}
 	\caption{p-values of $\chi^2$ test on different models using different inference procedures}
 	\label{tab:chi-pvals}
 \end{table}
@@ -175,7 +175,7 @@ Table \ref{tab:ks-pvals} shows that for all the continuous models considered, th
 	% 	single coin &           &            &                     &                 \\ \hline
 	% 	hmm         &           &            &                     &                 \\ \hline
 	% \end{tabular}
-	\csvautotabular{data/hypothesis-ks.csv}
+	\csvautotabular{data/hypothesis/hypothesis-ks.csv}
 	\caption{p-values of K-S test on different models using different inference procedures}
 	\label{tab:ks-pvals}
 \end{table}
@@ -185,11 +185,11 @@ Table \ref{tab:ks-pvals} shows that for all the continuous models considered, th
 % TODO: add a few lines to show difference between 
 I also used the KL-divergence metric to determine the (dis)similarity of two distributions. The formula for KL Divergence of discrete distributions $P$ and $Q$ is easy to calculate by \eqref{eq:kl_disc}
 
-$${D_{\text{KL}}(P\parallel Q)=\sum _{x\in {\mathcal {X}}}P(x)\log \left({\frac {P(x)}{Q(x)}}\right)}$$ \label{eq:kl_disc}
+\[{D_{\text{KL}}(P\parallel Q)=\sum _{x\in {\mathcal {X}}}P(x)\log \left({\frac {P(x)}{Q(x)}}\right)}\] \label{eq:kl_disc}
 
 The continuous version is similar, with $p$ and $q$ now being density functions as in \eqref{eq:kl_cont}. 
 
-$${D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx$$ \label{eq:kl_cont}
+\[{D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx\] \label{eq:kl_cont}
 
 % Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins to approximate $q(x)$. I then used Monte Carlo integration to compute the integral. 
 Since I only have a set of samples from $q$, this integral can't be calculated exactly - there is no exact density function. However, there are ways to estimate density functions, as in (Perez 2008) \cite{perez2008kullback}. The first step is to approximate the cdf by finding the empirical cdf, $P_e$ \eqref{eq:pe} then linearly interpolating between points to produce a continuous function $P_c$ \eqref{eq:pc}. Estimating the derivative of $P_c$ then gives the pdf, $\hat{P}$ \eqref{eq:phat}. 
@@ -278,13 +278,14 @@ Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares aga
 			
 These graphs show that my PPL performs reasonably well compared to webPPL in both memory and time. It is less efficient for some models, but not excessively so. In particular, my implementation of a particle filter performs relatively poorly. This is possibly because when using a large number of particles, a large number of small memory allocations are made by OCaml, which introduced overhead both to my program and the garbage collector. The languages I compare with are both also garbage collected, but may be more optimised for this use case. Anglican is a Clojure library, which runs on the JVM, whereas WebPPL is run using nodejs, a JavaScript interpreter. It is possible there is an interpretive overhead with webPPL, explaining slower running times - however based on my results, it is not significant.
 
-I also measured the running time of inference with increased data used - I test the clustering and linear regression models, increasing the length of the arrays used as input. Models which are conditioned on more data are expected to give more accurate results, and my results show that running time increases linearly with the size of data. 
+% TODO: add clustering model
+I also measured the running time of inference with increased data used - I tested the linear regression model, increasing the length of the arrays used as input. Models which are conditioned on more data are expected to give more accurate results, and my results show that running time increases linearly with the size of data. Figure \ref{fig:time-datasize} shows that all the inference functions run in time linear to the size of the input, but the constant factors vary substantially - for example, Sequential Monte Carlo has a much steeper gradient than Metropolis-Hastings, for example, but both have the same shape. This also shows how some inference procedures take much more time than others, however, this often results in more accurate results. For example, smc is slower than rejection sampling here, but Figure \ref{fig:kl} shows that smc produces posterior distributions which are closer to exact solutions. The y axis has a log scale, showing the large difference in running time for each method.
 
 \begin{figure}[!ht]
 	\centering
 	\input{chapters/tikz/linreg_by_datasize.tex}
-	\caption{Time taken for inference as a function of input data length}
-	\label{fig:mem-perf}
+	\caption{Time taken for inference as a function of input data length as the mean of 10 runs each taking 1,000 samples from the posterior, shaded areas are the 95\% confidence interval ($\pm 2\sigma$)}
+	\label{fig:time-datasize}
 \end{figure}
 
 % For sequential Monte Carlo algorithms, I compared running times with regards to the number of particles used.
