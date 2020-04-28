@@ -1,0 +1,53 @@
+\ProvidesPackage{mydiss}
+
+\usepackage{microtype}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{upquote}
+\usepackage{verbatim}
+\usepackage{csvsimple}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepackage{tikz}
+\usepackage[hidelinks]{hyperref}
+\usepackage[parfill]{parskip}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[outputdir=out]{minted}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[margin=2cm,headheight=13.6pt]{geometry}
+\usepackage[margin=10pt,font=small,labelfont=bf,labelsep=endash,textfont=it]{caption}
+\usepackage{longtable,booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{subfig}
+\usepackage{dirtree}
+\usepackage{wrapfig}
+\usepgfplotslibrary{groupplots}
+\usepgfplotslibrary{fillbetween}
+\pgfplotsset{compat=1.13}
+
+\setminted{fontsize=\small}
+\newmintedfile[ocamlcode]{ocaml}{frame=single,framesep=7pt}
+\newmintedfile[jscode]{js}{frame=single,framesep=7pt}
+\newmintedfile[clojurecode]{clj}{frame=single,framesep=7pt}
+
+\newminted[ocamlcode-in]{ocaml}{frame=single,framesep=7pt,autogobble}
+
+\DeclareUnicodeCharacter{2060}{\nolinebreak}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\raggedbottom                           % try to avoid widows and orphans
+\sloppy
+\clubpenalty1000%
+\widowpenalty1000%
+
+% \addtolength{\oddsidemargin}{6mm}       % adjust margins
+% \addtolength{\evensidemargin}{-8mm}
+
+\renewcommand{\baselinestretch}{1.1}    % adjust line spacing to make
+                                        % more readable

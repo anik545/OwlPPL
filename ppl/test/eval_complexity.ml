@@ -1,7 +1,7 @@
 open Ppl
 open Core
 
-let root_dir = "/home/anik/Files/work/project/diss/data/"
+let root_dir = "/home/anik/Files/work/project/diss/data/perf/by_datasize"
 
 let string_of_float f = sprintf "%.15f" f
 
@@ -14,17 +14,10 @@ let print_2d arr =
 
 (* save a string matrix (2d array) as a csv file *)
 let write_to_csv ~fname data =
-  let oc = Out_channel.create (root_dir ^ fname) in
+  let oc = Out_channel.create (sprintf "%s/%s" root_dir fname) in
   Array.iter data ~f:(fun line ->
-      printf "%s" @@ String.concat ~sep:"," (Array.to_list line);
-      (* Array.iter line ~f:(fprintf oc "%s,"); *)
+      fprintf oc "%s" @@ String.concat ~sep:"," (Array.to_list line);
       fprintf oc "\n");
-  (* for i = 1 to Array.length data do
-     for j = 1 to Array.length data.(i) do
-      fprintf oc "%s," data.(i).(j)
-      done;
-      fprintf oc ";\n";
-      done; *)
   Out_channel.close oc
 
 let x_vals = Owl.Arr.(to_array (logspace ~base:10. 2. 4. 5))
@@ -150,11 +143,24 @@ let by_data_length_linreg_single_inf ?(num_times = 3) ?(num_x = 20) inf :
   by_data_length_linreg_single_inf inf
   |> write_to_csv
        ~fname:("linreg_by_data_length_" ^ print_infer_strat_short inf ^ ".csv") *)
+let mh, imp, rej, smc = (MH 500, Importance 50, Rejection (100, Soft), SMC 50)
+
+let str_to_inf = function
+  | "mh" -> mh
+  | "imp" -> imp
+  | "rej" -> rej
+  | "smc" -> smc
+  | s -> failwith (s ^ " is not an inference method")
+
+let infs =
+  if Array.length @@ Sys.get_argv () > 1 then
+    Array.sub (Sys.get_argv ()) ~pos:1 ~len:(Array.length (Sys.get_argv ()) - 1)
+    |> Array.map ~f:str_to_inf
+  else [| mh; rej; imp; smc |]
 
 let _ =
-  let infs = [| Rejection (100, Soft); MH 500; SMC 50; Importance 50 |] in
   Array.map infs ~f:(fun inf ->
-      by_data_length_linreg_single_inf inf
+      by_data_length_linreg_single_inf inf ~num_times:10
       |> write_to_csv
            ~fname:
              ("linreg_by_data_length_" ^ print_infer_strat_short inf ^ ".csv"))

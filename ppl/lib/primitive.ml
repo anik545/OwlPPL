@@ -26,7 +26,6 @@ module type PRIM_DIST = sig
 
   val cdf : t -> float
 
-  (* TODO: add ppf function *)
   val ppf : t -> float
 
   val support : t support

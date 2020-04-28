@@ -1,0 +1,22 @@
+\chapter{Example Programs} \label{app:examples}
+\section{Sprinkler} \label{app:sprinkler}
+\section{Coin} \label{app:coin}
+The likelihood model ($X$) is a binomial.
+% 
+\begin{alignat*}{3}
+	\text{Prior:~}      & \Theta &   & \sim \text{Uniform}(0,1)    \\
+	\text{Likelihood:~} & X      &   & \sim \text{Binom}(n,\theta) 
+\end{alignat*}
+% 
+We then use Bayes' rule to calculate the posterior.
+\begin{align*}
+	P(\Theta=\theta \mid X=x) & = \frac{1}{\kappa}P(\Theta=\theta)P(X=x\mid\theta)     \\ 
+	                          & = \frac{1}{\kappa}\binom{n}{x}\theta^x(1-\theta)^{n-x} \\
+	                          & = \frac{1}{\kappa'}\theta^x(1-\theta)^{n-x}            
+\end{align*}
+
+\[\kappa'=\int_{\phi=0}^1\phi^x(1-\phi)^{n-x}~d\phi\]
+This is the beta distribution - Beta()
+\section{Linear Regression} \label{app:linreg}
+\section{Hidden Markov Model} \label{app:hmm}
+\section{Dirichlet Process} \label{app:dp}

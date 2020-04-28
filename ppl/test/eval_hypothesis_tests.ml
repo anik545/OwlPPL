@@ -61,7 +61,7 @@ let print_line oc (line : string * Owl_stats.hypothesis list) =
 
 let args = Sys.get_argv ()
 
-let root_dir = "/home/anik/Files/work/project/diss/data"
+let root_dir = "/home/anik/Files/work/project/diss/data/hypothesis"
 
 (* chi *)
 let chi () =

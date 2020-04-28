@@ -61,10 +61,10 @@ ocaml.not_built = True
 
 n = 3
 models = [
-    # 'coin',
-    # 'hmm',
+    'coin',
+    'hmm',
     'linreg',
-    # 'sprinkler'
+    'sprinkler'
 ]
 lang_funcs = [
     ('OwlPPL', ocaml),
@@ -80,7 +80,7 @@ languages = map(lambda (x, y): x, lang_funcs)
 def get_stats_for_inf(inf, mem=False):
     return \
         {lang:
-         {model: np.array([func(model, inf=inf, mem=mem) for _ in range(n)])
+         {model: np.array([func(model, inf=inf,  mem=mem) for _ in range(n)])
           for model in models}
          for lang, func in lang_funcs
          }
@@ -111,7 +111,7 @@ _ = \
 
 def write_to_csv(times, fname="times.csv"):
 
-    root_dir = "/home/anik/Files/work/project/diss/data"
+    root_dir = "/home/anik/Files/work/project/diss/data/perf"
     fname = root_dir + '/' + fname
     with open(fname, 'w') as f:
         lines = []
@@ -134,7 +134,7 @@ def write_to_csv(times, fname="times.csv"):
 
 def write_to_csv1(times, fname="times.csv"):
 
-    root_dir = "/home/anik/Files/work/project/diss/data"
+    root_dir = "/home/anik/Files/work/project/diss/data/perf"
     fname = root_dir + '/' + fname
     with open(fname, 'w') as f:
         lines = []
@@ -157,6 +157,7 @@ def write_to_csv1(times, fname="times.csv"):
 
 mode = sys.argv[1]
 
+# graph per inference algorithm
 # if mode == "time" or mode == "all":
 #     for i in infs:
 #         times_inf_by_language = get_stats_for_inf(i, mem=False)
@@ -167,15 +168,15 @@ mode = sys.argv[1]
 #         mems_inf_by_language = get_stats_for_inf(i, mem=True)
 #         write_to_csv(mems_inf_by_language, fname="mems_" + i + ".csv")
 
-
+# graph per model
 if mode == "time" or mode == "all":
     for m in models:
         times_inf_by_language = get_stats_for_model(m, mem=False)
         print(times_inf_by_language)
-        write_to_csv1(times_inf_by_language, fname="times_" + m + ".csv")
+        write_to_csv1(times_inf_by_language, fname="time/times_" + m + ".csv")
 
 if mode == "mem" or mode == "all":
     for m in models:
         mems_inf_by_language = get_stats_for_model(m, mem=True)
         print(mems_inf_by_language)
-        write_to_csv1(mems_inf_by_language, fname="mems_" + m + ".csv")
+        write_to_csv1(mems_inf_by_language, fname="memory/mems_" + m + ".csv")

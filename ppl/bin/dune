@@ -3,5 +3,5 @@
 (executables
  (modes native)
  (names ppl_50_line dice sprinkler coins single_coin linreg hmm geometric
-   main graphing misc)
+   main graphing misc hmm_continuous hmm_discrete dpmm)
  (libraries ppl core owl owl-plplot))

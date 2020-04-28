@@ -4,7 +4,7 @@
 	\pgfplotstableread[col sep = comma]{#1}\datatable
 	\pgfplotstablegetcolsof{\datatable}
 	\pgfmathtruncatemacro\numberofcols{(\pgfplotsretval-1)*0.5}
-																																																										    
+																																																											    
 	\pgfplotsinvokeforeach{1,...,\numberofcols}{
 		\pgfmathtruncatemacro\e{##1 + \numberofcols}
 		\pgfplotstablegetcolumnnamebyindex{##1}\of{\datatable}\to{\colname}
@@ -25,7 +25,7 @@
 				horizontal sep=0.2cm,
 				yticklabels at=edge left
 			},
-			ylabel={time (s)},
+			ylabel={time (ms)},
 			ymin=0,ymax=1000,
 			ybar,
 			xtick=data,

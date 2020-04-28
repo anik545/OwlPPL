@@ -45,6 +45,7 @@ let weighted_dist ?(n = 300) (d : 'a dist) : ('a, int) Core.Map.Poly.t =
   loop n Core.Map.Poly.empty
 
 let time f =
+  Gc.compact ();
   let t = Unix.gettimeofday () in
   let res = f () in
   let t1 = Unix.gettimeofday () in

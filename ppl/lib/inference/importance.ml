@@ -17,6 +17,7 @@ let importance' n d =
    categorical particles *)
 
 let rec create' n d sofar =
+  (* printf "create\n"; *)
   if n = 0 then sofar
   else
     match sample d with

@@ -46,10 +46,7 @@ type 'a hidden_state = 'a
 
 type 'a observed_state = 'a
 
-let hmm_general (transition : 'a hidden_state -> 'a hidden_state dist)
-    (emission : 'a hidden_state -> 'b observed_state Primitive.t)
-    (* need a pdf for emissions *) (observed_values : 'a observed_state list)
-    (start : 'b hidden_state list dist) =
+let hmm_general transition emission observed_values start =
   let score y x = Primitive.pdf (emission x) y in
   let expand d y =
     condition' (fun l -> score y (List.hd_exn l))

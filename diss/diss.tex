@@ -1,83 +1,32 @@
+%TC:group ocamlcode-in 0 0
 \documentclass[12pt,notitlepage,a4paper]{report}
 
-\usepackage[outputdir=out]{minted}
-\usepackage{lmodern}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{verbatim}
-\usepackage{csvsimple}
-\usepackage{pgfplots}
-\usepackage{pgfplotstable}
-\usepackage{tikz}
-\usepackage[hidelinks]{hyperref}
-\usepackage[parfill]{parskip}
-\usepackage{enumitem}
-\usepackage{hyperref}
-\usepackage{graphicx}
-\usepackage{upquote}
-\usepackage{amsmath}
-\usepackage{xcolor}
-\usepackage[margin=2cm,headheight=13.6pt]{geometry}
-\usepackage{microtype}
-\usepackage[margin=10pt,font=small,labelfont=bf,labelsep=endash,textfont=it]{caption}
-\usepackage{longtable,booktabs}
-\usepackage{amssymb,amsmath}
-\usepackage{subfig}
-\usepackage{dirtree}
-\usepackage{wrapfig}
-\usepgfplotslibrary{groupplots}
-\usepgfplotslibrary{fillbetween}
-\pgfplotsset{compat=1.13}
+\usepackage{mydiss}
 
-\setminted{fontsize=\small}
-\newmintedfile[ocamlcode]{ocaml}{frame=single,framesep=7pt}
-
-\newmintedfile[jscode]{js}{frame=single,framesep=7pt}
-\newmintedfile[clojurecode]{clj}{frame=single,framesep=7pt}
-\newminted[ocamlcode-in]{ocaml}{frame=single,framesep=7pt,autogobble}
-
-\DeclareUnicodeCharacter{2060}{\nolinebreak}
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\setlength{\emergencystretch}{3em}  % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-
-\raggedbottom                           % try to avoid widows and orphans
-\sloppy
-\clubpenalty1000%
-\widowpenalty1000%
-
-% \addtolength{\oddsidemargin}{6mm}       % adjust margins
-% \addtolength{\evensidemargin}{-8mm}
-
-\renewcommand{\baselinestretch}{1.1}    % adjust line spacing to make
-                                        % more readable
-
+\usepackage{excludeonly}
+\includeonly{chapters/introduction}
+% \includeonly{chapters/introduction,chapters/preparation,chapters/implementation}
+% \excludeonly{chapters/evaluation,chapters/appendices/documentation}
 %TC:ignore
+
 \begin{document}
-
-\bibliographystyle{plain}
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Title
-
 
 \pagestyle{empty}
 
 \hfill{\LARGE \bf Anik Roy}
 
-\vspace*{60mm}
+\vspace*{\fill}
 \begin{center}
-	\Huge
-	{\bf A probabilistic programming language in Ocaml} \\
-	\vspace*{5mm}
-	Computer Science Tripos - Part II \\
-	\vspace*{5mm}
-	Christ's College \\
-	\vspace*{5mm}
-	\today  % today's date
+	\huge
+	\textbf{A probabilistic programming language in Ocaml}\\
+	\vspace*{8mm}
+	{\LARGE Computer Science Tripos - Part II} \\
+	{\LARGE Christ's College} \\
+	{\LARGE \today}
 \end{center}
+\vspace*{\fill}
 
 \cleardoublepage
 
@@ -88,31 +37,9 @@
 \pagenumbering{roman}
 \pagestyle{plain}
 
-\chapter*{Declaration of Originality}
-
-I, Anik Roy of Christ's College, being a candidate for Part II of the Computer Science Tripos, hereby declare that this dissertation and the work described in it are my own work, unaided except as may be specified below, and that the dissertation does not contain material that has already been used to any substantial extent for a comparable purpose.
-
-I, Anik Roy of Christ's College, am content for my dissertation to be made available to the students and staff of the University. 
-
-\bigskip
-\noindent Signed \raisebox{-1ex}{\includegraphics[trim=0 0cm 0 0,height=1.5\baselineskip]{figs/signature.png}}
-
-\medskip
-\leftline{Date:  \today}
-\clearpage
-
-\chapter*{Proforma}
-\input{chapters/proforma.tex}
-\newpage
-
-\cleardoublepage
-
-\tableofcontents
-\listoffigures
-\listoflistings
+\include{chapters/frontmatter}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% now for the chapters
 
 \cleardoublepage        % just to make sure before the page numbering
 % is changed
@@ -121,68 +48,36 @@ I, Anik Roy of Christ's College, am content for my dissertation to be made avail
 \pagenumbering{arabic}
 \pagestyle{headings}
 
-
 %TC:endignore
+\include{chapters/introduction}
+% \cleardoublepage
 
-\chapter{Introduction}
-\input{chapters/introduction.tex}
-\cleardoublepage
+\include{chapters/preparation}
+% \cleardoublepage
 
-\chapter{Preparation}
-\input{chapters/preparation.tex}
-\cleardoublepage
+\include{chapters/implementation}
+% \cleardoublepage
 
-\chapter{Implementation}
-\input{chapters/implementation.tex}
-\cleardoublepage
+\include{chapters/evaluation}
+% \cleardoublepage
 
-\chapter{Evaluation}
-\input{chapters/evaluation.tex}
-\cleardoublepage
+\include{chapters/conclusion}
+% \cleardoublepage
 
-\chapter{Conclusion}
-\input{chapters/conclusion.tex}
-\cleardoublepage
-% TC:ignore
+%TC:ignore
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% the bibliography
-
+% bibliography
+\bibliographystyle{unsrt}
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliography{refs}
-\cleardoublepage
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% the appendices
+% appendices
 \appendix
 
-\chapter{Example Programs} \label{app:examples}
-\section{Sprinkler} \label{app:sprinkler}
-\section{Coin} \label{app:coin}
-The likelihood model ($X$) is a binomial.
-% 
-\begin{alignat*}{3}
-	\text{Prior:~}      & \Theta &   & \sim \text{Uniform}(0,1)    \\
-	\text{Likelihood:~} & X      &   & \sim \text{Binom}(n,\theta) 
-\end{alignat*}
-% 
-We then use Bayes' rule to calculate the posterior.
-\begin{align*}
-	P(\Theta=\theta \mid X=x) & = \frac{1}{\kappa}P(\Theta=\theta)P(X=x\mid\theta)     \\ 
-	                          & = \frac{1}{\kappa}\binom{n}{x}\theta^x(1-\theta)^{n-x} \\
-	                          & = \frac{1}{\kappa'}\theta^x(1-\theta)^{n-x}            
-\end{align*}
-
-\[\kappa'=\int_{\phi=0}^1\phi^x(1-\phi)^{n-x}~d\phi\]
-This is the beta distribution - Beta()
-\section{Linear Regression} \label{app:linreg}
-\section{Hidden Markov Model} \label{app:hmm}
-\section{Dirichlet Process} \label{app:dp}
-
-\chapter{Full Documentation} \label{app:docs}
-\input{chapters/docs}
-
-\chapter{Project Proposal}
-\input{propbody}
+\include{chapters/appendices/examples}
+\include{chapters/appendices/documentation}
+\include{chapters/appendices/proposal}
 
 \end{document}
-% TC:endignore
+%TC:endignore
