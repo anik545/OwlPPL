@@ -8,7 +8,7 @@ DISS = diss.tex refs.bib propbody.tex figs/diagram.eps makefile.txt
 
 PROP = proposal.tex propbody.tex
 
-ALL_TEX = $(shell find data code_snippets chapters -type f) $(wilcard *.tex *.txt *.bib)
+ALL_TEX = $(shell find data code_snippets chapters -type f) $(wilcard *.tex *.txt *.bib) figs data tikz code_snippets chapters
 
 OUTDIR = out
 
@@ -17,14 +17,12 @@ help:
 	@echo "USAGE:"
 	@echo
 	@echo "make          display help information"
-	@echo "make prop     make the proposal and view it using xdvi"
-	@echo "make diss.ps  make a postscript version of the dissertation"
-	@echo "make diss.pdf make a .pdf version of the dissertation"
-	@echo "make gv       view the dissertation with ghostview"
-	@echo "make gs       view the dissertation with ghostscript"
-	@echo "make all      construct proposal.dvi and diss.ps"
-	@echo "make count    display an estimated word count"
-	@echo "make pub      put demodiss.tar on my homepage"
+	@echo "make proposal"
+	@echo "make diss"
+
+	@echo "make linecount"
+	@echo "make wordcount"
+	@echo "make submit"
 	@echo "make clean    remove all remakeable files"
 	@echo
 
@@ -42,8 +40,8 @@ proposal: proposal.pdf
 proposal.pdf: propbody.tex proposal.tex
 	latexmk $(LATEXMK_ARGS) proposal.tex
 
-count:
-	detex diss.tex | tr -cd '0-9A-Za-z \n' | wc -w
+wordcount:
+	detex chapters/conclusion.tex chapters/evaluation.tex chapters/implementation.tex chapters/introduction.tex chapters/preparation.tex chapters/proforma.tex | tr -cd '0-9A-Za-z \n' | wc -w
 	texcount -inc -sum -1 diss.tex
 
 linecount:

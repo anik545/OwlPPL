@@ -2,7 +2,7 @@
 \href{../../index.html}{Ppl} » \href{../index.html}{Dist} » PplOps
 
 \section{\texorpdfstring{Module
-\texttt{Dist.PplOps}}{Module Dist.PplOps}}\label{module-dist.pplops}
+ \texttt{Dist.PplOps}}{Module Dist.PplOps}}\label{module-dist.pplops}
 
 Operators for distributions
 
@@ -36,7 +36,7 @@ Operators for distributions
 \href{../index.html}{Ppl} » Dist
 
 \section{\texorpdfstring{Module
-\texttt{Ppl.Dist}}{Module Ppl.Dist}}\label{module-ppl.dist}
+ \texttt{Ppl.Dist}}{Module Ppl.Dist}}\label{module-ppl.dist}
 
 Module used for defining probabilistic models
 
@@ -44,15 +44,15 @@ Contains a type \href{index.html\#type-dist}{\texttt{dist}} which is
 used to represent probabilistic models.
 
 \begin{itemize}
-\tightlist
-\item
-  \protect\hyperlink{distux5fmonad}{Condition Operators}
-\item
-  \protect\hyperlink{distux5fmonad}{Monad Functions}
-\item
-  \protect\hyperlink{distux5fsample}{Sampling}
-\item
-  \protect\hyperlink{prior}{Prior Distribution}
+	\tightlist
+	\item
+	      \protect\hyperlink{distux5fmonad}{Condition Operators}
+	\item
+	      \protect\hyperlink{distux5fmonad}{Monad Functions}
+	\item
+	      \protect\hyperlink{distux5fsample}{Sampling}
+	\item
+	      \protect\hyperlink{prior}{Prior Distribution}
 \end{itemize}
 
 \protect\hyperlink{exception-Undefined}{}\texttt{exception\ }\texttt{Undefined}
@@ -61,55 +61,55 @@ used to represent probabilistic models.
 \protect\hyperlink{module-Prob}{}\texttt{module\ Prob\ :\ Ppl\_\_.Sigs.Prob}
 
 \begin{description}
-\item[{\protect\hyperlink{type-prob}{}\texttt{type\ prob}\texttt{\ =\ Prob.t}}]
-A type for which values need to sum to 1
+	\item[{\protect\hyperlink{type-prob}{}\texttt{type\ prob}\texttt{\ =\ Prob.t}}]
+	A type for which values need to sum to 1
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{type-likelihood}{}\texttt{type\ likelihood}\texttt{\ =\ Prob.t}}]
-A type for which values don't need to sum to 1
+	\item[{\protect\hyperlink{type-likelihood}{}\texttt{type\ likelihood}\texttt{\ =\ Prob.t}}]
+	A type for which values don't need to sum to 1
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{type-samples}{}\texttt{type\ \textquotesingle{}a\ samples}\texttt{\ =\ (\textquotesingle{}a\ *\ prob)\ list}}]
-A set of weighted samples, summing to one
+	\item[{\protect\hyperlink{type-samples}{}\texttt{type\ \textquotesingle{}a\ samples}\texttt{\ =\ (\textquotesingle{}a\ *\ prob)\ list}}]
+	A set of weighted samples, summing to one
 \end{description}
 
 \protect\hyperlink{type-dist}{}\texttt{type\ \_\ dist}\texttt{\ =\ private\ }
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-\protect\hyperlink{type-dist.Return}{}\texttt{\textbar{}\ }\texttt{Return\ :\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}a\ dist}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-distribution with a single value
-\strut\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-\protect\hyperlink{type-dist.Bind}{}\texttt{\textbar{}\ }\texttt{Bind\ :\ \textquotesingle{}a\ dist\ *\ (\textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b\ dist)\ -\textgreater{}\ \textquotesingle{}b\ dist}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-monadic bind
-\strut\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-\protect\hyperlink{type-dist.Primitive}{}\texttt{\textbar{}\ }\texttt{Primitive\ :\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}a\ dist}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-primitive exact distribution
-\strut\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-\protect\hyperlink{type-dist.Conditional}{}\texttt{\textbar{}\ }\texttt{Conditional\ :\ (\textquotesingle{}a\ -\textgreater{}\ likelihood)\ *\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-variant that defines likelihood model
-\strut\end{minipage}\tabularnewline
-\bottomrule
+	\toprule
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	\protect\hyperlink{type-dist.Return}{}\texttt{\textbar{}\ }\texttt{Return\ :\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}a\ dist}
+	\strut\end{minipage} &   
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	distribution with a single value
+	\strut\end{minipage}\tabularnewline
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	\protect\hyperlink{type-dist.Bind}{}\texttt{\textbar{}\ }\texttt{Bind\ :\ \textquotesingle{}a\ dist\ *\ (\textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b\ dist)\ -\textgreater{}\ \textquotesingle{}b\ dist}
+	\strut\end{minipage} &   
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	monadic bind
+	\strut\end{minipage}\tabularnewline
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	\protect\hyperlink{type-dist.Primitive}{}\texttt{\textbar{}\ }\texttt{Primitive\ :\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}a\ dist}
+	\strut\end{minipage} &   
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	primitive exact distribution
+	\strut\end{minipage}\tabularnewline
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	\protect\hyperlink{type-dist.Conditional}{}\texttt{\textbar{}\ }\texttt{Conditional\ :\ (\textquotesingle{}a\ -\textgreater{}\ likelihood)\ *\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
+	\strut\end{minipage} &   
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	variant that defines likelihood model
+	\strut\end{minipage}\tabularnewline
+	\bottomrule
 \end{longtable}
 
 Type for representing distributions
 
 \hypertarget{distux5fmonad}{\subsubsection{\texorpdfstring{\protect\hyperlink{distux5fmonad}{}Condition
-Operators}{Condition Operators}}\label{distux5fmonad}}
+	Operators}{Condition Operators}}\label{distux5fmonad}}
 
 \protect\hyperlink{val-conditionux27}{}\texttt{val\ condition\textquotesingle{}\ :\ (\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
 
@@ -122,7 +122,7 @@ Operators}{Condition Operators}}\label{distux5fmonad}}
 \protect\hyperlink{val-fromux5fprimitive}{}\texttt{val\ from\_primitive\ :\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}a\ dist}
 
 \hypertarget{distux5fmonad}{\subsubsection{\texorpdfstring{\protect\hyperlink{distux5fmonad}{}Monad
-Functions}{Monad Functions}}\label{distux5fmonad}}
+	Functions}{Monad Functions}}\label{distux5fmonad}}
 
 {\texttt{include\ Ppl\_\_.Monad.Monad\ with\ type\ \textquotesingle{}a\ t\ :=\ \textquotesingle{}a\ dist}}
 
@@ -155,9 +155,9 @@ used in models. Ok
 \protect\hyperlink{type-primitive}{}\texttt{type\ \textquotesingle{}a\ primitive}
 
 \begin{description}
-\item[{\protect\hyperlink{val-binomial}{}\texttt{val\ binomial\ :\ int\ -\textgreater{}\ float\ -\textgreater{}\ int\ primitive}}]
-Create a binomial distribution, the output is the number of successes
-from n independent trials with probability of success p
+	\item[{\protect\hyperlink{val-binomial}{}\texttt{val\ binomial\ :\ int\ -\textgreater{}\ float\ -\textgreater{}\ int\ primitive}}]
+	Create a binomial distribution, the output is the number of successes
+	from n independent trials with probability of success p
 \end{description}
 
 \protect\hyperlink{val-normal}{}\texttt{val\ normal\ :\ float\ -\textgreater{}\ float\ -\textgreater{}\ float\ primitive}
@@ -187,7 +187,7 @@ from n independent trials with probability of success p
 \protect\hyperlink{val-distux5fofux5fnux5fsamples}{}\texttt{val\ dist\_of\_n\_samples\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ list\ dist}
 
 \hypertarget{prior}{\subsubsection{\texorpdfstring{\protect\hyperlink{prior}{}Prior
-Distribution}{Prior Distribution}}\label{prior}}
+	Distribution}{Prior Distribution}}\label{prior}}
 
 \protect\hyperlink{val-priorux27}{}\texttt{val\ prior\textquotesingle{}\ :\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
 
@@ -198,15 +198,15 @@ Distribution}{Prior Distribution}}\label{prior}}
 \protect\hyperlink{val-support}{}\texttt{val\ support\ :\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ list}
 
 \begin{description}
-\item[{\protect\hyperlink{module-PplOps}{}\texttt{module\ PplOps\ :\ Ppl\_\_.Sigs.Ops\ with\ type\ \textquotesingle{}a\ dist\ :=\ \textquotesingle{}a\ dist}}]
-Operators for distributions
+	\item[{\protect\hyperlink{module-PplOps}{}\texttt{module\ PplOps\ :\ Ppl\_\_.Sigs.Ops\ with\ type\ \textquotesingle{}a\ dist\ :=\ \textquotesingle{}a\ dist}}]
+	Operators for distributions
 \end{description}
 
 \href{../index.html}{Up} -- \href{../../index.html}{ppl} »
 \href{../index.html}{Ppl} » Inference
 
 \section{\texorpdfstring{Module
-\texttt{Ppl.Inference}}{Module Ppl.Inference}}\label{module-ppl.inference}
+ \texttt{Ppl.Inference}}{Module Ppl.Inference}}\label{module-ppl.inference}
 
 Implementation of inference algorithms
 
@@ -214,26 +214,26 @@ Inference algorithms to be called on probabilistic models defined using
 \href{../Dist/index.html}{\texttt{Dist}}
 
 \begin{itemize}
-\tightlist
-\item
-  \protect\hyperlink{infux5fhelpers}{Helpers}
-\item
-  \protect\hyperlink{infux5fexact}{Exact Inference}
-\item
-  \protect\hyperlink{infux5fimp}{Importance Sampling}
-\item
-  \protect\hyperlink{rejux5fhelpers}{Rejetion Sampling}
-\item
-  \protect\hyperlink{infux5fsmc}{Sequential Monte Carlo}
-\item
-  \protect\hyperlink{infux5fmh}{Metropolis Hastings}
-\item
-  \protect\hyperlink{infux5fpmcmc}{Particle Independent Metropolis
-  Hastings}
-\item
-  \protect\hyperlink{infux5fpc}{Particle Cascade}
-\item
-  \protect\hyperlink{com}{Common}
+	\tightlist
+	\item
+	      \protect\hyperlink{infux5fhelpers}{Helpers}
+	\item
+	      \protect\hyperlink{infux5fexact}{Exact Inference}
+	\item
+	      \protect\hyperlink{infux5fimp}{Importance Sampling}
+	\item
+	      \protect\hyperlink{rejux5fhelpers}{Rejetion Sampling}
+	\item
+	      \protect\hyperlink{infux5fsmc}{Sequential Monte Carlo}
+	\item
+	      \protect\hyperlink{infux5fmh}{Metropolis Hastings}
+	\item
+	      \protect\hyperlink{infux5fpmcmc}{Particle Independent Metropolis
+	      Hastings}
+	\item
+	      \protect\hyperlink{infux5fpc}{Particle Cascade}
+	\item
+	      \protect\hyperlink{com}{Common}
 \end{itemize}
 
 \protect\hyperlink{exception-Undefined}{}\texttt{exception\ }\texttt{Undefined}
@@ -251,29 +251,29 @@ Inference algorithms to be called on probabilistic models defined using
 \protect\hyperlink{val-flatten}{}\texttt{val\ flatten\ :\ (\textquotesingle{}a\ samples\ *\ Dist.prob)\ list\ -\textgreater{}\ \textquotesingle{}a\ samples}
 
 \hypertarget{infux5fexact}{\subsubsection{\texorpdfstring{\protect\hyperlink{infux5fexact}{}Exact
-Inference}{Exact Inference}}\label{infux5fexact}}
+	Inference}{Exact Inference}}\label{infux5fexact}}
 
 \protect\hyperlink{val-enumerate}{}\texttt{val\ enumerate\ :\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ float\ -\textgreater{}\ \textquotesingle{}a\ samples}
 
 \protect\hyperlink{val-exactux5finference}{}\texttt{val\ exact\_inference\ :\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist}
 
 \hypertarget{infux5fimp}{\subsubsection{\texorpdfstring{\protect\hyperlink{infux5fimp}{}Importance
-Sampling}{Importance Sampling}}\label{infux5fimp}}
+	Sampling}{Importance Sampling}}\label{infux5fimp}}
 
 \protect\hyperlink{val-importance}{}\texttt{val\ importance\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ samples\ Dist.dist}
 
 \protect\hyperlink{val-importanceux27}{}\texttt{val\ importance\textquotesingle{}\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist}
 
 \hypertarget{rejux5fhelpers}{\subsubsection{\texorpdfstring{\protect\hyperlink{rejux5fhelpers}{}Rejetion
-Sampling}{Rejetion Sampling}}\label{rejux5fhelpers}}
+	Sampling}{Rejetion Sampling}}\label{rejux5fhelpers}}
 
 \protect\hyperlink{type-rejectionux5ftype}{}\texttt{type\ rejection\_type}\texttt{\ =\ }
 
 \begin{longtable}[c]{@{}l@{}}
-\toprule
-\protect\hyperlink{type-rejectionux5ftype.Hard}{}\texttt{\textbar{}\ }\texttt{Hard}\tabularnewline
-\protect\hyperlink{type-rejectionux5ftype.Soft}{}\texttt{\textbar{}\ }\texttt{Soft}\tabularnewline
-\bottomrule
+	\toprule                                                                                           
+	\protect\hyperlink{type-rejectionux5ftype.Hard}{}\texttt{\textbar{}\ }\texttt{Hard}\tabularnewline 
+	\protect\hyperlink{type-rejectionux5ftype.Soft}{}\texttt{\textbar{}\ }\texttt{Soft}\tabularnewline 
+	\bottomrule                                                                                        
 \end{longtable}
 
 \protect\hyperlink{val-ppux5frejectionux5ftype}{}\texttt{val\ pp\_rejection\_type\ :\ Stdlib.Format.formatter\ -\textgreater{}\ rejection\_type\ -\textgreater{}\ unit}
@@ -299,7 +299,7 @@ Sampling}{Rejetion Sampling}}\label{rejux5fhelpers}}
 \protect\hyperlink{val-rejection}{}\texttt{val\ rejection\ :\ ?⁠n:int\ -\textgreater{}\ rejection\_type\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist}
 
 \hypertarget{infux5fsmc}{\subsubsection{\texorpdfstring{\protect\hyperlink{infux5fsmc}{}Sequential
-Monte Carlo}{Sequential Monte Carlo}}\label{infux5fsmc}}
+	Monte Carlo}{Sequential Monte Carlo}}\label{infux5fsmc}}
 
 \protect\hyperlink{val-smc}{}\texttt{val\ smc\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ samples\ Dist.dist}
 
@@ -314,7 +314,7 @@ Monte Carlo}{Sequential Monte Carlo}}\label{infux5fsmc}}
 \protect\hyperlink{val-smcMultipleux27}{}\texttt{val\ smcMultiple\textquotesingle{}\ :\ int\ -\textgreater{}\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist}
 
 \hypertarget{infux5fmh}{\subsubsection{\texorpdfstring{\protect\hyperlink{infux5fmh}{}Metropolis
-Hastings}{Metropolis Hastings}}\label{infux5fmh}}
+	Hastings}{Metropolis Hastings}}\label{infux5fmh}}
 
 \protect\hyperlink{val-mhux27}{}\texttt{val\ mh\textquotesingle{}\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist}
 
@@ -325,15 +325,15 @@ Hastings}{Metropolis Hastings}}\label{infux5fmh}}
 \protect\hyperlink{val-mhux5ftransform}{}\texttt{val\ mh\_transform\ :\ burn:int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist}
 
 \hypertarget{infux5fpmcmc}{\subsubsection{\texorpdfstring{\protect\hyperlink{infux5fpmcmc}{}Particle
-Independent Metropolis
-Hastings}{Particle Independent Metropolis Hastings}}\label{infux5fpmcmc}}
+	Independent Metropolis
+	Hastings}{Particle Independent Metropolis Hastings}}\label{infux5fpmcmc}}
 
 \protect\hyperlink{val-pimh}{}\texttt{val\ pimh\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ samples\ list\ Dist.dist}
 
 \protect\hyperlink{val-pimhux27}{}\texttt{val\ pimh\textquotesingle{}\ :\ int\ -\textgreater{}\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist}
 
 \hypertarget{infux5fpc}{\subsubsection{\texorpdfstring{\protect\hyperlink{infux5fpc}{}Particle
-Cascade}{Particle Cascade}}\label{infux5fpc}}
+	Cascade}{Particle Cascade}}\label{infux5fpc}}
 
 \protect\hyperlink{val-resamplePC}{}\texttt{val\ resamplePC\ :\ (\textquotesingle{}a\ *\ float)\ list\ -\textgreater{}\ int\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ list\ Dist.dist}
 
@@ -346,18 +346,18 @@ Cascade}{Particle Cascade}}\label{infux5fpc}}
 \protect\hyperlink{type-inferux5fstrat}{}\texttt{type\ infer\_strat}\texttt{\ =\ }
 
 \begin{longtable}[c]{@{}l@{}}
-\toprule
-\protect\hyperlink{type-inferux5fstrat.MH}{}\texttt{\textbar{}\ }\texttt{MH\ of\ int}\tabularnewline
-\protect\hyperlink{type-inferux5fstrat.SMC}{}\texttt{\textbar{}\ }\texttt{SMC\ of\ int}\tabularnewline
-\protect\hyperlink{type-inferux5fstrat.PC}{}\texttt{\textbar{}\ }\texttt{PC\ of\ int}\tabularnewline
-\protect\hyperlink{type-inferux5fstrat.PIMH}{}\texttt{\textbar{}\ }\texttt{PIMH\ of\ int}\tabularnewline
-\protect\hyperlink{type-inferux5fstrat.Importance}{}\texttt{\textbar{}\ }\texttt{Importance\ of\ int}\tabularnewline
-\protect\hyperlink{type-inferux5fstrat.Rejection}{}\texttt{\textbar{}\ }\texttt{Rejection\ of\ int\ *\ rejection\_type}\tabularnewline
-\protect\hyperlink{type-inferux5fstrat.RejectionTrans}{}\texttt{\textbar{}\ }\texttt{RejectionTrans\ of\ int\ *\ rejection\_type}\tabularnewline
-\protect\hyperlink{type-inferux5fstrat.Prior}{}\texttt{\textbar{}\ }\texttt{Prior}\tabularnewline
-\protect\hyperlink{type-inferux5fstrat.Enum}{}\texttt{\textbar{}\ }\texttt{Enum}\tabularnewline
-\protect\hyperlink{type-inferux5fstrat.Forward}{}\texttt{\textbar{}\ }\texttt{Forward}\tabularnewline
-\bottomrule
+	\toprule                                                                                                                                         
+	\protect\hyperlink{type-inferux5fstrat.MH}{}\texttt{\textbar{}\ }\texttt{MH\ of\ int}\tabularnewline                                             
+	\protect\hyperlink{type-inferux5fstrat.SMC}{}\texttt{\textbar{}\ }\texttt{SMC\ of\ int}\tabularnewline                                           
+	\protect\hyperlink{type-inferux5fstrat.PC}{}\texttt{\textbar{}\ }\texttt{PC\ of\ int}\tabularnewline                                             
+	\protect\hyperlink{type-inferux5fstrat.PIMH}{}\texttt{\textbar{}\ }\texttt{PIMH\ of\ int}\tabularnewline                                         
+	\protect\hyperlink{type-inferux5fstrat.Importance}{}\texttt{\textbar{}\ }\texttt{Importance\ of\ int}\tabularnewline                             
+	\protect\hyperlink{type-inferux5fstrat.Rejection}{}\texttt{\textbar{}\ }\texttt{Rejection\ of\ int\ *\ rejection\_type}\tabularnewline           
+	\protect\hyperlink{type-inferux5fstrat.RejectionTrans}{}\texttt{\textbar{}\ }\texttt{RejectionTrans\ of\ int\ *\ rejection\_type}\tabularnewline 
+	\protect\hyperlink{type-inferux5fstrat.Prior}{}\texttt{\textbar{}\ }\texttt{Prior}\tabularnewline                                                
+	\protect\hyperlink{type-inferux5fstrat.Enum}{}\texttt{\textbar{}\ }\texttt{Enum}\tabularnewline                                                  
+	\protect\hyperlink{type-inferux5fstrat.Forward}{}\texttt{\textbar{}\ }\texttt{Forward}\tabularnewline                                            
+	\bottomrule                                                                                                                                      
 \end{longtable}
 
 \protect\hyperlink{val-ppux5finferux5fstrat}{}\texttt{val\ pp\_infer\_strat\ :\ Stdlib.Format.formatter\ -\textgreater{}\ infer\_strat\ -\textgreater{}\ unit}
@@ -377,7 +377,7 @@ Cascade}{Particle Cascade}}\label{infux5fpc}}
 PRIM\_DIST
 
 \section{\texorpdfstring{Module type
-\texttt{Primitive.PRIM\_DIST}}{Module type Primitive.PRIM\_DIST}}\label{module-type-primitive.primux5fdist}
+ \texttt{Primitive.PRIM\_DIST}}{Module type Primitive.PRIM\_DIST}}\label{module-type-primitive.primux5fdist}
 
 The signature for new primitives distributions
 
@@ -397,78 +397,78 @@ The signature for new primitives distributions
 \href{../index.html}{Ppl} » Primitive
 
 \section{\texorpdfstring{Module
-\texttt{Ppl.Primitive}}{Module Ppl.Primitive}}\label{module-ppl.primitive}
+ \texttt{Ppl.Primitive}}{Module Ppl.Primitive}}\label{module-ppl.primitive}
 
 Module defining a type for primitive distributions
 
 \begin{itemize}
-\tightlist
-\item
-  \protect\hyperlink{newux5fprim}{New Distributions}
-\item
-  \protect\hyperlink{inbuiltux5fdists}{Predefined Distributions}
-\item
-  \protect\hyperlink{basicux5fops}{Basic Operations}
-\item
-  \protect\hyperlink{primux5fother}{Other}
+	\tightlist
+	\item
+	      \protect\hyperlink{newux5fprim}{New Distributions}
+	\item
+	      \protect\hyperlink{inbuiltux5fdists}{Predefined Distributions}
+	\item
+	      \protect\hyperlink{basicux5fops}{Basic Operations}
+	\item
+	      \protect\hyperlink{primux5fother}{Other}
 \end{itemize}
 
 \protect\hyperlink{type-support}{}\texttt{type\ \textquotesingle{}a\ support}\texttt{\ =\ }
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-\protect\hyperlink{type-support.DiscreteFinite}{}\texttt{\textbar{}\ }\texttt{DiscreteFinite\ of\ \textquotesingle{}a\ list}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-A list of valid values
-\strut\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-\protect\hyperlink{type-support.DiscreteInfinite}{}\texttt{\textbar{}\ }\texttt{DiscreteInfinite}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-discrete dist with infinite support e.g. poisson
-\strut\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-\protect\hyperlink{type-support.ContinuousFinite}{}\texttt{\textbar{}\ }\texttt{ContinuousFinite\ of\ (\textquotesingle{}a\ *\ \textquotesingle{}a)\ list}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-set of endpoints
-\strut\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-\protect\hyperlink{type-support.ContinuousInfinite}{}\texttt{\textbar{}\ }\texttt{ContinuousInfinite}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-continuous dist with an infinite support e.g.
-\strut\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-\protect\hyperlink{type-support.Merged}{}\texttt{\textbar{}\ }\texttt{Merged\ of\ \textquotesingle{}a\ support\ *\ \textquotesingle{}a\ support}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
-combination of any of the above
-\strut\end{minipage}\tabularnewline
-\bottomrule
+	\toprule
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	\protect\hyperlink{type-support.DiscreteFinite}{}\texttt{\textbar{}\ }\texttt{DiscreteFinite\ of\ \textquotesingle{}a\ list}
+	\strut\end{minipage} &   
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	A list of valid values
+	\strut\end{minipage}\tabularnewline
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	\protect\hyperlink{type-support.DiscreteInfinite}{}\texttt{\textbar{}\ }\texttt{DiscreteInfinite}
+	\strut\end{minipage} &   
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	discrete dist with infinite support e.g. poisson
+	\strut\end{minipage}\tabularnewline
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	\protect\hyperlink{type-support.ContinuousFinite}{}\texttt{\textbar{}\ }\texttt{ContinuousFinite\ of\ (\textquotesingle{}a\ *\ \textquotesingle{}a)\ list}
+	\strut\end{minipage} &   
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	set of endpoints
+	\strut\end{minipage}\tabularnewline
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	\protect\hyperlink{type-support.ContinuousInfinite}{}\texttt{\textbar{}\ }\texttt{ContinuousInfinite}
+	\strut\end{minipage} &   
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	continuous dist with an infinite support e.g.
+	\strut\end{minipage}\tabularnewline
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	\protect\hyperlink{type-support.Merged}{}\texttt{\textbar{}\ }\texttt{Merged\ of\ \textquotesingle{}a\ support\ *\ \textquotesingle{}a\ support}
+	\strut\end{minipage} &   
+	\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+	combination of any of the above
+	\strut\end{minipage}\tabularnewline
+	\bottomrule
 \end{longtable}
 
 The type of supports - the values with a distribution can take
 
 \begin{description}
-\item[{\protect\hyperlink{module-type-PRIMux5fDIST}{}\texttt{module\ type\ PRIM\_DIST\ =\ sig\ ...\ end}}]
-The signature for new primitives distributions
+	\item[{\protect\hyperlink{module-type-PRIMux5fDIST}{}\texttt{module\ type\ PRIM\_DIST\ =\ sig\ ...\ end}}]
+	The signature for new primitives distributions
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{type-t}{}\texttt{type\ \textquotesingle{}a\ t}}]
-Type of primitive dists wrapping a module
+	\item[{\protect\hyperlink{type-t}{}\texttt{type\ \textquotesingle{}a\ t}}]
+	Type of primitive dists wrapping a module
 \end{description}
 
 \hypertarget{newux5fprim}{\subsubsection{\texorpdfstring{\protect\hyperlink{newux5fprim}{}New
-Distributions}{New Distributions}}\label{newux5fprim}}
+	Distributions}{New Distributions}}\label{newux5fprim}}
 
 \protect\hyperlink{val-createux5fprimitive}{}\texttt{val\ create\_primitive\ :\ sample:(unit\ -\textgreater{}\ \textquotesingle{}a)\ -\textgreater{}\ pdf:(\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ cdf:(\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ support:\textquotesingle{}a\ support\ -\textgreater{}\ ppf:(\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ \textquotesingle{}a\ t}
 
 \hypertarget{inbuiltux5fdists}{\subsubsection{\texorpdfstring{\protect\hyperlink{inbuiltux5fdists}{}Predefined
-Distributions}{Predefined Distributions}}\label{inbuiltux5fdists}}
+	Distributions}{Predefined Distributions}}\label{inbuiltux5fdists}}
 
 \protect\hyperlink{val-binomial}{}\texttt{val\ binomial\ :\ int\ -\textgreater{}\ float\ -\textgreater{}\ int\ t}
 
@@ -487,7 +487,7 @@ Distributions}{Predefined Distributions}}\label{inbuiltux5fdists}}
 \protect\hyperlink{val-continuousux5funiform}{}\texttt{val\ continuous\_uniform\ :\ float\ -\textgreater{}\ float\ -\textgreater{}\ float\ t}
 
 \hypertarget{basicux5fops}{\subsubsection{\texorpdfstring{\protect\hyperlink{basicux5fops}{}Basic
-Operations}{Basic Operations}}\label{basicux5fops}}
+	Operations}{Basic Operations}}\label{basicux5fops}}
 
 \protect\hyperlink{val-pdf}{}\texttt{val\ pdf\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}
 
@@ -509,32 +509,30 @@ Operations}{Basic Operations}}\label{basicux5fops}}
 \href{../index.html}{Ppl} » Helpers
 
 \section{\texorpdfstring{Module
-\texttt{Ppl.Helpers}}{Module Ppl.Helpers}}\label{module-ppl.helpers}
+ \texttt{Ppl.Helpers}}{Module Ppl.Helpers}}\label{module-ppl.helpers}
 
 Utilities for working with distributions
 
 A set of utilities for generating statistics and printing distributions
 
 \begin{itemize}
-\tightlist
-\item
-  \protect\hyperlink{samples}{Samples}
-\item
-  \protect\hyperlink{print}{Printing}
-\item
-  \protect\hyperlink{otherux5fhelpers}{Others}
+	\tightlist
+	\item
+	      \protect\hyperlink{samples}{Samples}
+	\item
+	      \protect\hyperlink{print}{Printing}
+	\item
+	      \protect\hyperlink{otherux5fhelpers}{Others}
 \end{itemize}
 
 \hypertarget{samples}{\subsubsection{\texorpdfstring{\protect\hyperlink{samples}{}Samples}{Samples}}\label{samples}}
 
-\begin{description}
-\item[{\protect\hyperlink{val-sampleux5fmean}{}\texttt{val\ sample\_mean\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}\\
+\protect\hyperlink{val-sampleux5fmean}{}\texttt{val\ sample\_mean\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}\\
 \protect\hyperlink{val-sampleux5fvariance}{}\texttt{val\ sample\_variance\ :\ ?⁠n:int\ -\textgreater{}\ float\ Dist.dist\ -\textgreater{}\ float}\\
 \protect\hyperlink{val-takeux5fkux5fsamples}{}\texttt{val\ take\_k\_samples\ :\ int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ array}\\
-\protect\hyperlink{val-unduplicate}{}\texttt{val\ unduplicate\ :\ (\textquotesingle{}a\ *\ Dist.prob)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ list}}]
+\protect\hyperlink{val-unduplicate}{}\texttt{val\ unduplicate\ :\ (\textquotesingle{}a\ *\ Dist.prob)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ list}
 Removes duplicates and sums the probabilities associated so that each
 value appears once
-\end{description}
 
 \protect\hyperlink{val-flatten}{}\texttt{val\ flatten\ :\ ((\textquotesingle{}a\ *\ Dist.prob)\ list\ *\ Dist.prob)\ list\ -\textgreater{}\ (\textquotesingle{}a\ *\ Dist.prob)\ list}
 
@@ -564,7 +562,7 @@ value appears once
 \href{../index.html}{Ppl} » Evaluation
 
 \section{\texorpdfstring{Module
-\texttt{Ppl.Evaluation}}{Module Ppl.Evaluation}}\label{module-ppl.evaluation}
+ \texttt{Ppl.Evaluation}}{Module Ppl.Evaluation}}\label{module-ppl.evaluation}
 
 A module for evaluating the correctness of models and inference
 procedures
@@ -573,11 +571,11 @@ Contains functionality to perform hypothesis tests and KL-divergences
 for both continuous and discrete distributions
 
 \begin{itemize}
-\tightlist
-\item
-  \protect\hyperlink{kl}{KL-Divergence}
-\item
-  \protect\hyperlink{hypux5ftests}{Hypothesis Tests}
+	\tightlist
+	\item
+	      \protect\hyperlink{kl}{KL-Divergence}
+	\item
+	      \protect\hyperlink{hypux5ftests}{Hypothesis Tests}
 \end{itemize}
 
 \protect\hyperlink{type-samples}{}\texttt{type\ \textquotesingle{}a\ samples}\texttt{\ =\ \textquotesingle{}a\ Empirical.Discrete.t}
@@ -587,13 +585,13 @@ for both continuous and discrete distributions
 \hypertarget{kl}{\subsubsection{\texorpdfstring{\protect\hyperlink{kl}{}KL-Divergence}{KL-Divergence}}\label{kl}}
 
 \begin{description}
-\item[{\protect\hyperlink{val-klux5fdiscrete}{}\texttt{val\ kl\_discrete\ :\ ?⁠n:int\ -\textgreater{}\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ float}}]
-Find the KL divergence for two discrete distributions
+	\item[{\protect\hyperlink{val-klux5fdiscrete}{}\texttt{val\ kl\_discrete\ :\ ?⁠n:int\ -\textgreater{}\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ float}}]
+	Find the KL divergence for two discrete distributions
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-klux5fcontinuous}{}\texttt{val\ kl\_continuous\ :\ ?⁠n:int\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ float\ dist\ -\textgreater{}\ float}}]
-Find the KL divergence for two continuous distributions
+	\item[{\protect\hyperlink{val-klux5fcontinuous}{}\texttt{val\ kl\_continuous\ :\ ?⁠n:int\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ float\ dist\ -\textgreater{}\ float}}]
+	Find the KL divergence for two continuous distributions
 \end{description}
 
 \protect\hyperlink{val-klux5fcumux5fdiscrete}{}\texttt{val\ kl\_cum\_discrete\ :\ int\ array\ -\textgreater{}\ bool\ Primitive.t\ -\textgreater{}\ bool\ dist\ -\textgreater{}\ (int\ *\ float)\ array}
@@ -601,25 +599,25 @@ Find the KL divergence for two continuous distributions
 \protect\hyperlink{val-klux5fcumux5fcontinuous}{}\texttt{val\ kl\_cum\_continuous\ :\ int\ array\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ float\ dist\ -\textgreater{}\ (int\ *\ float)\ array}
 
 \hypertarget{hypux5ftests}{\subsubsection{\texorpdfstring{\protect\hyperlink{hypux5ftests}{}Hypothesis
-Tests}{Hypothesis Tests}}\label{hypux5ftests}}
+	Tests}{Hypothesis Tests}}\label{hypux5ftests}}
 
 \begin{description}
-\item[{\protect\hyperlink{val-kolmogorovux5fsmirnov}{}\texttt{val\ kolmogorov\_smirnov\ :\ ?⁠n:int\ -\textgreater{}\ ?⁠alpha:float\ -\textgreater{}\ float\ dist\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ Owl\_stats.hypothesis}}]
-Perform kolmogorov smirnov test, returns a \texttt{hypothesis} which is
-true if the null hypothesis is rejected
+	\item[{\protect\hyperlink{val-kolmogorovux5fsmirnov}{}\texttt{val\ kolmogorov\_smirnov\ :\ ?⁠n:int\ -\textgreater{}\ ?⁠alpha:float\ -\textgreater{}\ float\ dist\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ Owl\_stats.hypothesis}}]
+	Perform kolmogorov smirnov test, returns a \texttt{hypothesis} which is
+	true if the null hypothesis is rejected
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-chiux5fsq}{}\texttt{val\ chi\_sq\ :\ ?⁠n:int\ -\textgreater{}\ ?⁠alpha:float\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ Owl\_stats.hypothesis}}]
-Perform chi-squared test, returns a \texttt{hypothesis} which is true if
-the null hypothesis is rejected
+	\item[{\protect\hyperlink{val-chiux5fsq}{}\texttt{val\ chi\_sq\ :\ ?⁠n:int\ -\textgreater{}\ ?⁠alpha:float\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ Owl\_stats.hypothesis}}]
+	Perform chi-squared test, returns a \texttt{hypothesis} which is true if
+	the null hypothesis is rejected
 \end{description}
 
 \href{../index.html}{Up} -- \href{../../index.html}{ppl} »
 \href{../index.html}{Ppl} » Plot
 
 \section{\texorpdfstring{Module
-\texttt{Ppl.Plot}}{Module Ppl.Plot}}\label{module-ppl.plot}
+ \texttt{Ppl.Plot}}{Module Ppl.Plot}}\label{module-ppl.plot}
 
 Plotting utilies
 
@@ -627,24 +625,24 @@ Plotting utilies
 to graph PPL distributions
 
 \begin{itemize}
-\tightlist
-\item
-  \protect\hyperlink{histograms}{Histograms}
-\item
-  \protect\hyperlink{otherux5fplots}{Other Plots}
+	\tightlist
+	\item
+	      \protect\hyperlink{histograms}{Histograms}
+	\item
+	      \protect\hyperlink{otherux5fplots}{Other Plots}
 \end{itemize}
 
 \protect\hyperlink{type-options}{}\texttt{type\ options} =
 \texttt{{[}\ }
-
-\begin{longtable}[c]{@{}l@{}}
-\toprule
-\protect\hyperlink{type-options.Xux5flabel}{}\texttt{\textbar{}\ }\texttt{`X\_label\ of\ string}\tabularnewline
-\protect\hyperlink{type-options.Yux5flabel}{}\texttt{\textbar{}\ }\texttt{`Y\_label\ of\ string}\tabularnewline
-\protect\hyperlink{type-options.Title}{}\texttt{\textbar{}\ }\texttt{`Title\ of\ string}\tabularnewline
-\bottomrule
-\end{longtable}
-
+		
+	\begin{longtable}[c]{@{}l@{}}
+		\toprule                                                                                                        
+		\protect\hyperlink{type-options.Xux5flabel}{}\texttt{\textbar{}\ }\texttt{`X\_label\ of\ string}\tabularnewline 
+		\protect\hyperlink{type-options.Yux5flabel}{}\texttt{\textbar{}\ }\texttt{`Y\_label\ of\ string}\tabularnewline 
+		\protect\hyperlink{type-options.Title}{}\texttt{\textbar{}\ }\texttt{`Title\ of\ string}\tabularnewline         
+		\bottomrule                                                                                                     
+	\end{longtable}
+		
 \texttt{\ {]}}
 
 \hypertarget{histograms}{\subsubsection{\texorpdfstring{\protect\hyperlink{histograms}{}Histograms}{Histograms}}\label{histograms}}
@@ -654,7 +652,7 @@ to graph PPL distributions
 \protect\hyperlink{val-histux5fdistux5fdiscrete}{}\texttt{val\ hist\_dist\_discrete\ :\ ?⁠h:handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ ?⁠options:options\ list\ -\textgreater{}\ float\ dist\ -\textgreater{}\ handle}
 
 \hypertarget{otherux5fplots}{\subsubsection{\texorpdfstring{\protect\hyperlink{otherux5fplots}{}Other
-Plots}{Other Plots}}\label{otherux5fplots}}
+	Plots}{Other Plots}}\label{otherux5fplots}}
 
 \protect\hyperlink{val-qqux5fplot}{}\texttt{val\ qq\_plot\ :\ ?⁠h:handle\ -\textgreater{}\ ?⁠n:int\ -\textgreater{}\ ?⁠fname:string\ -\textgreater{}\ ?⁠options:options\ list\ -\textgreater{}\ float\ dist\ -\textgreater{}\ float\ Primitive.t\ -\textgreater{}\ handle}
 
@@ -672,7 +670,7 @@ Plots}{Other Plots}}\label{otherux5fplots}}
 \href{../index.html}{Ppl} » Empirical
 
 \section{\texorpdfstring{Module
-\texttt{Ppl.Empirical}}{Module Ppl.Empirical}}\label{module-ppl.empirical}
+ \texttt{Ppl.Empirical}}{Module Ppl.Empirical}}\label{module-ppl.empirical}
 
 \hypertarget{module-type-S}{}
 \protect\hyperlink{module-type-S}{}\texttt{module\ type\ S\ =\ sig\ ...\ end}
@@ -688,51 +686,51 @@ Plots}{Other Plots}}\label{otherux5fplots}}
 Discrete
 
 \section{\texorpdfstring{Module
-\texttt{Empirical.Discrete}}{Module Empirical.Discrete}}\label{module-empirical.discrete}
+ \texttt{Empirical.Discrete}}{Module Empirical.Discrete}}\label{module-empirical.discrete}
 
 \protect\hyperlink{type-t}{}\texttt{type\ \textquotesingle{}a\ t}
 
 \begin{description}
-\item[{\protect\hyperlink{val-fromux5fdist}{}\texttt{val\ from\_dist\ :\ ?⁠n:int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ t}}]
-Create a empirical distribution from a distribution object, using n
-samples to approximate it
+	\item[{\protect\hyperlink{val-fromux5fdist}{}\texttt{val\ from\_dist\ :\ ?⁠n:int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ t}}]
+	Create a empirical distribution from a distribution object, using n
+	samples to approximate it
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-empty}{}\texttt{val\ empty\ :\ \textquotesingle{}a\ t}}]
-Create an empty distribution
+	\item[{\protect\hyperlink{val-empty}{}\texttt{val\ empty\ :\ \textquotesingle{}a\ t}}]
+	Create an empty distribution
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-addux5fsample}{}\texttt{val\ add\_sample\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}a\ t}}]
-Add another sample to the distribution
+	\item[{\protect\hyperlink{val-addux5fsample}{}\texttt{val\ add\_sample\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}a\ t}}]
+	Add another sample to the distribution
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-getux5fnum}{}\texttt{val\ get\_num\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ int}}]
-Get the numer of samples with the value
+	\item[{\protect\hyperlink{val-getux5fnum}{}\texttt{val\ get\_num\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ int}}]
+	Get the numer of samples with the value
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-getux5fprob}{}\texttt{val\ get\_prob\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}}]
-Get the probability of a particular value
+	\item[{\protect\hyperlink{val-getux5fprob}{}\texttt{val\ get\_prob\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}}]
+	Get the probability of a particular value
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-toux5fpdf}{}\texttt{val\ to\_pdf\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}}]
-Create a pdf function
+	\item[{\protect\hyperlink{val-toux5fpdf}{}\texttt{val\ to\_pdf\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}}]
+	Create a pdf function
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-printux5fmap}{}\texttt{val\ print\_map\ :\ (module\ Core.Pretty\_printer.S\ with\ type\ t\ =\ \textquotesingle{}a)\ -\textgreater{}\ \textquotesingle{}a\ t\ -\textgreater{}\ unit}}]
-print the entire distribution
+	\item[{\protect\hyperlink{val-printux5fmap}{}\texttt{val\ print\_map\ :\ (module\ Core.Pretty\_printer.S\ with\ type\ t\ =\ \textquotesingle{}a)\ -\textgreater{}\ \textquotesingle{}a\ t\ -\textgreater{}\ unit}}]
+	print the entire distribution
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-toux5farr}{}\texttt{val\ to\_arr\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ (\textquotesingle{}a\ *\ int)\ array}\\
-\protect\hyperlink{val-toux5fnormux5farr}{}\texttt{val\ to\_norm\_arr\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ array}\\
-\protect\hyperlink{val-support}{}\texttt{val\ support\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ list}}]
-Get the set of values for the distribution
+	\item[{\protect\hyperlink{val-toux5farr}{}\texttt{val\ to\_arr\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ (\textquotesingle{}a\ *\ int)\ array}\\
+	            \protect\hyperlink{val-toux5fnormux5farr}{}\texttt{val\ to\_norm\_arr\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ array}\\
+	      \protect\hyperlink{val-support}{}\texttt{val\ support\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ list}}]
+	Get the set of values for the distribution
 \end{description}
 
 \href{../index.html}{Up} -- \href{../../../index.html}{ppl} »
@@ -740,16 +738,16 @@ Get the set of values for the distribution
 ContinuousArr
 
 \section{\texorpdfstring{Module
-\texttt{Empirical.ContinuousArr}}{Module Empirical.ContinuousArr}}\label{module-empirical.continuousarr}
+ \texttt{Empirical.ContinuousArr}}{Module Empirical.ContinuousArr}}\label{module-empirical.continuousarr}
 
 \protect\hyperlink{type-t}{}\texttt{type\ \textquotesingle{}a\ t}\texttt{\ =\ }\texttt{\{}
 
 \begin{longtable}[c]{@{}l@{}}
-\toprule
-\protect\hyperlink{type-t.samples}{}\texttt{samples\ :\ float\ array;}\tabularnewline
-\protect\hyperlink{type-t.n}{}\texttt{n\ :\ int;}\tabularnewline
-\protect\hyperlink{type-t.maxux5flength}{}\texttt{max\_length\ :\ int;}\tabularnewline
-\bottomrule
+	\toprule                                                                               
+	\protect\hyperlink{type-t.samples}{}\texttt{samples\ :\ float\ array;}\tabularnewline  
+	\protect\hyperlink{type-t.n}{}\texttt{n\ :\ int;}\tabularnewline                       
+	\protect\hyperlink{type-t.maxux5flength}{}\texttt{max\_length\ :\ int;}\tabularnewline 
+	\bottomrule                                                                            
 \end{longtable}
 
 \texttt{\}}
@@ -776,49 +774,49 @@ ContinuousArr
 \href{../../index.html}{Ppl} » \href{../index.html}{Empirical} » S
 
 \section{\texorpdfstring{Module type
-\texttt{Empirical.S}}{Module type Empirical.S}}\label{module-type-empirical.s}
+ \texttt{Empirical.S}}{Module type Empirical.S}}\label{module-type-empirical.s}
 
 \protect\hyperlink{type-t}{}\texttt{type\ \textquotesingle{}a\ t}
 
 \begin{description}
-\item[{\protect\hyperlink{val-fromux5fdist}{}\texttt{val\ from\_dist\ :\ ?⁠n:int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ t}}]
-Create a empirical distribution from a distribution object, using n
-samples to approximate it
+	\item[{\protect\hyperlink{val-fromux5fdist}{}\texttt{val\ from\_dist\ :\ ?⁠n:int\ -\textgreater{}\ \textquotesingle{}a\ Dist.dist\ -\textgreater{}\ \textquotesingle{}a\ t}}]
+	Create a empirical distribution from a distribution object, using n
+	samples to approximate it
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-empty}{}\texttt{val\ empty\ :\ \textquotesingle{}a\ t}}]
-Create an empty distribution
+	\item[{\protect\hyperlink{val-empty}{}\texttt{val\ empty\ :\ \textquotesingle{}a\ t}}]
+	Create an empty distribution
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-addux5fsample}{}\texttt{val\ add\_sample\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}a\ t}}]
-Add another sample to the distribution
+	\item[{\protect\hyperlink{val-addux5fsample}{}\texttt{val\ add\_sample\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}a\ t}}]
+	Add another sample to the distribution
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-getux5fnum}{}\texttt{val\ get\_num\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ int}}]
-Get the numer of samples with the value
+	\item[{\protect\hyperlink{val-getux5fnum}{}\texttt{val\ get\_num\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ int}}]
+	Get the numer of samples with the value
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-getux5fprob}{}\texttt{val\ get\_prob\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}}]
-Get the probability of a particular value
+	\item[{\protect\hyperlink{val-getux5fprob}{}\texttt{val\ get\_prob\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}}]
+	Get the probability of a particular value
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-toux5fpdf}{}\texttt{val\ to\_pdf\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}}]
-Create a pdf function
+	\item[{\protect\hyperlink{val-toux5fpdf}{}\texttt{val\ to\_pdf\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ -\textgreater{}\ float}}]
+	Create a pdf function
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-printux5fmap}{}\texttt{val\ print\_map\ :\ (module\ Core.Pretty\_printer.S\ with\ type\ t\ =\ \textquotesingle{}a)\ -\textgreater{}\ \textquotesingle{}a\ t\ -\textgreater{}\ unit}}]
-print the entire distribution
+	\item[{\protect\hyperlink{val-printux5fmap}{}\texttt{val\ print\_map\ :\ (module\ Core.Pretty\_printer.S\ with\ type\ t\ =\ \textquotesingle{}a)\ -\textgreater{}\ \textquotesingle{}a\ t\ -\textgreater{}\ unit}}]
+	print the entire distribution
 \end{description}
 
 \begin{description}
-\item[{\protect\hyperlink{val-toux5farr}{}\texttt{val\ to\_arr\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ (\textquotesingle{}a\ *\ int)\ array}\\
-\protect\hyperlink{val-toux5fnormux5farr}{}\texttt{val\ to\_norm\_arr\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ array}\\
-\protect\hyperlink{val-support}{}\texttt{val\ support\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ list}}]
-Get the set of values for the distribution
+	\item[{\protect\hyperlink{val-toux5farr}{}\texttt{val\ to\_arr\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ (\textquotesingle{}a\ *\ int)\ array}\\
+	            \protect\hyperlink{val-toux5fnormux5farr}{}\texttt{val\ to\_norm\_arr\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ (\textquotesingle{}a\ *\ float)\ array}\\
+	      \protect\hyperlink{val-support}{}\texttt{val\ support\ :\ \textquotesingle{}a\ t\ -\textgreater{}\ \textquotesingle{}a\ list}}]
+	Get the set of values for the distribution
 \end{description}

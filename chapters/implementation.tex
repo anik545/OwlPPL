@@ -1,4 +1,5 @@
 % !TeX root = ../diss.tex
+\chapter{Implementation}
 In this chapter I describe how the DSL is implemented. Documentation for all publicly exposed functions can be found in appendix \ref{app:docs}.
 
 \section{Repository Overview}
@@ -70,7 +71,6 @@ As mentioned before, monads are a natural way to represent probability distribut
 Using monads also allows us to define several helper functions which can be used when working with distributions. For example, we can `lift' operators to the \texttt{dist} type, for example allowing us to define adding two distributions over integers or floats using liftM or liftM2. We can also fold lists of distributions using a similar technique.
 	
 Using monads also allows the use of the extended let operators introduced in OCaml 4.08. These allow the definition of custom let operators, which mimic do-notation in Haskell. This means that sampling from a distribution (within a model) can be done using the \texttt{let*} operator, and the variable that is bound to can be used as if it were a normal value. The one caveat is that the user must remember to \texttt{return} at the end of the model with whatever variable(s) they want to find the posterior over. The \texttt{and*} operator can also be used when we use several independent distributions in a row. This can make for more efficient sampling (and inference) since we have more information about the structure of the program. It is also a common pattern to set up a model by first independently drawing from several distributions, as below.
-	
 % \begin{noindent}
 \begin{ocamlcode-in}
 (* two independent draws from standard normals *)
@@ -112,18 +112,18 @@ Although this is not the final data structure I chose for general probabilistic 
 \subsection{GADT} \label{sec:gadt}
 % TODO: check this
 The structure that I landed on to represent general models is a generalised algebraic data type. GADTs are often used to implement interpreters in functional languages, and have been used to represent probabilistic models. The GADT I implement here (and some inference algorithms) is based on (Scibior et al. 2015)\cite{scibior2015practical}. This represents a model in a very general way, and can then be `interpreted' by a sampler or an inference algorithm. For sampling, I traverse the model, ignoring conditionals to enable forward sampling from the prior. For inference, I provide some inference functions as transforming the conditional distributions to distributions without any conditional statements, allowing sampling to be performed as normal. Some inference functions are also implemented by generating an empirical distribution that can be sampled from similarly. Primitive distributions also have a special variant (which takes a different \texttt{primitive} type). We can find the exact pdf/cdf of these distributions, unlike the \texttt{dist} type, which can only be sampled from. Listing \ref{lst:gadt1} shows each of the variants. The monad functions are also provided, which construct the corresponding variant in the GADT. \texttt{Return} represents a distribution with only one value, and \texttt{Bind} contains a distribution and a function, which represents that function being applied to the output from that distribution.
-	
+
 \begin{listing}[!ht]
 	\ocamlcode{code_snippets/gadt.ml}	
 	\caption{Representing a probabilistic model using a GADT}
 	\label{lst:gadt1}
 \end{listing}
-	
+
 An important feature of this type is that it is polymorphic - this allows distributions to be defined over any type. Often, distributions are defined over floats or integers, but this allows us to define distributions over anything, including arbitary ADTs or even distributions themselves.
-	
+
 \subsection{Primitive Distributions}
-In PPLs, users build complex models by composing more simple elementary primitive distributions (ERP) \cite{pmlr-v15-wingate11a}. These primitive distributions need to have a few operations defined on them, namely \texttt{sample, pdf, cdf} and \texttt{support}.
-	
+In PPLs, users build complex models by composing more simple elementary primitive distributions (ERP) \cite{pmlr-v15-wingate11a}. These primitive distributions need to have a few operations defined on them, namely \texttt{sample, pdf, cdf, ppf} (inverse of cdf) and \texttt{support} (the set of values that a distribution can take). These are all standard properties of distributions.
+
 An extension goal achieved here is to allow users to define their own primitive distributions if they have not already been defined in the library. A concrete use case - I have not implemented the Poisson distribution as a primitive distribution, but you can imagine models which need to use the Poisson as a building block. To achieve this, the user simply has to write a function which takes the parameters of the distribution as arguments and return a first class module matching the primitive distribution signature. This technique also allows users to use modules that they may have already defined, and constrain them to the required signature for use in the PPL.
 	
 The type of a primitive distribution is \texttt{type 'a prim\_dist = (module PRIM\_DIST with type t='a)}, with the \texttt{PRIM\_DIST} signature defined as in listing \ref{lst:prim-sig}. 
@@ -389,13 +389,13 @@ The GADT is traversed top down, with particles being initialised at a `leaf' - p
 Increasing the number of particles finds a more accurate distribution, but also increases the amount of time and memory required.
 	
 \subsection{Particle Cascade} \label{sec:pc}
-The particle cascade algorithm (also Asynchronous Sequential Monte-Carlo) is an algorithm that extends the particle filter, introduced in (Paige et al. 2014)\cite{paige2014asynchronous}. It uses a lazily generated infinite set of particles, which allows it to be `anytime', that is, it can generate more particles without having to start regenerate a large particle set from scratch. It also features a parallelisable re-sample step, although I will not make use of this feature, since I am not using multi-core OCaml.
+The particle cascade algorithm (also Asynchronous Sequential Monte-Carlo) is an algorithm that extends the particle filter, introduced in (Paige et al. 2014) \cite{paige2014asynchronous}. It uses a lazily generated infinite set of particles, which allows it to be `anytime', that is, it can generate more particles without having to start regenerate a large particle set from scratch. It also features a parallelisable re-sample step, although I will not make use of this feature, since I am not using multi-core OCaml.
 	
 The main implementation difference is that instead of resampling, a particle `branching' operation is used, which produces a lazily generated set of particles at each resample step. Each particle produces 0 or more children to be used in the next iteration.
 	
 \subsection{Particle-Independent Metropolis-Hastings} \label{sec:pimh}
 	
-SMC and MCMC algorithms are two distinct classes of algorithms, but can be combined to produce more efficient inference procedures. A simple example of these algorithms (known as PMCMC), is the particle-independent metropolis-hastings algorithm\cite{pmcmc}. This algorithm first uses a particle filter to find an approximation of the posterior, then uses this approximation as a prior distribution for metropolis-hastings.
+SMC and MCMC algorithms are two distinct classes of algorithms, but can be combined to produce more efficient inference procedures. A simple example of these algorithms (known as PMCMC), is the particle-independent metropolis-hastings algorithm \cite{pmcmc}. This algorithm first uses a particle filter to find an approximation of the posterior, then uses this approximation as a prior distribution for metropolis-hastings.
 	
 % TODO: describe maths using https://www.maths.lancs.ac.uk/~sherlocc/CompStats/Dawn_of_Time/PseudoMarg/compstats_PIMH_BT.pdf
 	
@@ -437,10 +437,10 @@ Continuous distributions are also displayed as histograms, with a set of samples
 	\label{fig:vis-norm}
 \end{figure}
 	
-Other important visualisations for continuous distributions are the Q-Q and P-P plots. These provides a way to qualitatively compare distributions. Q-Q plots plot the quantiles of two distributions against each other as a scatter plot - if all the points lie on the the line $y=x$, the distributions are identical. P-P plots plot the cdfs of two distributions against each other, that is, for two cdfs $F$ and $G$, the points (F(z), G(z)) are plotted for some values of z in the range $(-\infty,+\infty)$. Both these plots are often used to find the differences between some theoretical expected distribution and the distribution given by some data. This can be used in the PPL context to find whether a distribution given by a model matches what was expected in the theory. Figure \ref{fig:vis-qq} shows the output of inference for a model that is expected to output a beta distributions (the coin model in section \ref{sec:coin}) - the points are close to the expected line, visualising a successful inference procedure.
-	
+Other important visualisations for continuous distributions are the Q-Q and P-P plots. These provides a way to qualitatively compare distributions. P-P plots plot the cdfs of two distributions against each other, that is, for two cdfs $F$ and $G$, the points $(F(z), G(z))$ are plotted for some values of z in the range $(-\infty,+\infty)$. Q-Q plots plot the quantiles of both distributions - it uses the inverse of the cdfs (the ppf) to plot the points $(F^{-1}(q), G^{-1}(q))$, where $q$, the quantile, is in the interval $[0,1]$. This plots will generally use as many points as the data allows, and calculate the percentile for every data point available. For both plots, if all the points lie on the the line $y=x$, the distributions are identical. These plots are often used to find the differences between some theoretical expected distribution and the distribution given by some data. This can be used in the PPL context to find whether a distribution given by a model matches what was expected in the theory. Figure \ref{fig:vis-qq} shows the output of inference for a model that is expected to output a beta distributions (the coin model in section \ref{sec:coin}) - the points are close to the expected line, showing successful inference.
+
 \begin{figure}[!htb]
-	\centering			
+	\centering
 	\subfloat[Q-Q plot]{{\includegraphics[width=0.4\textwidth]{figs/qq.png} }}%
 	\qquad
 	\subfloat[P-P plot]{{\includegraphics[width=0.4\textwidth]{figs/pp.png} }}%
