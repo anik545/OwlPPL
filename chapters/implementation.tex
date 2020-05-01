@@ -1,6 +1,6 @@
 % !TeX root = ../diss.tex
 \chapter{Implementation}
-In this chapter I describe how the DSL is implemented. Documentation for all publicly exposed functions can be found in appendix \ref{app:docs}.
+\textit{In this chapter I describe how my PPL is implemented and the design decisions considered. I discuss the core data structures used to represent distributions and how inference was implemented over these. I also describe auxiliary functionality included, such as visualisation functions. Finally, I describe the challenges of testing a probabilistic system and how I overcame them. Documentation for all publicly exposed functions can be found in appendix \ref{app:docs}.}
 
 \section{Repository Overview}
 
@@ -36,37 +36,71 @@ In this chapter I describe how the DSL is implemented. Documentation for all pub
 	\label{fig:dirs}
 \end{wrapfigure}
 
-The majority of my code is in the \texttt{ppl} directory, which contains the core library, unit tests, statistical testing code and some example programs written using the library. A separate evaluation folder contains code to compare my ppl to other languages.
+The code for the PPL library is in the \texttt{ppl} directory, which contains the core library, unit tests, statistical testing code and some example programs written using the library. A separate evaluation folder contains code to benchmark my ppl's performance compared to other languages.
 
-I have implemented my ppl as a library residing in the \texttt{lib} subdirectory, contained within the module \texttt{Ppl}. Opening this module in a script allows a user to use my library. Ppl includes several submodules, most importantly the \texttt{Dist} and \texttt{Inference} modules, which contains the code for representing, creating and combining distributions, and performing inference, respectively. These functions can be found in separate files in the inference folder, and are all exported in the inference module. The other modules exported in Ppl are plot, prim\_dist, and samples.
+The structure follows the de facto standard for dune projects. The lib directory contains all the code for the library, bin contains standalone scripts which contain example models, doc contains auto-generated documentation, and test contains unit and hypothesis tests. The ppl.opam file describes my library and it's dependencies, to allow my library to be distributed via opam.
 
-\texttt{Prim\_dist} contains code for using primitive distributions - as well as types which a user can provide to define their own distributions. It also defines functions which can be used by the user to create new primitive distributions.
-
-The \texttt{Plot} module contains helper functions which wrap around Owl\_plplot, allowing users to easily create visualisations from distributions defined in my ppl. This includes histograms 
-
-The \texttt{bin} directory contains several example programs to show how the ppl can be used to express many different models. 
-
-The \texttt{test} directory contains basic unit tests as well as hypothesis tests to check the correctness of inference.
-
-The \texttt{evaluation} directory contains code to compare my ppl to both hand-written inference procedures, as well as equivalent programs in other PPLs. There are several directories, which each correspond to a particular problem/model.
+The lib directory contains several modules to separate functionality within my ppl. The entry point is the Ppl module, which exports the other modules so that opening Ppl is sufficient to define models. The inference directory contains inference algorithms in separate modules, which are then re-exported in the main Inference module. The Dist module is the module for user-defined models on which inference is run. 
 
 All code is written in OCaml 4.08, with the main dependencies being Jane Street's \texttt{Core} and \texttt{Owl} \cite{owl}.	
 	
 \section{Language Design}
-I chose to implement my language as a domain specific language (DSL) shallowly embedded into the main OCaml language. This allows models built in the ppl to be easily composed with other standard OCaml programs.
-	
-Using a shallow embedding means we can use all of the features of OCaml as normal, including branching (if/then/else), loops, references, let bindings, (higher-order) functions, and importantly, recursion. This can allow us to define models that do not terminate and are therefore invalid. However, we can write functions which are \textit{stochastic recursive} \cite{siegmund}, that is, functions which have a probability of termination that tends to 1 as the number of successive calls tends to infinity. This leads to functions which terminate their recursion non-deterministically. Any model which does not satisfy this will be considered an invalid model - unfortunately as it is not possible to determine whether or not a program will halt, this property cannot be enforced. 
+% specify DSL here 
+I chose to implement my language as a domain specific language (DSL) shallowly embedded into the main OCaml language. Using a shallow embedding means we can use all of the features of OCaml as normal, including branching (if/then/else), loops, references, let bindings, (higher-order) functions, and importantly, recursion. This can allow us to define models that do not terminate and are therefore invalid. However, we can write functions which are \textit{stochastic recursive} \cite{siegmund}, that is, functions which have a probability of termination that tends to 1 as the number of successive calls tends to infinity. This leads to functions which terminate their recursion non-deterministically. Any model which does not satisfy this will be considered an invalid model - unfortunately as it is not possible to determine whether or not a program will halt, this property cannot be enforced. 
 	
 I use a set of primitive distributions which can be combined (using arbitrarily complex deterministic OCaml code) to produce new more complex distribution. For example, one can take the sum of two discrete uniform distributions to simulate the addition of two dice rolls. 
 	
 PPLs in general are similar to normal programming languages, but need to support two extra operations - \texttt{sample} and \texttt{condition} \cite{gordon2014probabilistic}. The sample operator allows models to be built up. The condition operator has a few variants, which are covered in section \ref{sec:condition}.
 	
 \section{Representing Distributions}
-In order to define my DSL, I needed data structures to represent probabilistic models as well as distributions that are used as both input and output. Input distributions are the primitive distributions that are used to build models and constrain observations. We have more information about these distributions, such as how to sample from them exactly and exact pdf functions, and this information is used in inference. The output of inference is usually a distribution which can be sampled from to obtain the posterior, but we generally want to also collate statistics about the posterior distribution. Since we only have an approximate sampler, we can output empirical distributions from which many statistics, e.g. mean, variance, cdf etc., can be approximated.
+In order to define my DSL, I use 3 different data structures to represent different types of distribution:
+\begin{itemize}
+	\item General probabilistic models - conditional distributions
+	\item Input - primitive distributions that are used to build models
+	\item Output - empirical distributions, a set of 
+\end{itemize}
 	
-\subsection{Probability Monad}
+\subsection{Primitive Distributions}
+In PPLs, users build complex models by composing more simple elementary primitive distributions for which we have extra information such as exact equations or the ability to sample directly. These primitive distributions need to have a few operations defined on them, namely \texttt{sample, pdf, cdf, ppf} (inverse of cdf) and \texttt{support} (the set of values that a distribution can take). These are all standard properties of distributions, and are used to perform inference.
+
+An extension goal achieved here is to allow users to define their own primitive distributions if they have not already been defined in the library. A concrete use case - I have not implemented the Poisson distribution as a primitive distribution, but you can imagine models which need to use the Poisson as a building block. To achieve this, the user simply has to write a function which takes the parameters of the distribution as arguments and return a first class module matching the primitive distribution signature. This technique also allows users to use modules that they may have already defined, and constrain them to the required signature for use in the PPL.
 	
-As mentioned before, monads are a natural way to represent probability distributions. They allow the output from one distribution (essentially a sample), to be used as if it was of the type that the distribution is defined over. Essentially, the \texttt{bind} operation allows us to 'unwrap' the 'a dist type to allow us to manipulate a value of type 'a. We must then use \texttt{return} to `wrap' the value back into a value of type 'a dist. The type signature of bind is \texttt{'a m -> ('a -> 'b m) -> 'b m}, and return is \texttt{'a -> 'a m}, with m being the monad type.
+The type of a primitive distribution is \mintinline{ocaml}|type 'a prim_dist = (module PRIM_DIST with type t='a)|, with the \texttt{PRIM\_DIST} signature defined as in listing \ref{lst:prim-sig}. 
+	
+% TODO: put these side by side instead
+\begin{figure}[!htb]
+	\begin{minipage}{0.5\textwidth}
+		\ocamlcode{code_snippets/prim_sig.ml}
+		\captionof{listing}{Signature of the module that primitive distributions must implement}
+		\label{lst:prim-sig}
+	\end{minipage}
+	\begin{minipage}{0.5\textwidth}
+		\ocamlcode{code_snippets/new_dist.ml}	
+		\captionof{listing}{Adding a new distribution as a primitive}
+		\label{lst:new-dist}
+	\end{minipage}
+\end{figure}
+	
+% \begin{listing}[!ht]
+% 	\ocamlcode{code_snippets/prim_sig.ml}
+% 	\caption{Signature of the module that primitive distributions must implement}
+% 	\label{lst:prim-sig}
+% \end{listing}
+	
+An example of this being used to add a new primitive distribution is given in listing \ref{lst:new-dist}, for the specific case of the Poisson distribution. The \texttt{Poisson} distribution can be used as other primitives are, e.g. in \texttt{observe} statements.
+	
+% \begin{listing}[!ht]
+% 	\ocamlcode{code_snippets/new_dist.ml}	
+% 	\caption{Adding a new distribution as a primitive}
+% 	\label{lst:new-dist}
+% \end{listing}
+	
+\subsection{General Probabilistic Models}
+Statistical models are the input to inference, and are designed by the user to model a process they are interested in. They are build up from primitive distributions, and should be composable and amenable to inference procedures.
+
+\subsubsection{Probability Monad}
+	
+As mentioned before, monads are a natural way to represent composable probability distributions. They allow the output from one distribution (essentially a sample), to be used as if it was of the type that the distribution is defined over. Essentially, the \texttt{bind} operation allows us to 'unwrap' the 'a dist type to allow us to manipulate a value of type 'a. We must then use \texttt{return} to `wrap' the value back into a value of type 'a dist. The type signature of bind is \texttt{'a m -> ('a -> 'b m) -> 'b m}, and return is \texttt{'a -> 'a m}, with m being the monad type.
 	
 Using monads also allows us to define several helper functions which can be used when working with distributions. For example, we can `lift' operators to the \texttt{dist} type, for example allowing us to define adding two distributions over integers or floats using liftM or liftM2. We can also fold lists of distributions using a similar technique.
 	
@@ -109,7 +143,7 @@ A major problem with this approach is that in flattening distributions, we must 
 	
 Although this is not the final data structure I chose for general probabilistic models, it is the one I used for discrete empirical distributions.
 	
-\subsection{GADT} \label{sec:gadt}
+\subsubsection{GADT} \label{sec:gadt}
 % TODO: check this
 The structure that I landed on to represent general models is a generalised algebraic data type. GADTs are often used to implement interpreters in functional languages, and have been used to represent probabilistic models. The GADT I implement here (and some inference algorithms) is based on (Scibior et al. 2015)\cite{scibior2015practical}. This represents a model in a very general way, and can then be `interpreted' by a sampler or an inference algorithm. For sampling, I traverse the model, ignoring conditionals to enable forward sampling from the prior. For inference, I provide some inference functions as transforming the conditional distributions to distributions without any conditional statements, allowing sampling to be performed as normal. Some inference functions are also implemented by generating an empirical distribution that can be sampled from similarly. Primitive distributions also have a special variant (which takes a different \texttt{primitive} type). We can find the exact pdf/cdf of these distributions, unlike the \texttt{dist} type, which can only be sampled from. Listing \ref{lst:gadt1} shows each of the variants. The monad functions are also provided, which construct the corresponding variant in the GADT. \texttt{Return} represents a distribution with only one value, and \texttt{Bind} contains a distribution and a function, which represents that function being applied to the output from that distribution.
 
@@ -121,44 +155,9 @@ The structure that I landed on to represent general models is a generalised alge
 
 An important feature of this type is that it is polymorphic - this allows distributions to be defined over any type. Often, distributions are defined over floats or integers, but this allows us to define distributions over anything, including arbitary ADTs or even distributions themselves.
 
-\subsection{Primitive Distributions}
-In PPLs, users build complex models by composing more simple elementary primitive distributions (ERP) \cite{pmlr-v15-wingate11a}. These primitive distributions need to have a few operations defined on them, namely \texttt{sample, pdf, cdf, ppf} (inverse of cdf) and \texttt{support} (the set of values that a distribution can take). These are all standard properties of distributions.
-
-An extension goal achieved here is to allow users to define their own primitive distributions if they have not already been defined in the library. A concrete use case - I have not implemented the Poisson distribution as a primitive distribution, but you can imagine models which need to use the Poisson as a building block. To achieve this, the user simply has to write a function which takes the parameters of the distribution as arguments and return a first class module matching the primitive distribution signature. This technique also allows users to use modules that they may have already defined, and constrain them to the required signature for use in the PPL.
-	
-The type of a primitive distribution is \texttt{type 'a prim\_dist = (module PRIM\_DIST with type t='a)}, with the \texttt{PRIM\_DIST} signature defined as in listing \ref{lst:prim-sig}. 
-	
-% TODO: put these side by side instead
-\begin{figure}[!htb]
-	\begin{minipage}{0.5\textwidth}
-		\ocamlcode{code_snippets/prim_sig.ml}
-		\captionof{listing}{Signature of the module that primitive distributions must implement}
-		\label{lst:prim-sig}
-	\end{minipage}
-	\begin{minipage}{0.5\textwidth}
-		\ocamlcode{code_snippets/new_dist.ml}	
-		\captionof{listing}{Adding a new distribution as a primitive}
-		\label{lst:new-dist}
-	\end{minipage}
-\end{figure}
-	
-% \begin{listing}[!ht]
-% 	\ocamlcode{code_snippets/prim_sig.ml}
-% 	\caption{Signature of the module that primitive distributions must implement}
-% 	\label{lst:prim-sig}
-% \end{listing}
-	
-An example of this being used to add a new primitive distribution is given in listing \ref{lst:new-dist}, for the specific case of the Poisson distribution. The \texttt{Poisson} distribution can be used as other primitives are, e.g. in \texttt{observe} statements.
-	
-% \begin{listing}[!ht]
-% 	\ocamlcode{code_snippets/new_dist.ml}	
-% 	\caption{Adding a new distribution as a primitive}
-% 	\label{lst:new-dist}
-% \end{listing}
-	
 \subsection{Empirical Distributions}
-	
-The output of Bayesian inference is a probability distribution over the variable we are concerned with. Ideally, we would be able to produce an exact posterior distribution, and be able to extract exact statistics from it. However, approximate inference only allows us to create functions to sample from this posterior. We can define a signature for a type of an empirical distribution that is created from posterior distributions and can be used to calculate useful properties such as the pdf or cdf. The type is abstract to allow different implementations for discrete and continuous distributions. 
+
+The output of Bayesian inference is a probability distribution over the variable we are concerned with. Ideally, we would be able to produce an exact posterior distribution, and be able to extract exact statistics from it. However, approximate inference only allows us to create functions to sample from this posterior. We can define a signature for a type of an empirical distribution that is created from posterior distributions by taking many samples. This can then be used to calculate useful statistics - e.g. mean, variance, pdf, cdf, etc.. The type is abstract to allow different implementations for discrete and continuous distributions. 
 	
 For discrete distributions, I use a \texttt{Core.Map}\footnote{\url{https://ocaml.janestreet.com/ocaml-core/latest/doc/base/Base/Map/index.html}}, with the keys being the values that the distribution can take and the values the number of samples with that value. This allows . Continuous distributions use a dynamically resizing array - adding each sample is then $O(1)$ amortized, and statistics can be calculated using Owl's functions that operate on arrays. A constraint on continuous distributions of this type is that they are defined over floats, and only represent one dimension.
 % Creating values with these types required passing a first class module representing the type of the keys - this is so that an appropriate compare function can be used in the internal tree data structure.
@@ -172,14 +171,7 @@ For discrete distributions, I use a \texttt{Core.Map}\footnote{\url{https://ocam
 \end{listing}
 	
 The signature in listing \ref{lst:empirical} is implemented for both continuous and discrete distributions. For the continuous case, I perform binning to approximate the continuous distribution by a discrete one in order to approximate the pdf. The number of bins used is calculated automatically from the number of samples taken.
-	
-% \begin{figure}[!hb]
-% 	\centering
-% 	\includegraphics[width=\textwidth]{figs/bins.png}
-% 	\caption{An example of approximating a continuous distribution using discrete bins}
-% 	\label{fig:binning}
-% \end{figure}
-	
+		
 \section{Conditioning} \label{sec:condition}
 	
 The GADT described in section \ref{sec:gadt} can be used to describe general models, in particular conditional distributions, thanks to the \texttt{Conditional} variant. Without this variant, we can only define prior distributions, but including it means we can incorporate observed data into our models and perform inference.
@@ -264,7 +256,7 @@ Inference can be thought of as a program transformation \cite{scibior2015practic
 		
 % TODO: write example program, and relate to terms in formula
 		
-\subsection{Enumeration} \label{sec:enum}
+\subsection{Enumeration (Exact Inference)} \label{sec:enum}
 Enumeration is the simplest way to perform exact inference on probabilistic programs, and essentially consists of computing the joint distribution over all the random variables in the model. This involves enumerating every execution path in the model, in this case performing a depth first search over the \texttt{dist} data structure. For every \texttt{bind} (i.e. every \texttt{let*}), there is a distribution ($d$) and a function from samples to new distributions ($f$). I call this function on every value in the support of the distribution $d$, and then enumerate all the possibilities. The final output is a \texttt{('a * float) list}, from which duplicates are removed and is then normalised, so that the probabilities sum to one.
 		
 \begin{listing}[ht]
@@ -273,7 +265,7 @@ Enumeration is the simplest way to perform exact inference on probabilistic prog
 	\label{lst:enum}
 \end{listing}
 		
-This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions (and are not compatible with the way I represent models). Exact inference of this kind only works on models that can be represented as finite networks, and exact inference for Bayesian networks is in fact NP-hard\cite{cooper1990computational}. So instead, most of my project focuses on approximate inference.
+This method is very naive, and therefore inefficient. Since we essentially take every possible execution trace, we do not exploit structure such as overlapping traces. This can be made slightly more efficient by using algorithms such as belief propagation \cite{belief-prop}, but they still only work on models made up from discrete distributions (and are not compatible with the way I represent models). Exact inference of this kind only works on models that can be represented as finite networks, and exact inference for Bayesian networks is in fact NP-hard \cite{cooper1990computational}. So instead, most of my project focuses on approximate inference.
 		
 \subsection{Rejection Sampling} \label{sec:rej}
 % https://www.cs.ubc.ca/~schmidtm/Courses/540-W18/wood.pdf pg30
@@ -311,7 +303,7 @@ condition (x=0)
 \end{listing}
 % \end{noindent}
 % 
-\subsection{Likelihood Weighting} \label{sec:likelihood-wighting}
+\subsection{Likelihood Weighting (Importance Sampling)} \label{sec:likelihood-wighting}
 % http://www.cs.tut.fi/~elomaa/teach/AI-2013-9.pdf
 		
 Likelihood weighting is an importance sampling method, when the proposal distribution we use is the prior. We want any algorithm we use to be as general as possible, and not need to be tuned using auxiliary distributions chosen by hand. Since for any model we can find the prior distribution easily, it is natural to use this as a proposal distribution here - this can be seen in several of the implementations of inference. 
@@ -334,7 +326,7 @@ categorical particles
 The sequence function is a monad function that takes a list of distributions and fold them together so that they act as a single distribution returning entire lists. This allows The use of \texttt{(let*)} to sample a set of particles at once, and use them directly as the distribution.
 % code of importance sampling.
 	
-\subsection{Metropolis Hastings} \label{sec:mh}
+\subsection{Metropolis Hastings (MCMC)} \label{sec:mh}
 Metropolis Hastings is an MCMC algorithm, and so is used to find a Markov chain with the stationary distribution equal to the target distribution, here the posterior. There are many variants of this algorithm, and the one I implement here is the independent metropolis hastings (IMH) algorithm. I use the prior as a proposal distribution, using scores as an approximation to a density function. The algorithm is outlined below.
 \begin{itemize}
 	\item Let $\pi$ be the target distribution that we want to sample from.
@@ -346,7 +338,7 @@ Metropolis Hastings is an MCMC algorithm, and so is used to find a Markov chain 
 	      \begin{equation}
 	      	\label{eq:accept}
 	      	\alpha(x,y) = 
-	      	\begin{cases}	
+	      	\begin{cases}
 	      		\min{\left( \frac{\pi(y)q(x)}{\pi{x}q(y)},1 \right) } & \pi(x)q(x) > 0 \\
 	      		1                                                     & \pi(x)q(x) = 0 \\
 	      	\end{cases}
@@ -370,7 +362,7 @@ One important property of the return distribution is that consecutive sample sta
 	\label{lst:mh}
 \end{listing}
 	
-\subsection{Bootstrap Particle Filter} \label{sec:pf}
+\subsection{Bootstrap Particle Filter (SMC)} \label{sec:pf}
 % https://probmods.org/chapters/inference-algorithms.html
 % particle filter section
 Particle Filters are a class of algorithms which use particles to approximate a posterior. This is similar to the technique I used in importance sampling (\ref{sec:likelihood-wighting}), but the difference here is that the particles are sequentially updated as we observe condition statements (i.e. as we observe data). In fact, an example of a particle filtering algorithm is sequential importance sampling, but here I use an algorithm called the bootstrap filter \cite{particlefilter}.
@@ -388,28 +380,29 @@ The GADT is traversed top down, with particles being initialised at a `leaf' - p
 	
 Increasing the number of particles finds a more accurate distribution, but also increases the amount of time and memory required.
 	
-\subsection{Particle Cascade} \label{sec:pc}
+\subsection{Particle Cascade (SMC)} \label{sec:pc}
 The particle cascade algorithm (also Asynchronous Sequential Monte-Carlo) is an algorithm that extends the particle filter, introduced in (Paige et al. 2014) \cite{paige2014asynchronous}. It uses a lazily generated infinite set of particles, which allows it to be `anytime', that is, it can generate more particles without having to start regenerate a large particle set from scratch. It also features a parallelisable re-sample step, although I will not make use of this feature, since I am not using multi-core OCaml.
 	
 The main implementation difference is that instead of resampling, a particle `branching' operation is used, which produces a lazily generated set of particles at each resample step. Each particle produces 0 or more children to be used in the next iteration.
 	
-\subsection{Particle-Independent Metropolis-Hastings} \label{sec:pimh}
+\subsection{Particle-Independent Metropolis-Hastings (PMCMC)} \label{sec:pimh}
 	
-SMC and MCMC algorithms are two distinct classes of algorithms, but can be combined to produce more efficient inference procedures. A simple example of these algorithms (known as PMCMC), is the particle-independent metropolis-hastings algorithm \cite{pmcmc}. This algorithm first uses a particle filter to find an approximation of the posterior, then uses this approximation as a prior distribution for metropolis-hastings.
+SMC and MCMC algorithms are two distinct classes of algorithms, but can be combined to produce more efficient inference procedures. A simple example of these algorithms, is the particle-independent metropolis-hastings algorithm \cite{pmcmc}. This algorithm first uses a particle filter to find an approximation of the posterior, then uses this approximation as a prior distribution for metropolis-hastings.
 	
 % TODO: describe maths using https://www.maths.lancs.ac.uk/~sherlocc/CompStats/Dawn_of_Time/PseudoMarg/compstats_PIMH_BT.pdf
-	
+% TODO: find that diagram talking about inner and outer steps of mh and smc? in some blog article
 Due to the fact that my PPL allows composition of inference algorithms, a basic implementation is very simple.
 	
 % \begin{noindent}
-	\begin{ocamlcode-in}
+\begin{listing}
+\begin{ocamlcode-in}
 let pimh k n d = mh k (Smc.smc n d)
-	\end{ocamlcode-in}
+\end{ocamlcode-in}
+\caption{Particle-Independent Metropolis-Hastings}
+\end{listing}
 % \end{noindent}
-However, there are flaws in this implementation, since any sampler produced is slow and can be made more efficient.
-In addition, the reason this works is because the \texttt{smc} function produces a dist with conditionals, which no other inference method does.
-	
-% These examples should really be in evaluation
+However, there are flaws in this implementation, since any sampler produced is slow and can be made more efficient. In addition, This composition is only possible since the \texttt{smc} function produces a dist with conditionals, which no other inference method does.
+
 \section{Visualisations}
 Visualising the output distributions from inference can be done using the \texttt{Owl\_plplot} module, which allows plotting directly from OCaml, rather than having to interface with other programs manually. I have implemented several helper functions which simplify visualising distributions created by my PPL. Empirical distributions are approximated by histograms displayed as bar charts using \texttt{Owl\_plplot}.
 	
@@ -470,10 +463,14 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 	
 \section{Testing}\label{sec:impl-testing}
 	
-Testing systems which are linked to randomness can be quite tricky, as it is difficult to test behaviour that is expected to change from one execution to the next. One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. Even with a fixed random seed, a change in code may cause new outputs even though the fundamental statistical property desired hasn't changed. Another approach is to perform some statistical test such as kolmogorov-smirnov \cite{massey1951kolmogorov}, to ensure distributions produced by my library are equal to what is expected. A problem with tests of this kind is that they are expected to fail sometimes, meaning unit tests will provide limited utility due to their inherent flakiness with random programs. In fact, since we expect these tests to fail a certain percentage of the time, if they do not sometimes fail there is a problem with our program.
+Testing systems which are linked to randomness can be tricky, as it is difficult to test behaviour that is expected to change from one execution to the next. 
 
+One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. Even with a fixed random seed, a change in code may cause new outputs even though the fundamental statistical property desired hasn't changed. 
 
-Automated testing of PPLs is difficult for reasons outlined in section \ref{sec:prep-testing}. However, I still wrote basic unit tests. The test framework I used, Alcotest, lets me check that outputs of functions match expected values. This allows me to test all deterministic helper functions, e.g. normalise. It also lets me test the exact inference method, and very simple distributions and models which only contain a single value. I also used an additional library Quickcheck, to test that a specified invariant holds for a function - it uses randomly generated inputs to check the widest range of values. As an example (listing \ref{lst:test}), for the normalise function, we expect that the output probabilities always sum to one, no matter the input array - the test is given below.
+Another approach is to perform a hypothesis test such as kolmogorov-smirnov \cite{massey1951kolmogorov}, to ensure distributions produced by my library are equal to what is expected. A problem with tests of this kind is that they are expected to fail sometimes, meaning unit tests will provide limited utility due to their inherent flakiness with random programs. In fact, since we expect these tests to fail a certain percentage of the time, if they do not sometimes fail there is a problem with our program.
+
+% I tested that my set of models compiles and can be sampled from (after inference), but didnt test the output samples
+However, I still wrote basic unit tests. The test framework I used, Alcotest, lets me check that outputs of functions match expected values. This allows me to test all deterministic helper functions, e.g. normalise. It also lets me test the exact inference method, and very simple distributions and models which only contain a single value. I also used an additional library Quickcheck, to test that a specified invariant holds for a function - it uses randomly generated inputs to check the widest range of values. As an example (listing \ref{lst:test}), for the normalise function, we expect that the output probabilities always sum to one, no matter the input array - the test is given below.
 	
 	
 % \begin{noindent}

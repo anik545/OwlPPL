@@ -86,3 +86,5 @@ talk about the name, owlppl
 
 add a pie chart of gprof output
 add a line chart of memory usage over time from spacetime.
+
+ppl -> PPL
