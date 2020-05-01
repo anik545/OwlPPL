@@ -89,5 +89,12 @@
 
 \usepackage{pifont}% http://ctan.org/pkg/pifont
 % \newcommand{\cmark}{\ding{52}}%
-\newcommand{\cmark}{{\color{green}\checkmark}}%
-\newcommand{\xmark}{{color{red} \ding{55}}}%
+\definecolor{green1}{rgb}{0.0, 0.5, 0.0}
+\definecolor{red1}{rgb}{1.0, 0.01, 0.24}
+\newcommand{\cmark}{\textcolor{green1}{\checkmark}}%
+\newcommand{\xmark}{\textcolor{red1}{\ding{55}}}%
+
+\usepackage{xpatch,letltxmacro}
+\LetLtxMacro{\cminted}{\minted}
+\let\endcminted\endminted
+\xpretocmd{\cminted}{\RecustomVerbatimEnvironment{Verbatim}{BVerbatim}{}}{}{}
