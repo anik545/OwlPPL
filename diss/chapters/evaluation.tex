@@ -43,36 +43,20 @@ let () =
 (*false: 0.13706 true: 0.86294*)
 		\end{ocamlcode-in}
 		\captionof{listing}{Output of inference}
-		\label{lst:inf-output}					
+		\label{lst:inf-output}
 	\end{minipage}
-	\begin{minipage}{0.47\linewidth}
-	\end{minipage}
-	
 	% \caption{}
 	% \label{}
 \end{figure*}
 % \end{noindent}
 
-% \begin{listing}[!ht]
-% 	\ocamlcode{code_snippets/sprinkler.ml}	
-% 	\caption{Sprinkler model}
-% 	\label{lst:sprinkler}
-% \end{listing}
-
-% \begin{figure}[!htb]
-% 	\centering
-% 	\includegraphics[width=0.5\textwidth]{figs/sprinkler-network.png}
-% 	\caption{Bayesian Network example}
-% 	\label{fig:sprinkler-network}
-% \end{figure}
-
 \subsection{Biased Coin} \label{sec:coin} 
 % to show analytically solvable continuous distribution
 % include graph of beta compared to computed posterior
 Modelling a biased coin shows an example of a very simple model with a continuous posterior that can be calculated analytically \cite{datasci}. 
-% 
+
 The model is of a coin that is tossed $n$ times to give $x$ heads. We do not know if the coin is biased or not, and would like to find out the bias, $p$ of the coin, where $p$ is the probability of heads, with $p=0.5$ being an unbiased coin.
-% 
+
 To find the posterior, we use an uninformative prior ($\Theta$), the uniform. This results in the posterior, the beta distribution, specifically Beta$(x+1,n-x+1)$.
 
 The program in my PPL is shown in listing \ref{lst:coin}, and demonstrates setting up the model, performing inference as well as finding the mean of the posterior. The application is to find the chance of the next coin flip landing heads. This example uses $n=10$ and $x=9$, so the mean produced is roughly 0.83, the mean of Beta$(10,2)$.
@@ -139,9 +123,9 @@ $H_1:$ The sample data do not follow the exact distribution
 \subsection{Chi-squared}
 
 The $\chi^2$ test is a simple goodness-of-fit test which can test whether or not a given discrete distribution. The test statistic is as follows, with each $i$ being a distinct element in the distribution, $x_i$ is the observed number of samples with the value $i$, and $m_i$ is the expected number of samples for the value $i$.
-
+% 
 \[X^{2}=\sum _{i=1}^{k}{\frac {(x_{i}-m_{i})^{2}}{m_{i}}}\]
-
+% 
 This test statistic is compared against the critical value (at the significance level) of the chi-squared distribution, with the degrees of freedom being $k-1$, where k is the number of possible values of the distribution.
 \subsubsection{Results}
 \begin{table}[!ht]
@@ -184,16 +168,16 @@ Table \ref{tab:ks-pvals} shows that for all the continuous models considered, th
 
 \section{Convergence of sampling}
 I also used the KL-divergence metric to determine the (dis)similarity of two distributions. The formula for KL Divergence of discrete distributions $P$ and $Q$ is easy to calculate by \eqref{eq:kl_disc}
-
+% 
 \[{D_{\text{KL}}(P\parallel Q)=\sum _{x\in {\mathcal {X}}}P(x)\log \left({\frac {P(x)}{Q(x)}}\right)}\] \label{eq:kl_disc}
-
+% 
 The continuous version is similar, with $p$ and $q$ now being density functions as in \eqref{eq:kl_cont}. 
-
+% 
 \[{D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx\] \label{eq:kl_cont}
-
+% 
 % Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins to approximate $q(x)$. I then used Monte Carlo integration to compute the integral. 
 Since I only have a set of samples from $q$, this integral can't be calculated exactly - there is no exact density function. However, there are ways to estimate density functions, as in (Perez 2008) \cite{perez2008kullback}. The first step is to approximate the cdf by finding the empirical cdf, $P_e$ \eqref{eq:pe} then linearly interpolating between points to produce a continuous function $P_c$ \eqref{eq:pc}. Estimating the derivative of $P_c$ then gives the pdf, $\hat{P}$ \eqref{eq:phat}. 
-
+% 
 \begin{align}
 	P_e(x)     & = \frac1{n}\sum_{i=1}^n U(x-x_i) ,        & \text{ where U is the step function}\label{eq:pe}      \\ 
 	P_c(x)     & = \begin{cases}                                                                                
@@ -205,19 +189,17 @@ Since I only have a set of samples from $q$, this integral can't be calculated e
 \end{align}
 % 
 The final estimator \eqref{eq:final_kl_est} is given by using the exact pdf of $q$ and performing Monte Carlo integration.
-
+% 
 \begin{equation}
 	\label{eq:final_kl_est}
 	\hat{D}_{KL}(P \| Q) = \frac1{n}\sum_{i=1}^n \log\left(\frac{\hat{P}(x_i)}{q(x_i)}\right) 
 \end{equation}
-
+% 
 Both the metrics (discrete and continuous) were computed with code written using the \texttt{EmpiricalDist} modules.
 
 The idea behind conducting this test is ensuring that the KL divergence decreases as we take more samples from the posterior. This ensures that the solution converges to the correct distribution - a KL divergence of 0 implies the distributions are identical.
 
-Figure \ref{fig:kl} shows the results of this test. For each inference procedure, we can see that the KL-divergence for each model generally decreases as we take more samples. Rejection sampling is consistently the worst performing inference procedure, with particle based methods such as smc or importance sampling generating more accurate distributions. These plots have all been smoothes by taking a moving average in order to reduce the impact of noise.
-
-In the case of the sprinkler model, there is a rise near the end, but this can be attributed to noise since the KL-divergence is actually lowest for that model, implying that inference performed best for it. 
+Figure \ref{fig:kl} shows the results of this test. For each inference procedure, we can see that the KL-divergence for each model generally decreases as we take more samples. Rejection sampling is consistently the worst performing inference procedure, with particle based methods such as smc or importance sampling generating more accurate distributions. These plots have all been smoothed by taking a moving average in order to reduce the impact of noise.
 
 \begin{figure}[!ht]
 	\centering

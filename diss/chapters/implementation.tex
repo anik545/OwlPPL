@@ -7,11 +7,12 @@ In this chapter I describe how the DSL is implemented. Documentation for all pub
 \begin{wrapfigure}[25]{R}{0.4\textwidth}
 	\dirtree{%
 		.1 ppl.
-		.2 \_build.
-		.2 \_coverage.
+		% .2 \_build.
+		% .2 \_coverage.
 		.2 bin.
 		.3 \dots.
 		.2 doc.
+		.3 \dots.
 		.2 lib.
 		.3 inference.
 		.4 \dots.
@@ -35,7 +36,6 @@ In this chapter I describe how the DSL is implemented. Documentation for all pub
 	\label{fig:dirs}
 \end{wrapfigure}
 
-% TODO: include a file tree?
 The majority of my code is in the \texttt{ppl} directory, which contains the core library, unit tests, statistical testing code and some example programs written using the library. A separate evaluation folder contains code to compare my ppl to other languages.
 
 I have implemented my ppl as a library residing in the \texttt{lib} subdirectory, contained within the module \texttt{Ppl}. Opening this module in a script allows a user to use my library. Ppl includes several submodules, most importantly the \texttt{Dist} and \texttt{Inference} modules, which contains the code for representing, creating and combining distributions, and performing inference, respectively. These functions can be found in separate files in the inference folder, and are all exported in the inference module. The other modules exported in Ppl are plot, prim\_dist, and samples.
@@ -236,23 +236,23 @@ let observe x dst d = Conditional((fun _ -> Primitive.pdf dst x),d)
 The simplest operation to define on models is to sample from them. Sampling from conditional distributions required inference, and is discussed in section \ref{sec:inference}. Here, we run a probabilistic program 'forwards', that is, running a generative model and seeing the outputs without conditioning on observed data.
 		
 In PPLs, a complete program can be thought of as a posterior, $P(\theta\mid x)$, the distribution of a parameter given some observed data. The generative model, i.e. the program without condition statements, can be thought of as the prior distribution, $P(\theta)$. The condition statements then define the likelihood model, that is, $P(x\mid \theta)$, the probability of the observations in the current model (the prior). So finding the prior is the same as disregarding the conditionals (essentially ignoring the data). Sampling is only difficult in the presence of conditionals (as this requires inference), so this allows us to sample from the prior using the same sample function defined before. We can also transform any \texttt{'a dist} into a different \texttt{'a dist} that is the prior by ignoring conditional statements.
-		
+	
 We can also take into account the conditionals, and produce weighted samples, with the weight being the score assigned by each conditional branch, accumulated by multiplying all the scores. This gives us a set of values with corresponding weights which represent how likely those values are. An important property of these weights is that they are not normalised, so we cannot use this to find the posterior directly. I have implemented several variants of functions for finding the prior and sampling, all with the same concept as below.
 	
 \begin{listing}[!htb]
 	\centering
 	\ocamlcode{code_snippets/prior_sample.ml}
 	\caption{Sampling functions}
-	% \label{}
+	\label{lst:sampling}
 \end{listing}
 	
 The function for generating a prior does not directly take samples, but manipulates the structure of the dist GADT. For example, in the \texttt{Bind} branch, it actually introduces 2 new bind variants (via \texttt{let*}) which produces a new distribution lazily. This makes it easier to use the prior within inference algorithms, and allows it to be composed with other distribution modifying functions.
 	
-\section{Inference} \label{sec:inference}
+\section{Implementing Inference} \label{sec:inference}
+
+Inference is the key motivation behind probabilistic programming. Up to this section, I have discussed how to represent models but not do anything with them that couldn't be done in a standard language. With inference, we can produce a sampler which will accurately reflect a posterior distribution.
 	
-Inference is the key motivation behind probabilistic programming. Up to this section, we have discussed how to represent models but not do anything with them that couldn't be done in a standard language. With inference, we can produce a sampler which will accurately reflect a posterior distribution.
-	
-Inference can be thought of as a program transformation \cite{scibior2015practical} \cite{Zinkov2016ComposingIA}. In my ppl, this corresponds to a function of type \texttt{'a dist -> 'a dist}. This method allows for the composition of inference algorithms, exemplified in section \ref{sec:pimh}.
+Inference can be thought of as a program transformation \cite{scibior2015practical, Zinkov2016ComposingIA}. In my ppl, this corresponds to a function of type \texttt{'a dist -> 'a dist}. This method allows for the composition of inference algorithms, exemplified in section \ref{sec:pimh}.
 	
 % use equations from here: https://arxiv.org/pdf/1507.00996.pdf
 		
@@ -468,8 +468,11 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 \end{figure}
 	
 	
-\section{Testing}
+\section{Testing}\label{sec:impl-testing}
 	
+Testing systems which are linked to randomness can be quite tricky, as it is difficult to test behaviour that is expected to change from one execution to the next. One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. Even with a fixed random seed, a change in code may cause new outputs even though the fundamental statistical property desired hasn't changed. Another approach is to perform some statistical test such as kolmogorov-smirnov \cite{massey1951kolmogorov}, to ensure distributions produced by my library are equal to what is expected. A problem with tests of this kind is that they are expected to fail sometimes, meaning unit tests will provide limited utility due to their inherent flakiness with random programs. In fact, since we expect these tests to fail a certain percentage of the time, if they do not sometimes fail there is a problem with our program.
+
+
 Automated testing of PPLs is difficult for reasons outlined in section \ref{sec:prep-testing}. However, I still wrote basic unit tests. The test framework I used, Alcotest, lets me check that outputs of functions match expected values. This allows me to test all deterministic helper functions, e.g. normalise. It also lets me test the exact inference method, and very simple distributions and models which only contain a single value. I also used an additional library Quickcheck, to test that a specified invariant holds for a function - it uses randomly generated inputs to check the widest range of values. As an example (listing \ref{lst:test}), for the normalise function, we expect that the output probabilities always sum to one, no matter the input array - the test is given below.
 	
 	

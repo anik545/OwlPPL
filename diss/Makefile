@@ -33,6 +33,7 @@ LATEXMK_ARGS = -synctex=1 -interaction=nonstopmode -file-line-error -pdf --shell
 .PHONY: diss
 diss: diss.pdf
 diss.pdf: diss.tex $(ALL_TEX)
+	sed -i 's/^\\\includeonly/% \\\includeonly/g' diss.tex
 	latexmk $(LATEXMK_ARGS) diss.tex
 
 .PHONY: proposal
@@ -57,8 +58,12 @@ ar899.tar.gz: $(CODE_TO_SUBMIT)
 
 .PHONY: submit
 submit: diss.pdf ar899.tar.gz
-	cp diss.pdf ../ar899.pdf
+	cp out/diss.pdf ../ar899.pdf
 	cp ar899.tar.gz ../ar899.tar.gz
+
+upload: diss.pdf ar899.tar.gz
+	scp out/diss.pdf srcf:~/public_html
+	scp ar899.tar.gz srcf:~/public_html
 
 .PHONY: clean
 

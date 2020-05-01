@@ -1,0 +1,5104 @@
+Anik Roy
+
+A probabilistic programming language
+in Ocaml
+Computer Science Tripos - Part II
+Christ’s College
+April 28, 2020
+
+Declaration of Originality
+I, Anik Roy of Christ’s College, being a candidate for Part II of the Computer Science Tripos,
+hereby declare that this dissertation and the work described in it are my own work, unaided
+except as may be specified below, and that the dissertation does not contain material that has
+already been used to any substantial extent for a comparable purpose.
+I, Anik Roy of Christ’s College, am content for my dissertation to be made available to the
+students and staff of the University.
+Signed:
+Date: April 28, 2020
+
+i
+
+Proforma
+Candidate Number: 2349E
+Project Title:
+A Probabilistic Programming
+Language in Ocaml
+Examination:
+Computer Science Tripos Part II - 2020
+Word Count:
+11531 1
+Final Line Count:
+4686 2
+Project Originator: Dr R. Mortier
+Supervisor:
+Dr R. Mortier
+
+Original Aims of the Project
+The original aim was to design and implement a language in OCaml, which allows the user
+to specify probabilistic models naturally in code, and perform inference on these models
+automatically in order to separate the concerns of defining generative models and performing
+inference. Exact Bayesian inference is intractable in practice, so I needed to develop approximate
+algorithms. I aimed to allow users to build models from a set of primitive distributions, and
+choose from a selection of inference algorithms to perform inference. An efficient and expressive
+way to represent and combine distributions needed to be developed.
+
+Work Completed
+I have achieved all the initial requirements. My PPL exists as a shallowly embedded DSL in
+OCaml, is able to represent a wide variety of models, and is not limited to finite graphical models
+or discrete distributions. I have implemented several inference procedures, exceeding my initial
+requirements, and shown that they are correct using statistical tests on simple problems solved
+analytically. I represent distributions as a GADT which is a monad, allowing distributions to
+be combined to build up models. I have also included functionality to easily create plots from
+distributions.
+This word count was computed by texcount -inc -sum -1 diss.tex and only includes the main body,
+excluding code listings
+2
+This line count was computed by cloc and excludes blank lines and comments
+1
+
+ii
+
+Special Difficulties
+None
+
+iii
+
+Contents
+1 Introduction
+1.1 Related work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2 Preparation
+2.1 Starting Point . . . . . . . . . . . . . . . . . .
+2.2 Requirements . . . . . . . . . . . . . . . . . .
+2.3 Professional Practice . . . . . . . . . . . . . .
+2.3.1 Testing . . . . . . . . . . . . . . . . . .
+2.3.2 Continuous Integration . . . . . . . . .
+2.3.3 Licenses . . . . . . . . . . . . . . . . .
+2.4 Tools and Technologies . . . . . . . . . . . . .
+2.5 OCaml . . . . . . . . . . . . . . . . . . . . . .
+2.5.1 GADTs . . . . . . . . . . . . . . . . .
+2.5.2 Monads . . . . . . . . . . . . . . . . .
+2.5.3 Modules . . . . . . . . . . . . . . . . .
+2.6 Owl . . . . . . . . . . . . . . . . . . . . . . .
+2.7 Approaches to probabilistic programming . . .
+2.8 Bayesian Inference . . . . . . . . . . . . . . .
+2.9 Inference Algorithms . . . . . . . . . . . . . .
+2.9.1 Exact Inference . . . . . . . . . . . . .
+2.9.2 Rejection Sampling . . . . . . . . . . .
+2.9.3 Importance Sampling . . . . . . . . . .
+2.9.4 Monte Carlo Markov Chains (MCMC)
+2.9.5 Sequential Monte Carlo (SMC) . . . .
+3 Implementation
+3.1 Repository Overview . . . . .
+3.2 Language Design . . . . . . .
+3.3 Representing Distributions . .
+3.3.1 Probability Monad . .
+3.3.2 GADT . . . . . . . . .
+3.3.3 Primitive Distributions
+3.3.4 Empirical Distributions
+3.4 Conditioning . . . . . . . . .
+3.5 Forward Sampling . . . . . . .
+3.6 Implementing Inference . . . .
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+iv
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+1
+2
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+3
+3
+3
+4
+4
+5
+5
+5
+6
+6
+6
+7
+8
+8
+9
+9
+10
+10
+10
+11
+11
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+12
+12
+13
+13
+14
+16
+16
+17
+18
+19
+20
+
+3.7
+3.8
+
+3.6.1 Enumeration . . . . . . . . . . . . . . . .
+3.6.2 Rejection Sampling . . . . . . . . . . . . .
+3.6.3 Likelihood Weighting . . . . . . . . . . . .
+3.6.4 Metropolis Hastings . . . . . . . . . . . . .
+3.6.5 Bootstrap Particle Filter . . . . . . . . . .
+3.6.6 Particle Cascade . . . . . . . . . . . . . .
+3.6.7 Particle-Independent Metropolis-Hastings .
+Visualisations . . . . . . . . . . . . . . . . . . . .
+Testing . . . . . . . . . . . . . . . . . . . . . . . .
+
+4 Evaluation
+4.1 Examples . . . . . . . . . . .
+4.1.1 Sprinkler . . . . . . . .
+4.1.2 Biased Coin . . . . . .
+4.1.3 HMM . . . . . . . . .
+4.1.4 Linear Regression . . .
+4.1.5 Infinite Mixture Model
+4.2 Statistical tests . . . . . . . .
+4.2.1 Chi-squared . . . . . .
+4.2.2 Kolmogorov-Smirnov .
+4.3 Convergence of sampling . . .
+4.4 Performance . . . . . . . . . .
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+20
+21
+22
+23
+23
+24
+25
+26
+28
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+30
+30
+30
+30
+32
+33
+33
+33
+34
+34
+35
+37
+
+5 Conclusion
+
+40
+
+Bibliography
+
+41
+
+A Example Programs
+A.1 Sprinkler . . . . . . . .
+A.2 Coin . . . . . . . . . .
+A.3 Linear Regression . . .
+A.4 Hidden Markov Model
+A.5 Dirichlet Process . . .
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+44
+44
+44
+44
+44
+44
+
+B Full Documentation
+B.1 Module Dist.PplOps . . . . . . . .
+B.2 Module Ppl.Dist . . . . . . . . . .
+B.3 Module Ppl.Inference . . . . . .
+B.4 Module type Primitive.PRIM_DIST
+B.5 Module Ppl.Primitive . . . . . .
+B.6 Module Ppl.Helpers . . . . . . . .
+B.7 Module Ppl.Evaluation . . . . . .
+B.8 Module Ppl.Plot . . . . . . . . . .
+B.9 Module Ppl.Empirical . . . . . .
+B.10 Module Empirical.Discrete . . .
+B.11 Module Empirical.ContinuousArr
+B.12 Module type Empirical.S . . . . .
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+45
+45
+45
+48
+50
+51
+52
+53
+54
+55
+55
+55
+56
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+
+v
+
+C Project Proposal
+
+57
+
+vi
+
+List of Figures
+3.1
+3.2
+3.3
+3.4
+3.5
+
+Directory structure . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Samples from a binomial distribution visualised, n = 10, 000 . . . . . . . . . . .
+Approximate pdf and cdf of samples from a standard normal distribution . . . .
+Plots to compare inferred distributions with the exact solutions . . . . . . . . .
+The approximate and exact pdf of the output of inference for a biased coin model,
+with code to produce plot . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.6 Output from running unit tests . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4.1
+4.2
+4.3
+4.4
+
+4.5
+
+4.6
+
+Sprinkler model as a network . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+The coin model in WebPPL (JS) and Anglican (Clojure) . . . . . . . . . . . . .
+Plot of KL-divergence with increasing number of samples for different models
+and inference procedures . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Time taken for inference against other languages for different models and inference
+algorithms, taking 10,000 samples from the posterior, averaged over 20 runs. Error
+bars show the 95% confidence interval . . . . . . . . . . . . . . . . . . . . . . . .
+Memory Usage of my ppl, compared against other languages for different models,
+all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged
+over 20 runs. Error bars show the 95% confidence interval . . . . . . . . . . . .
+Time taken for inference as a function of input data length as the mean of 10
+runs each taking 1,000 samples from the posterior, shaded areas are the 95%
+confidence interval (±2σ) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+vii
+
+12
+26
+27
+27
+28
+29
+31
+32
+36
+
+37
+
+38
+
+39
+
+List of Listings
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+New let syntax which makes monadic binds easier to express . . . . . .
+Simple Probability Monad . . . . . . . . . . . . . . . . . . . . . . . . .
+Simple probability monad using a map . . . . . . . . . . . . . . . . . .
+Representing a probabilistic model using a GADT . . . . . . . . . . . .
+Signature of the module that primitive distributions must implement .
+Adding a new distribution as a primitive . . . . . . . . . . . . . . . . .
+Signature for empirical distributions . . . . . . . . . . . . . . . . . . . .
+The definitions of the different conditioning operators . . . . . . . . . .
+Sampling functions . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Enumerating all paths through a model . . . . . . . . . . . . . . . . . .
+Simplest rejection sampling method . . . . . . . . . . . . . . . . . . . .
+An example of a model that is very inefficient under rejection sampling
+Likelihood weighting . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Metropolis hastings . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Particle Filter . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Testing the normalisation function for particles . . . . . . . . . . . . .
+Sprinkler model in code . . . . . . . . . . . . . . . . . . . . . . . . . .
+Output of inference . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Coin model . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+WebPPL . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Anglican . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Hidden Markov Model . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Linear Regression . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+viii
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+7
+15
+15
+16
+17
+17
+18
+19
+20
+21
+22
+22
+22
+24
+25
+28
+31
+31
+31
+32
+32
+32
+33
+
+List of Tables
+4.1
+4.2
+
+p-values of χ2 test on different models using different inference procedures . . .
+p-values of K-S test on different models using different inference procedures . . .
+
+ix
+
+34
+35
+
+Chapter 1
+Introduction
+Creating statistical models and performing inference on these models is an important part
+of data science. A probabilistic programming languages (PPL) is a language used to create
+models, and allow inference to be performed on these models automatically. This allows the
+problem of efficient inference to be abstracted away from the specification of the model, and
+means inference code does not have to be hand-written for every model, making the task of
+designing models easier. Probabilistic models can then be written by domain experts, without
+having to worry about the task of inference. The inference ‘engine’ can also implement many
+different inference algorithms, which will each be more or less well-suited to different types of
+models. The core idea is that we have a prior belief over some parameters, (p(x), the generative
+model), and a set of conditions (p(y|x)) which specify the likelihood of observed data given
+those parameters. What we are interested in is the posterior, the (inferred) distribution over
+the parameters given the data we observe (p(y|x)). In general, this kind of Bayesian inference is
+intractable, so we must use methods which approximate the posterior.
+PPLs usually allow us to create these models as programs. However, since generative models
+are built up by sampling from probability distributions, PPLs need some way of modelling this
+non-determinism. Being able to condition programs on data is the other key part of PPLs, since
+we are interested in the posterior, which is conditional on the data. Without conditioning, we
+can run a program ‘forwards’, which essentially means generating samples using the model we
+write. However, when we include a condition statement, we can infer the distribution of the
+input parameters based on the data we observe.
+PPLs can either be standalone languages or be embedded into another language. Embedding a
+PPL into a pre-existing language allows us to utilise the full power of the ‘host’ language, and
+gives us access to operations in the host language without having to implement them separately.
+This makes it easier to combine models with each other as well as integrate them more easily
+into other programs written in the host language. Specifically, embedding a DSL into OCaml
+allows us to represent a wide range of models using OCaml’s inbuilt syntax, and leverage OCaml
+features such as an expressive type system or efficient native code generation.
+
+1
+
+CHAPTER 1. INTRODUCTION
+
+1.1
+
+2
+
+Related work
+
+There are many examples of PPLs, even as domain specific languages (DSLs) in OCaml. Some
+PPLs choose to limit the models that can be expressed in them in order to make inference more
+efficient - for example HANSEI in OCaml can only represent discrete distributions [1]. Others,
+such as STAN or infer.NET (F#) can only operate on finite graphical models, and do not allow
+unbounded recursion when defining models. Some, such as Church or WebPPL, can express
+more general models, and are therefore known as ‘universal’ [2] but often make the trade-off of
+less predictable or slower inference.
+
+Chapter 2
+Preparation
+In this chapter, I will discuss the research done before starting the project, and some of the
+design decisions made based on this. In particular, common patterns in OCaml (and functional
+programming in general), influenced the final DSL, as well as the design of other similar
+probabilistic programming systems. I also give a general description on several classes of
+inference algorithms.
+
+2.1
+
+Starting Point
+
+There do exist PPLs for OCaml, such as IBAL [3] or HANSEI [1], as well as PPLs for other
+languages, such as WebPPL - JavaScript[4], Church - LISP[5] or Infer.Net - F#[6] to name a
+few. My PPL can draw on some of the ideas introduced by these languages, particularly in
+implementing efficient inference engines. I will need to research the different approaches taken
+by these PPLs and decide what form of PPL to implement, especially in deciding the types of
+model I will want my PPL to be able to represent and the inference methods I implement.
+I will be using an existing OCaml numerical computation library (Owl). This library does not
+contain methods for probabilistic programming in general, although it does contain modules
+which will help in the implementation of an inference engine such as efficient random number
+generation and lazy evaluation.
+I have experience with the core SML language, which will aid in learning basic OCaml due
+to similarities in the languages, however I will still have to learn the modules system. 1B
+Foundations of Data Science also gives me a basic understanding of Bayesian inference. I did
+not have experience with domain specific languages in OCaml, although the 1B compilers course
+did implement a compiler and interpreter in OCaml.
+
+2.2
+
+Requirements
+
+Before starting to write any code, I made sure to set out the features I aimed to implement for
+my DSL. The main goal was to produce a usable language, which was defined by the following
+criteria:
+3
+
+CHAPTER 2. PREPARATION
+
+4
+
+• Language Features: Since I have written an embedded DSL, a user of my PPL should
+be able to take advantage of all standard OCaml features in the deterministic parts of
+their models. I need to make sure that this is the case, and features such as recursive or
+higher order functions will work.
+• Available distributions: I aimed to make sure my PPL has at minimum the Bernoulli
+and normal distributions available as basic building blocks to build more complex probabilistic programs.
+• Correctness of inference: I used the PPL developed on example problems to ensure
+correct results are produced. These results were compared to results produced in other
+PPLs as well as comparisons to analytic solutions for simple problems.
+• Available Inference Algorithms: I aimed to include at least one available inference
+algorithm. However, since different problems are more or less well suited to different
+general-purpose inference procedures, I wrote implementations for five separate algorithms.
+• Performance: This is a quantitative measure, comparing programs written in my PPL
+to equivalent programs in other PPLs. I used the profiling tools spacetime and GProf
+to profile my OCaml code. Performing inference should be possible within a reasonable
+amount of time, even though the project does not have a significant focus on performance.
+
+2.3
+
+Professional Practice
+
+I adopted several best practices in order to ensure the project was successful. This includes
+performing regular testing, splitting code into separate modules designing signatures first, and
+ensuring my code follows a consistent style (Jane Street)1 .
+
+2.3.1
+
+Testing
+
+Testing systems which are linked to randomness can be quite tricky, as it is difficult to test
+behaviour that is expected to change from one execution to the next. One approach is to set a
+fixed random seed and make sure the same sequence of results are produced. The aim of a unit
+test, however, is to make sure that a desired property does not change from one version of the
+code to the next. Even with a fixed random seed, a change in code may cause new outputs even
+though the fundamental statistical property desired hasn’t changed. Another approach is to
+perform some statistical test such as kolmogorov-smirnov [7], to ensure distributions produced
+by my library are equal to what is expected. A problem with tests of this kind is that they are
+expected to fail sometimes, meaning unit tests will provide limited utility due to their inherent
+flakiness with random programs. In fact, since we expect these tests to fail a certain percentage
+of the time, if they do not sometimes fail there is a problem with our program.
+As such, most of the unit tests I wrote are fairly simple and only catch very basic bugs. Unit tests
+were possible to write for the exact inference procedure when working with discrete distributions,
+since we always expect the same output distribution. However, all the other inference algorithms
+1
+
+https://opensource.janestreet.com/standards/
+
+CHAPTER 2. PREPARATION
+
+5
+
+are approximate, so tests suffer from the problems described above. I was still able to carry out
+a full evaluation, performing hypothesis tests such as the kolmogorov-smirnov or chi-squared
+tests.
+However, there are several auxiliary functions that can be tested effectively using conventional
+methods, so I was able to test them as normal. I also used the Quickcheck library to perform
+tests, which allows me to ensure certain invariants are preserved by functions by testing on
+large amounts of randomly generated inputs. I also use the bisect_ppx library to produce code
+coverage reports so that I can ensure I am thoroughly testing code.
+
+2.3.2
+
+Continuous Integration
+
+Since I will be developing a library, it is important to make sure that any unit tests are run
+regularly to ensure there are no regressions - no new code affects old behaviour. It is also
+important to make sure the library will function on different platforms, and that documentation
+is built (and possibly uploaded) automatically. To achieve this, I will be using GitHub’s
+continuous integration service, ‘actions’ to make sure code on the master branch always works.
+The CI can also be used to ensure the library works with older versions of OCaml, and is
+backwards-compatible.
+
+2.3.3
+
+Licenses
+
+The libraries I use, Owl and Jane Street Core, are both licensed under the MIT license. This
+allows me to freely open-source my work using a similar license.
+
+2.4
+
+Tools and Technologies
+
+The main tools I used are listed here:
+• Ocaml 4.08 - The language I wrote the main PPL library in
+• Dune - Build system for OCaml
+• Opam - OCaml package manager
+• Alcotest - Unit testing framework
+• Quickcheck - Random testing library
+• Bisect_ppx - Code coverage tool
+• Spacetime - Memory profiler for OCaml
+• Gprof - A Linux profiler
+• Owl - Scientific computing library in OCaml
+• VSCode (with ocaml extensions) - IDE for OCaml development
+• Git with GitHub - version control
+
+CHAPTER 2. PREPARATION
+
+6
+
+Using OCaml 4.08 allows me to use new features of OCaml, in particular the ability to define
+custom let operators as syntax sugar for monads. The dune build system also allows me to more
+easily manage building and testing my code, as well as automatically creating documentation
+from comments and function signatures in my code. The profilers I used allowed me to work
+out the causes of performance issues and remedy them.
+
+2.5
+
+OCaml
+
+I have chosen to use the OCaml language to implement my PPL. There are many features of
+OCaml which make it suitable for writing a DSL. Using OCaml, I can make sure that expressions
+in the DSL are well-typed, so that programs don’t fail to run. OCaml’s algebraic datatypes also
+make it easy to represent probabilistic programs as trees, and pattern matching makes it easy
+to ’interpret’ and transform these trees. The module system also makes sure that certain types
+are hidden from the user, which can ensure only valid structures are created by the user.
+
+2.5.1
+
+GADTs
+
+The main data structure I use to represent distributions is GADT - a generalised algebraic
+data type. GADTs are similar to ADTs (sum types), in that they have a set of constructors,
+but the main difference is that these constructors can have their output types annotated.
+The fact that the return types of constructors can vary is what makes GADTs more general
+than normal ADTs, whose return types are all the same. In OCaml, the syntax for this is
+type _ t = Constructor : a_type' -> a_type' t ... . Since we can now know which constructors produce which concrete types of t (e.g. an int t or a float t, etc.), functions can
+be defined to only accept certain constructors, and we can make sure the whole structure is well
+typed.
+Type inference for GADTs is undecidable, and so type inference often fails when pattern
+matching on GADTs, especially for recursive functions. I often need to annotate functions as
+being explicitly polymorphic using the syntax let f: 'a.'a t -> 'a t = fun x -> ....
+
+2.5.2
+
+Monads
+
+Monads are a design pattern commonly used in functional programming languages.
+The key data structure I use to model probability distributions is a monad. A data type is a
+monad if it defines two operations, return and bind, and can be thought of as datatypes which
+‘wrap’ values. The return function takes a value and returns a monad wrapping that value. The
+bind function takes a monad and a function, and applies the function to the value wrapped
+inside the monad, and rewraps this value. The type must also satisfy a set of laws, which I omit
+here[8]. Monads can be used to structure programs in a general way, and allow side effects to
+be described in a pure way.
+
+7
+
+CHAPTER 2. PREPARATION
+Probability Monad
+
+It has been shown that probability distributions form a monad, [9] [10], and that they can be
+used to create distributions composed from other distributions [11]. In this case, return x
+represents a distribution with only one value, x (technically a Dirac distribution). So bind d
+f is the main operator for composing distributions. Binding distributions together represents
+taking the output of one distribution (d) and using it in the body of the function (f). It can be
+thought of as taking a sample from d, however, it is important to note that calling bind does
+not directly produce a sample, but exposes that structure to an interpreter (here the inference
+engine) which can then decide what to do at that point.
+Custom let operators
+Ocaml 4.08 allows me to define definitions for custom let operators. This is used to provide
+syntactic sugar for working with monads, and is similar to do-notation in Haskell. The reference
+documentation 2 outlines this, and a monad should provide a module which implements the
+(let*) and (and*) operators. The (let*) operator is the standard bind function - here it takes
+the identifier bound to as the first argument to the function in bind. The (and*) operator is
+the product operation, it takes two monads and returns the monad pair - it has signature ’a m
+-> ’b m -> (’a*’b) m, where m is the monad type. An example, using the Option monad is
+given below to show the transformation that takes place. This syntax allows the user to not
+have to use the bind (or the alias »=) explicitly, and offers a more intuitive syntax.
+open Option
+(* new syntax *)
+let add_options x y =
+let* a = x in
+let* b = y in
+x+y
+
+open Option
+(* old syntax *)
+let add_options x y =
+x >>= (fun a ->
+y >>= (fun b ->
+a+b))
+
+Listing 1 – New let syntax which makes monadic binds easier to express
+
+2.5.3
+
+Modules
+
+The module system is a key feature of the OCaml language. Every function in OCaml is in a
+module, by default the name of the file it resides in. Modules can also have signatures, which
+define what code is visible to a user, and constrain the module. This allows modules to hide
+types and implementations to provide a clean API. Modules are often used to wrap a particular
+type, for example a list or map. This means that to create or manipulate that type, the user
+must go through the modules API, ensuring only permitted operations are carried out. This is a
+feature I’ve used in designing distribution types. Modules can also be dynamically created from
+other modules, using functors, which are functions from modules to modules. This technique is
+used extensively in the Core library, and it allows modules to be customised and extended.
+2
+
+http://caml.inria.fr/pub/distrib/ocaml-4.08/ocaml-4.08-refman.html
+
+CHAPTER 2. PREPARATION
+
+8
+
+In OCaml, the module language (functors, modules, signatures, etc.) and the core language
+(functions, values, types, etc.) are considered separate, and values can’t contain modules. First
+class modules provide a way around this constraint, and allows modules to be used in much the
+same way as ordinary values. This allows us to simplify the creation of modules from the users
+point of view, and means a library can define functions to create modules which can then be
+used by other functions.
+
+2.6
+
+Owl
+
+Owl is a scientific computing library written for OCaml [12]. Importantly for my PPL, it
+contains functions for working with a wide variety of statistical functions. In particular, it
+contains functionality relating to many common distributions, e.g. normal, beta, binomial,
+etc. Since my language will allow the user to combine these basic distributions into larger
+models, I will need to use these functions to allow sampling from and the ability to perform
+inference on models. In particular, it is important to be able to find the probability density
+function (pdf) and cumulative density function (cdf) of these distributions as well as sample
+from them. Another important feature of owl is it’s plotting functionality which enabled me to
+write functions which visualise output distributions directly from OCaml.
+
+2.7
+
+Approaches to probabilistic programming
+
+Existing PPLs take several different forms, both as standalone and embedded languages. The
+main trade-off that is made in the design of PPLs is the number of models that can be expressed
+in the language compared to how efficient inference is. One approach is graph-based, where a
+factor graph is generated from the program, over which efficient inference can take place. This
+approach can be seen in languages such as infer.NET or JAGS, and has the benefit of very
+fast inference, particularly since efficient computation graph frameworks can be leveraged - an
+example is Edward [13], which uses TensorFlow as a backend. However, these languages usually
+cannot represent infinite models or unbounded recursion. Another approach, taken by the
+likes of WebPPL or Anglican, is trace-based. This approach considers execution traces, with a
+‘trace’ being one run of a program, with all the intermediate variables taking a particular value.
+Inference algorithms can reason about these traces in order to produce a posterior distribution,
+as will be seen in the next section. A trace-based approach often leads to clearer programs,
+since we are not working with a computation graph. It also leads to more models being able to
+be expressed , since we are not limited by the constraints of a graph. These languages are often
+referred to as being ‘universal’. However, inference is often slower, particularly when dealing
+with data in high dimensions, since inference algorithms need to be more general purpose, and
+often converge slower.
+
+9
+
+CHAPTER 2. PREPARATION
+
+2.8
+
+Bayesian Inference
+
+Inference is the key motivating feature of probabilistic programming, and is a way to infer a
+distribution over the parameters based on the data we observe. The main feature of Bayesian
+inference is that we assign every model some prior belief. Often this prior is chosen based on our
+knowledge of the problem, but the prior can also be uninformative. The goal of Bayesian inference
+is to calculate the posterior distribution, which can be represented by Bayes’ formula,
+P (B | A)P (A)
+P (B)
+
+P (A | B) =
+
+with P (A) being the prior, and P (B | A) being the likelihood model we define. In the PPL
+setting, the prior is the generative model we define, with condition statements defining the
+likelihood. Running inference on the program then produces a sampler for the posterior.
+This formula holds for the continuous case too, using probability density functions (fX ),
+fY |X=x (y)fX (x)
+fY (y)
+
+fX|Y =y (x) =
+
+Unfortunately, exact Bayesian inference is usually computationally infeasible, especially when
+the number of random variables we consider is large. If we have 50 variables which can take one
+of two values, then we have to sum over 250 values. There do exist some algorithms which operate
+on Bayesian networks (DAGs which represent random variables and their interdependence),
+and reduce the number of calculations needed. These include static methods such as Variable
+Elimination or Message Passing [14]. Alternatively, in the continuous case the formula is
+P (x | θ)P (θ)
+P (x)
+
+P (θ | x) =
+with
+P (x) =
+
+Z
+Θ
+
+P (x, θ) dθ
+
+The normalizing constant here is an integral that often does not have an analytic solution, and
+so must be approximated. Another issue is that directly sampling from a distribution requires
+that we also invert this formula (in order to use inversion sampling).
+
+2.9
+
+Inference Algorithms
+
+Inference algorithms are ways to systematically generate samples from posterior distributions
+given a likelihood function and a prior distribution. In probabilistic programming, a model
+consists of latent variables and observed variables, and a single execution of a model (a program)
+can be thought of as an assignment to each of these variables, known as an execution trace. This
+can be defined mathematically as below, by Bayes’ rule:
+p(x1:N |y1:N ) ∝ p̃(y1:N , x1:N )
+Note that the trace may have a different number of variables each time a model is run, due to
+the fact that we allow general models which allow for unbounded recursion.
+
+CHAPTER 2. PREPARATION
+
+10
+
+Here, p is the posterior distribution of a particular trace x, given the observed variables y. This
+is proportional to the joint distribution of all the variables (p̂). The aim is then to find the
+posterior over the latent variables we are interested in (by marginalising the other variables).
+We can specify which variables we care about within the program, either as part of the model,
+or outside it in a query to the model.
+In general, there are two classes of inference algorithms - static and dynamic[15]. In static
+methods, the program is compiled to a particular model (e.g. a Bayesian network), which is
+analysed for inference to be performed. These methods generally constrain the models that
+can be represented (often to finite graphical models). Since my PPL aims to be universal, I
+focus instead on dynamic methods, which use sampling to run programs and use conditioning
+statements that occur on these runs to perform inference.
+
+2.9.1
+
+Exact Inference
+
+Exact Inference is the simplest method of calculating the posterior, but is usually computationally
+intractable. It involves calculating Bayes formula exactly, of which calculating the normalising
+constant is usually the problem. To sample directly, we would also need to find the inverse
+cumulative distribution to be able to use the inversion sampling method.
+For discrete posterior distributions it can be thought of as calculating the probability of
+every possible value of the variable of interest. Since a random variable will be dependent on
+several others, this involves finding every possible combination of these variables and their
+outcomes.
+
+2.9.2
+
+Rejection Sampling
+
+Since exact inference is too difficult in practice, we usually have to resort to Monte Carlo [16]
+methods.
+One such method, rejection sampling, is a very simple inference method which uses another
+distribution which can be sampled from. We take samples from this proposal distribution, and
+either accept or reject them. How likely we are to accept or reject a sample depends on the pdf
+of this proposal distribution. It can be shown that samples taken using this method converge to
+the required distribution [17].
+
+2.9.3
+
+Importance Sampling
+
+Importance sampling is another simple method, improving on rejection sampling, that can be
+used to sample from a target distribution using another distribution, known as the proposal
+distribution. We then calculate the ratio of the likelihoods between the two distributions to
+weight samples from the proposal. From doing this repeatedly with multiple samples from the
+proposal, we can build a posterior represented by a set of weighted samples.
+
+11
+
+CHAPTER 2. PREPARATION
+
+2.9.4
+
+Monte Carlo Markov Chains (MCMC)
+
+MCMC methods involve constructing a Markov chain with a stationary distribution equal to
+the posterior distribution. A Markov chain is a statistical model consisting of a sequence of
+events, where the probability of any event depends only on the previous event. The stationary
+distribution is the distribution over successive states that the chain converges to.
+There exists several algorithms for finding this Markov chain, for example metropolis-hastings.
+This algorithm requires that we have a function, f (x), which is proportional to the density
+of the distribution. The function is easy to compute for the posterior, since it is simply the
+prior multiplied by the posterior - the normalising constant can be ignored since we only need a
+proportional function.
+MCMC algorithms have the same basic structure - to first ‘run’ the chain for a burn-in period,
+taking samples and discarding them. Then, running the chain and collecting the states visited
+as samples. This set of samples is then a set of samples from the posterior, since the posterior
+should be equal to the stationary distribution. An important trade-off is made in the length of
+the burn-in period - too long and time is wasted discarding states, but too short and the chain
+will not converge to the correct distribution.
+
+2.9.5
+
+Sequential Monte Carlo (SMC)
+
+SMC methods are algorithms which are based on using large numbers of weighted samples
+(‘particles’) to represent a posterior distribution. SMC methods are also known as particle filters.
+A particle is a value paired with an unnormalised weight which represents the likelihood of that
+value in the distribution. These particles are updated when data is observed and re-sampled
+from in order to converge the set of particles to the posterior.
+For a set of weighted particles,
+{(x[i] , w[i] )}i=1..N
+the pdf of this distribution is represented by
+p(x) =
+
+N
+X
+
+w[i] δx[i] (x)
+
+i=1
+
+where δ is the Dirac distribution
+The simplest SMC algorithms are particle filters[18], which simply resample particles on encountering new data, updating the weights of the particles based on how likely this data is deemed
+to be. However, many variations exist - the resampling method, updating the weights and the
+initialisation of particles can all be varied. The main feature of SMC algorithms is that they
+sequentially create sets of particles which converge to the desired distribution.
+SMC methods can also be combined with MCMC methods to create new algorithms. These
+algorithms are known as particle Monte Carlo Markov chain (PMCMC) algorithms, and were
+first introduced for probabilistic programming in the Anglican language [19].
+
+Chapter 3
+Implementation
+In this chapter I describe how the DSL is implemented. Documentation for all publicly exposed
+functions can be found in appendix B.
+
+3.1
+
+Repository Overview
+
+The majority of my code is in the ppl directory, which
+contains the core library, unit tests, statistical testing
+code and some example programs written using the
+library. A separate evaluation folder contains code to
+compare my ppl to other languages.
+I have implemented my ppl as a library residing in
+the lib subdirectory, contained within the module Ppl.
+Opening this module in a script allows a user to use my
+library. Ppl includes several submodules, most importantly the Dist and Inference modules, which contains
+the code for representing, creating and combining distributions, and performing inference, respectively. These
+functions can be found in separate files in the inference
+folder, and are all exported in the inference module.
+The other modules exported in Ppl are plot, prim_dist,
+and samples.
+Prim_dist contains code for using primitive distributions - as well as types which a user can provide to
+define their own distributions. It also defines functions
+which can be used by the user to create new primitive
+distributions.
+The Plot module contains helper functions which wrap
+around Owl_plplot, allowing users to easily create visualisations from distributions defined in my ppl. This
+includes histograms
+12
+
+ppl
+
+_build
+_coverage
+bin
+...
+doc
+lib
+inference
+...
+dist.ml
+empirical.ml
+helpers.ml
+inference.ml
+monad.ml
+plot.ml
+ppl.ml
+primitive.ml
+test
+unit_tests
+...
+test_models.ml
+hypothesis_tests.ml
+dune-project
+ppl.opam
+
+Figure 3.1 – Directory structure
+
+CHAPTER 3. IMPLEMENTATION
+
+13
+
+The bin directory contains several example programs to show how the ppl can be used to
+express many different models.
+The test directory contains basic unit tests as well as hypothesis tests to check the correctness
+of inference.
+The evaluation directory contains code to compare my ppl to both hand-written inference
+procedures, as well as equivalent programs in other PPLs. There are several directories, which
+each correspond to a particular problem/model.
+All code is written in OCaml 4.08, with the main dependencies being Jane Street’s Core and
+Owl [12].
+
+3.2
+
+Language Design
+
+I chose to implement my language as a domain specific language (DSL) shallowly embedded
+into the main OCaml language. This allows models built in the ppl to be easily composed with
+other standard OCaml programs.
+Using a shallow embedding means we can use all of the features of OCaml as normal, including
+branching (if/then/else), loops, references, let bindings, (higher-order) functions, and importantly,
+recursion. This can allow us to define models that do not terminate and are therefore invalid.
+However, we can write functions which are stochastic recursive [20], that is, functions which have
+a probability of termination that tends to 1 as the number of successive calls tends to infinity.
+This leads to functions which terminate their recursion non-deterministically. Any model which
+does not satisfy this will be considered an invalid model - unfortunately as it is not possible to
+determine whether or not a program will halt, this property cannot be enforced.
+I use a set of primitive distributions which can be combined (using arbitrarily complex deterministic OCaml code) to produce new more complex distribution. For example, one can take
+the sum of two discrete uniform distributions to simulate the addition of two dice rolls.
+PPLs in general are similar to normal programming languages, but need to support two extra
+operations - sample and condition [15]. The sample operator allows models to be built up.
+The condition operator has a few variants, which are covered in section 3.4.
+
+3.3
+
+Representing Distributions
+
+In order to define my DSL, I needed data structures to represent probabilistic models as
+well as distributions that are used as both input and output. Input distributions are the
+primitive distributions that are used to build models and constrain observations. We have more
+information about these distributions, such as how to sample from them exactly and exact
+pdf functions, and this information is used in inference. The output of inference is usually a
+distribution which can be sampled from to obtain the posterior, but we generally want to also
+collate statistics about the posterior distribution. Since we only have an approximate sampler,
+
+CHAPTER 3. IMPLEMENTATION
+
+14
+
+we can output empirical distributions from which many statistics, e.g. mean, variance, cdf etc.,
+can be approximated.
+
+3.3.1
+
+Probability Monad
+
+As mentioned before, monads are a natural way to represent probability distributions. They
+allow the output from one distribution (essentially a sample), to be used as if it was of the type
+that the distribution is defined over. Essentially, the bind operation allows us to ’unwrap’ the
+’a dist type to allow us to manipulate a value of type ’a. We must then use return to ‘wrap’
+the value back into a value of type ’a dist. The type signature of bind is ’a m -> (’a -> ’b
+m) -> ’b m, and return is ’a -> ’a m, with m being the monad type.
+Using monads also allows us to define several helper functions which can be used when working
+with distributions. For example, we can ‘lift’ operators to the dist type, for example allowing
+us to define adding two distributions over integers or floats using liftM or liftM2. We can also
+fold lists of distributions using a similar technique.
+Using monads also allows the use of the extended let operators introduced in OCaml 4.08. These
+allow the definition of custom let operators, which mimic do-notation in Haskell. This means
+that sampling from a distribution (within a model) can be done using the let* operator, and
+the variable that is bound to can be used as if it were a normal value. The one caveat is that
+the user must remember to return at the end of the model with whatever variable(s) they want
+to find the posterior over. The and* operator can also be used when we use several independent
+distributions in a row. This can make for more efficient sampling (and inference) since we have
+more information about the structure of the program. It is also a common pattern to set up a
+model by first independently drawing from several distributions, as below.
+(* two independent draws from standard normals *)
+let* x = normal 0. 1.
+and* y = normal 0. 1. in
+(* ...rest of model *)
+return (x + y)
+
+I define my own functor for monads in order to automatically generate several helper functions.
+This takes a module with the basic monad functions and extends it with helper functions defined
+in terms of return and bind. The full module documentation for this can be found in appendix
+B (Monad.Make_extended). An example is the liftM2 function, which allows normal operations
+to be lifted to distributions, e.g. an addition operator for the output for two distributions
+can be simply created by lifting the normal addition operator, allowing distributions to be
+‘added’.
+let ( +~ ) = liftM2 ( +. )
+(* the distribution of the sum of 2 independent draws from standard normals *)
+let d = (normal 0. 1.) +~ (normal 0. 1.)
+
+However, there are many different underlying data structures which can be used to represent
+distributions. The simplest is a list of pairs representing a set of values and corresponding
+
+CHAPTER 3. IMPLEMENTATION
+
+15
+
+probabilities, (’a * float) list. This is a very convenient and natural way to represent
+discrete distributions, with return and bind defined as in listing 2. Here, return gives us the
+distribution with just one value, and bind combines a distribution with a function that takes
+every element from the initial distribution and applies a function that creates a set of new
+distributions. The new distributions are then ‘flattened’ and normalised. This approach has
+been used to create functional probabilistic languages [21], but has several drawbacks, primarily
+the fact that it cannot be used to represent continuous distributions, and that inference is not
+efficient - there is no information from the model encoded in this representation, such as how
+random variables are combined or from what distributions they came from.
+type 'a dist = ('a * float) list
+let unduplicate = (* omitted *) _
+let normalise = (* omitted *) _
+let bind d f =
+let mult_snd p = List.map ~f:(fun (a,x) -> (a,x*.p)) in
+List.concat_map ~f:(fun (x,p) -> mult_snd p (f x)) d
+|> unduplicate |> normalise
+let return x = [(x,1.)]
+Listing 2 – Simple Probability Monad
+
+A major problem with this approach is that in flattening distributions, we must make sure
+that duplicated values are combined, and this approach is O(n2 ) when using a list since we
+must scan up to the length of the entire list for every element. A better option is to use a map,
+which is provided in Core, and implemented as a balanced tree, significantly improving the time
+complexity of combining distributions.
+type 'a dist = ('a, float) Map.Poly.t
+let normalize map = (* omitted *) _
+let merge_maps = (* omitted *) _
+let bind d f =
+fold d ~init:empty ~f:(fun ~key ~data sofar ->
+Map.merge sofar (f key))
+~combine:(fun ~key -> ( *. ))
+|> normalize
+(* create a map with a single pair, x:1 *)
+let return x = add (empty) x 1.
+Listing 3 – Simple probability monad using a map
+
+Although this is not the final data structure I chose for general probabilistic models, it is the
+one I used for discrete empirical distributions.
+
+CHAPTER 3. IMPLEMENTATION
+
+3.3.2
+
+16
+
+GADT
+
+The structure that I landed on to represent general models is a generalised algebraic data type.
+GADTs are often used to implement interpreters in functional languages, and have been used to
+represent probabilistic models. The GADT I implement here (and some inference algorithms) is
+based on (Scibior et al. 2015)[22]. This represents a model in a very general way, and can then
+be ‘interpreted’ by a sampler or an inference algorithm. For sampling, I traverse the model,
+ignoring conditionals to enable forward sampling from the prior. For inference, I provide some
+inference functions as transforming the conditional distributions to distributions without any
+conditional statements, allowing sampling to be performed as normal. Some inference functions
+are also implemented by generating an empirical distribution that can be sampled from similarly.
+Primitive distributions also have a special variant (which takes a different primitive type).
+We can find the exact pdf/cdf of these distributions, unlike the dist type, which can only be
+sampled from. Listing 4 shows each of the variants. The monad functions are also provided,
+which construct the corresponding variant in the GADT. Return represents a distribution with
+only one value, and Bind contains a distribution and a function, which represents that function
+being applied to the output from that distribution.
+type _ dist =
+| Return : 'a -> 'a dist
+| Bind : 'a dist * ('a -> 'b dist) -> 'b dist
+| Primitive : 'a primitive -> 'a dist
+| Conditional : ('a -> float) * 'a dist -> 'a dist
+let return x = Return x
+let bind d f = Bind (d, f)
+Listing 4 – Representing a probabilistic model using a GADT
+
+An important feature of this type is that it is polymorphic - this allows distributions to be defined
+over any type. Often, distributions are defined over floats or integers, but this allows us to define
+distributions over anything, including arbitary ADTs or even distributions themselves.
+
+3.3.3
+
+Primitive Distributions
+
+In PPLs, users build complex models by composing more simple elementary primitive distributions (ERP) [23]. These primitive distributions need to have a few operations defined on
+them, namely sample, pdf, cdf, ppf (inverse of cdf) and support (the set of values that a
+distribution can take). These are all standard properties of distributions.
+An extension goal achieved here is to allow users to define their own primitive distributions if
+they have not already been defined in the library. A concrete use case - I have not implemented
+the Poisson distribution as a primitive distribution, but you can imagine models which need to
+use the Poisson as a building block. To achieve this, the user simply has to write a function
+which takes the parameters of the distribution as arguments and return a first class module
+matching the primitive distribution signature. This technique also allows users to use modules
+
+17
+
+CHAPTER 3. IMPLEMENTATION
+
+that they may have already defined, and constrain them to the required signature for use in the
+PPL.
+The type of a primitive distribution is type ’a prim_dist = (module PRIM_DIST with type
+t=’a), with the PRIM_DIST signature defined as in listing 5.
+module type PRIM_DIST = sig
+type t
+val
+val
+val
+val
+end
+
+sample : unit -> t
+pdf : t -> float
+ppf : t -> float
+cdf : t -> float
+
+Listing 5 – Signature of the module that primitive distributions must implement
+
+(* full definitions omitted *)
+let poisson l = (module struct
+type t = int
+let sample () = ... _
+let pdf k = ... _
+let ppf k = ... _
+let cdf k = ... _
+end: PRIM_DIST with type t = int)
+Listing 6 – Adding a new distribution as a
+primitive
+
+An example of this being used to add a new primitive distribution is given in listing 6, for
+the specific case of the Poisson distribution. The Poisson distribution can be used as other
+primitives are, e.g. in observe statements.
+
+3.3.4
+
+Empirical Distributions
+
+The output of Bayesian inference is a probability distribution over the variable we are concerned
+with. Ideally, we would be able to produce an exact posterior distribution, and be able to extract
+exact statistics from it. However, approximate inference only allows us to create functions to
+sample from this posterior. We can define a signature for a type of an empirical distribution that
+is created from posterior distributions and can be used to calculate useful properties such as the
+pdf or cdf. The type is abstract to allow different implementations for discrete and continuous
+distributions.
+For discrete distributions, I use a Core.Map1 , with the keys being the values that the distribution
+can take and the values the number of samples with that value. This allows . Continuous
+distributions use a dynamically resizing array - adding each sample is then O(1) amortized,
+and statistics can be calculated using Owl’s functions that operate on arrays. A constraint on
+continuous distributions of this type is that they are defined over floats, and only represent one
+dimension.
+The signature in listing 7 is implemented for both continuous and discrete distributions. For
+the continuous case, I perform binning to approximate the continuous distribution by a discrete
+one in order to approximate the pdf. The number of bins used is calculated automatically from
+the number of samples taken.
+1
+
+https://ocaml.janestreet.com/ocaml-core/latest/doc/base/Base/Map/index.html
+
+CHAPTER 3. IMPLEMENTATION
+
+18
+
+module type Empirical = sig
+type 'a t
+type 'a support = Discrete of 'a array | Continuous
+val
+val
+val
+val
+val
+val
+val
+val
+val
+end
+
+from_dist : ?n:int -> 'a dist -> 'a t
+empty : 'a t
+add_sample : 'a t -> 'a -> 'a t
+get_prob : 'a t -> 'a -> float
+to_pdf : 'a t -> 'a -> float
+to_cdf : 'a t -> 'a -> float
+to_list : 'a t -> 'a list
+mean : 'a t -> 'a
+support : 'a t -> 'a support
+
+Listing 7 – Signature for empirical distributions
+
+3.4
+
+Conditioning
+
+The GADT described in section 3.3.2 can be used to describe general models, in particular
+conditional distributions, thanks to the Conditional variant. Without this variant, we can
+only define prior distributions, but including it means we can incorporate observed data into
+our models and perform inference.
+The condition variant in my GADT is used to assign scores to traces, and takes a function which
+takes an element and returns a float, a ‘score’. This score represents how likely the current trace
+is, given the value passed to the functions. In this way, we can represent observations.
+I have also implemented a few helpers to make it easier to condition models. The three main
+helpers are condition, score and observe, which are all specific cases of the general Condition
+variant.
+The condition operator is used for hard conditioning, which conditions the model on an
+observation being true. If true is passed in, then the score assigned is 1, and if false, the score
+assigned is 0. This score represents how likely it is for the current trace to occur, and different
+inference algorithms will use this information to produce a distribution over all possible traces.
+We can use this operator to constrain certain variables or outcomes in a model. For example
+in the below model, we roll two dice and observe that the sum is 4 - we can then find the
+distribution over the first die (which won’t include 4,5 or 6 since they are >=4, the sum).
+let* dice1 = discrete_uniform [1;2;3;4;5;6] in
+let* dice2 = discrete_uniform [1;2;3;4;5;6] in
+condition (dice1+dice2 = 4)
+(return dice1)
+
+This function is mostly useful for discrete models when using equality in this manner, since the
+probability of observing any given value in a continuous distribution is zero. However, if we are
+
+CHAPTER 3. IMPLEMENTATION
+
+19
+
+dealing with ranges, then we can use hard conditioning as in the model below, which constrains
+the standard normal distribution to be positive.
+let* x = normal 0. 1. in
+condition x > 0.
+(return x)
+
+For soft conditioning, for example an observation that we know comes from a certain distribution,
+there is an observe function. This function is essential for continuous distributions, since the
+probability of observing any one value is 0, making hard conditioning since it will just reject
+every trace. Instead, we can use the pdf function of the distribution to determine how likely
+that observation is in the model.
+The score function is similar to the condition operator, except instead of 0, it assigns a particular
+constant score (any float) to the trace. This is generally used in a branch, where a constant
+score will be assigned depending on some (deterministic) condition.
+let condition b d = Conditional((fun _ -> if b then 1. else 0.), d)
+let score s d = Conditional((fun _ -> s),d)
+let observe x dst d = Conditional((fun _ -> Primitive.pdf dst x),d)
+Listing 8 – The definitions of the different conditioning operators
+
+3.5
+
+Forward Sampling
+
+The simplest operation to define on models is to sample from them. Sampling from conditional
+distributions required inference, and is discussed in section 3.6. Here, we run a probabilistic program ’forwards’, that is, running a generative model and seeing the outputs without conditioning
+on observed data.
+In PPLs, a complete program can be thought of as a posterior, P (θ | x), the distribution of a
+parameter given some observed data. The generative model, i.e. the program without condition
+statements, can be thought of as the prior distribution, P (θ). The condition statements then
+define the likelihood model, that is, P (x | θ), the probability of the observations in the current
+model (the prior). So finding the prior is the same as disregarding the conditionals (essentially
+ignoring the data). Sampling is only difficult in the presence of conditionals (as this requires
+inference), so this allows us to sample from the prior using the same sample function defined
+before. We can also transform any ’a dist into a different ’a dist that is the prior by ignoring
+conditional statements.
+We can also take into account the conditionals, and produce weighted samples, with the weight
+being the score assigned by each conditional branch, accumulated by multiplying all the scores.
+This gives us a set of values with corresponding weights which represent how likely those values
+are. An important property of these weights is that they are not normalised, so we cannot use
+this to find the posterior directly. I have implemented several variants of functions for finding
+the prior and sampling, all with the same concept as below.
+
+CHAPTER 3. IMPLEMENTATION
+
+20
+
+let rec sample : 'a. 'a dist -> 'a = function
+| Return x -> x
+| Bind (d, f) ->
+let y = f (sample d) in
+sample y
+| Primitive d -> Primitive.sample d
+| Conditional (_, _) -> raise Undefined
+let rec prior_with_score : 'a. 'a dist -> ('a * prob) dist = function
+| Conditional (c, d) ->
+let* x, s = prior_with_score d in
+return (x, s *. c x)
+| Bind (d, f) ->
+let* x, s = prior_with_score d in
+let* y, s1 = prior_with_score (f x) in
+return (y, s *. s1)
+| Primitive d ->
+let* x = Primitive d in
+return (x, Primitive.pdf d x)
+| Return x -> return (x, 1.)
+Listing 9 – Sampling functions
+
+The function for generating a prior does not directly take samples, but manipulates the structure
+of the dist GADT. For example, in the Bind branch, it actually introduces 2 new bind variants
+(via let*) which produces a new distribution lazily. This makes it easier to use the prior
+within inference algorithms, and allows it to be composed with other distribution modifying
+functions.
+
+3.6
+
+Implementing Inference
+
+Inference is the key motivation behind probabilistic programming. Up to this section, I have
+discussed how to represent models but not do anything with them that couldn’t be done in a
+standard language. With inference, we can produce a sampler which will accurately reflect a
+posterior distribution.
+Inference can be thought of as a program transformation [22] [24]. In my ppl, this corresponds
+to a function of type ’a dist -> ’a dist. This method allows for the composition of inference
+algorithms, exemplified in section 3.6.7.
+
+3.6.1
+
+Enumeration
+
+Enumeration is the simplest way to perform exact inference on probabilistic programs, and
+essentially consists of computing the joint distribution over all the random variables in the
+model. This involves enumerating every execution path in the model, in this case performing
+
+CHAPTER 3. IMPLEMENTATION
+
+21
+
+a depth first search over the dist data structure. For every bind (i.e. every let*), there is a
+distribution (d) and a function from samples to new distributions (f ). I call this function on
+every value in the support of the distribution d, and then enumerate all the possibilities. The
+final output is a (’a * float) list, from which duplicates are removed and is then normalised,
+so that the probabilities sum to one.
+let rec enumerate : type a. a dist -> float -> (a * float) list =
+fun dist multiplier ->
+if multiplier = 0. then []
+else
+match dist with
+| Bind (d, f) ->
+let c = enumerate d multiplier in
+List.concat_map c ~f:(fun (opt, p) -> enumerate (f opt) p)
+| Conditional (c, d) ->
+let c = enumerate d multiplier in
+List.map c ~f:(fun (x, p) -> (x, p *. c x))
+| Primitive p -> (
+match support p with
+| Discrete xs -> List.map xs ~f:(fun x -> (x, multiplier *. pdf p x))
+| Continuous -> raise Undefined )
+| Return x -> [(x, multiplier)]
+Listing 10 – Enumerating all paths through a model
+
+This method is very naive, and therefore inefficient. Since we essentially take every possible
+execution trace, we do not exploit structure such as overlapping traces. This can be made
+slightly more efficient by using algorithms such as belief propagation [14], but they still only
+work on models made up from discrete distributions (and are not compatible with the way I
+represent models). Exact inference of this kind only works on models that can be represented
+as finite networks, and exact inference for Bayesian networks is in fact NP-hard[25]. So instead,
+most of my project focuses on approximate inference.
+
+3.6.2
+
+Rejection Sampling
+
+In my implementation of rejection sampling, I take samples from the prior, with accumulated
+scores. If the score is above some constant threshold, then the sample is accepted, and rejected
+otherwise. The specific case of the general rejection sampling algorithm used here sets the
+proposal distribution as the prior, and we use the scores to approximate the density function of
+the posterior (listing 11).
+This method is naive, since it runs an entire trace even if the first condition dropped the score
+below the threshold. An optimisation I implemented is to short-circuit this, and reject as soon
+as the trace goes below the threshold. This does slightly increase the time taken for small
+models, and so is not the default. It is also implemented as a dist transformation, so can again
+be used with the same sample methods.
+
+CHAPTER 3. IMPLEMENTATION
+
+22
+
+let rejection ?(threshold = 0.) dist =
+(* repeat until a sample is accepted *)
+let rec repeat () =
+let* x, s = prior_with_score dist in
+if Float.(s > threshold) then return (x, s) else repeat () in
+repeat ()
+Listing 11 – Simplest rejection sampling method
+
+This particular function is hard rejection, since samples with a lower score are always rejected.
+I have also implemented functionality to perform ‘soft’ rejection. This method instead sets the
+probability of acceptance being the score attached to the sample.
+A problem with rejection sampling is if conditions make most execution traces very unlikely.
+This means it will take a very large number of samples to have enough (or any) accepted samples.
+An example is given in listing 12, where the condition only has a 1% chance of being true. This
+means that, on average, for every 1000 samples, we will only accept one.
+let* x = bernoulli 0.001 in
+condition (x=0)
+(return x)
+Listing 12 – An example of a model that is very inefficient under rejection sampling
+
+3.6.3
+
+Likelihood Weighting
+
+Likelihood weighting is an importance sampling method, when the proposal distribution we use
+is the prior. We want any algorithm we use to be as general as possible, and not need to be
+tuned using auxiliary distributions chosen by hand. Since for any model we can find the prior
+distribution easily, it is natural to use this as a proposal distribution here - this can be seen in
+several of the implementations of inference.
+The implementation of likelihood weighting is simple - we simply take a set of samples (with
+weights) from the prior, remove duplicates and normalise, and use this set of particles as a the
+categorical distribution representing the posterior.
+let importance n d =
+let particles_dist = sequence @@ List.init n ~f:(fun _ -> prior d) in
+let* particles = particles_dist in
+categorical particles
+Listing 13 – Likelihood weighting
+
+The sequence function is a monad function that takes a list of distributions and fold them
+together so that they act as a single distribution returning entire lists. This allows The use of
+(let*) to sample a set of particles at once, and use them directly as the distribution.
+
+23
+
+CHAPTER 3. IMPLEMENTATION
+
+3.6.4
+
+Metropolis Hastings
+
+Metropolis Hastings is an MCMC algorithm, and so is used to find a Markov chain with the
+stationary distribution equal to the target distribution, here the posterior. There are many
+variants of this algorithm, and the one I implement here is the independent metropolis hastings
+(IMH) algorithm. I use the prior as a proposal distribution, using scores as an approximation to
+a density function. The algorithm is outlined below.
+• Let π be the target distribution that we want to sample from.
+• Let q be the density function of the prior, approximated by the scores.
+• Initialise by taking a sample from the prior as the first state in the chain.
+• Let x be a sample from the prior.
+• Let y be the last state in the chain.
+• Calculate the acceptance probability, α(x, y) by (3.1)
+α(x, y) =
+
+
+
+
+min π(y)q(x) , 1
+
+π(x)q(x) > 0
+
+1
+
+π(x)q(x) = 0
+
+πxq(y)
+
+(3.1)
+
+• The state x is then accepted with probability α(x, y). If accepted, we use x as the next
+state, or if rejected, we re-use y as the next state.
+This produces a Markov chain with transition probability:
+p(x, y) = q(y)α(x, y)
+
+y 6= x
+
+. It is known as ‘independent’ metropolis hastings since subsequent candidate states (x) are
+independent on previous values of states.
+I have implemented IMH as a function transforming ’a dists (’a dist -> ’a dist). This
+allows it to be composed with other inference algorithms, as well as allowing the standard sample
+function to be used on the output. To model a Markov chain, I use a Core.Sequence, which is
+a data structure for a lazy list. The creator function uses a function that takes a previous state
+to produce a new state and output a value - analogous to the transition function. In this case,
+the output is the same as the state.
+One important property of the return distribution is that consecutive sample statements will
+need to return different values (to simulate running the chain). In order to achieve this, I create
+some mutable state - the sequence, which will take a step every time sample is called on the
+output distribution. In order to make sure this sequence is persistent, I use a reference and put
+it after a bind (let*) statement, incrementing the chain every time the function is called (which
+is only on sampling). Since the bind statement contains a function, the reference is closed over
+and is persistent to the output distribution.
+
+3.6.5
+
+Bootstrap Particle Filter
+
+Particle Filters are a class of algorithms which use particles to approximate a posterior. This is
+similar to the technique I used in importance sampling (3.6.3), but the difference here is that
+
+CHAPTER 3. IMPLEMENTATION
+
+24
+
+let mh_transform ~burn d =
+let proposal = prior_with_score d in
+let iterate (x, s) =
+let y, r = sample proposal in
+let ratio = if Float.(s = 0.) then 1. else r /. s in
+let accept = sample @@ bernoulli @@ Float.min 1. ratio in
+let next = if accept then (y, r) else (x, s) in
+Yield (return next, next) in
+let seq = Sequence.unfold_step ~init:(sample proposal) ~f:iterate in
+let seq = Sequence.drop_eagerly seq burn in
+(* burn initial *)
+let r = ref seq in
+let* _ = return () in
+(* to close over the sequence ref *)
+match Sequence.next !r with
+| Some (hd, tl) ->
+let* x, _ = hd in
+r := tl ;
+return x
+| None -> raise Undefined
+Listing 14 – Metropolis hastings
+
+the particles are sequentially updated as we observe condition statements (i.e. as we observe
+data). In fact, an example of a particle filtering algorithm is sequential importance sampling,
+but here I use an algorithm called the bootstrap filter [18].
+The code given in listing 15 transforms a conditional distribution to a new conditional distribution.
+In order to find the posterior, we simply ignore the conditional by finding the prior after using
+the smc method.
+The GADT is traversed top down, with particles being initialised at a ‘leaf’ - primitives or returns.
+From this root, bind functions apply functions to the particles, and conditional statements
+updates the weights and resamples. The resample function takes a set of particles and takes
+samples from this set with replacement - this is the ‘bootstrap’ resampling method. The output
+distribution is conditioned by the total weight of all particles.
+Increasing the number of particles finds a more accurate distribution, but also increases the
+amount of time and memory required.
+
+3.6.6
+
+Particle Cascade
+
+The particle cascade algorithm (also Asynchronous Sequential Monte-Carlo) is an algorithm that
+extends the particle filter, introduced in (Paige et al. 2014) [26]. It uses a lazily generated infinite
+set of particles, which allows it to be ‘anytime’, that is, it can generate more particles without
+having to start regenerate a large particle set from scratch. It also features a parallelisable
+
+CHAPTER 3. IMPLEMENTATION
+
+25
+
+let rec smc: 'a.int -> 'a dist -> 'a samples dist = fun n d ->
+match d with
+(* resample at each piece of evidence/data, *)
+| Conditional(c,d) ->
+let updated = fmap normalise @@
+condition' (List.sum (module Float) ~f:snd) @@
+let* last_particles = smc n d in
+let new_particles =
+List.map
+(* update particles by weight given by condition *)
+~f:(fun (x,w) -> (x, (c x) *. w))
+last_particles in
+return new_particles
+in
+let ps* = updated in
+resample ps
+(* apply function to each particle, no resampling *)
+| Bind(d,f) ->
+let* particles = smc n d in
+mapM (fun (x,weight) ->
+let* y = f x in
+return (y, weight))
+particles
+(* initialise n particles wih weights from the pdf *)
+| Primitive d ->
+List.init n
+~f:(fun _ -> (fmap (fun x-> (x, Primitive.pdf d x)) (Primitive d)))
+|> sequence
+(* initialise n particles with the same value and weight *)
+| Return x ->
+List.init n ~f:(fun _ -> return (x,1.))
+|> sequence
+Listing 15 – Particle Filter
+
+re-sample step, although I will not make use of this feature, since I am not using multi-core
+OCaml.
+The main implementation difference is that instead of resampling, a particle ‘branching’ operation
+is used, which produces a lazily generated set of particles at each resample step. Each particle
+produces 0 or more children to be used in the next iteration.
+
+3.6.7
+
+Particle-Independent Metropolis-Hastings
+
+SMC and MCMC algorithms are two distinct classes of algorithms, but can be combined to
+produce more efficient inference procedures. A simple example of these algorithms (known as
+PMCMC), is the particle-independent metropolis-hastings algorithm [27]. This algorithm first
+
+26
+
+CHAPTER 3. IMPLEMENTATION
+
+uses a particle filter to find an approximation of the posterior, then uses this approximation as
+a prior distribution for metropolis-hastings.
+Due to the fact that my PPL allows composition of inference algorithms, a basic implementation
+is very simple.
+let pimh k n d = mh k (Smc.smc n d)
+
+However, there are flaws in this implementation, since any sampler produced is slow and can be
+made more efficient. In addition, the reason this works is because the smc function produces a
+dist with conditionals, which no other inference method does.
+
+3.7
+
+Visualisations
+
+Visualising the output distributions from inference can be done using the Owl_plplot module,
+which allows plotting directly from OCaml, rather than having to interface with other programs
+manually. I have implemented several helper functions which simplify visualising distributions
+created by my PPL. Empirical distributions are approximated by histograms displayed as bar
+charts using Owl_plplot.
+For discrete distributions, this conversion is simple - each bar is simply the pmf (probability
+mass function) of the distribution at each value in the support. This is calculated by drawing
+N samples, then for each value xi , finding Nn , where n is the number of samples that equal xi ,
+to find the approximate probability of that value in the distribution, P (X = xi ).
+Where there is an ordering on the type, discrete distributions can also have their cdf visualised.
+The cdf of a discrete distribution is a step function. The ordering is given by a first class
+module representing the type. There are cases where there is no natural ordering - for example
+a distribution over an arbitrary ADT, so this also allows a user to custom define the ordering.
+Continuous distributions are also displayed as histograms, with a set of samples being put into
+
+(a) PDF
+
+(b) CDF
+
+Figure 3.2 – Samples from a binomial distribution visualised, n = 10, 000
+
+n equal width bins. The height of each bar is the the pdf (continuous analogue to the pmf),
+which is calculated by finding the number of samples in each bin, then dividing by the total
+
+27
+
+CHAPTER 3. IMPLEMENTATION
+
+number of samples. To display the cdf, we can display the empirical cdf directly as a scatter
+plot, or join points to draw a step function.
+
+(a) PDF
+
+(b) CDF
+
+Figure 3.3 – Approximate pdf and cdf of samples from a standard normal distribution
+
+Other important visualisations for continuous distributions are the Q-Q and P-P plots. These
+provides a way to qualitatively compare distributions. P-P plots plot the cdfs of two distributions
+against each other, that is, for two cdfs F and G, the points (F (z), G(z)) are plotted for some
+values of z in the range (−∞, +∞). Q-Q plots plot the quantiles of both distributions - it uses
+the inverse of the cdfs (the ppf) to plot the points (F −1 (q), G−1 (q)), where q, the quantile, is in
+the interval [0, 1]. This plots will generally use as many points as the data allows, and calculate
+the percentile for every data point available. For both plots, if all the points lie on the the line
+y = x, the distributions are identical. These plots are often used to find the differences between
+some theoretical expected distribution and the distribution given by some data. This can be
+used in the PPL context to find whether a distribution given by a model matches what was
+expected in the theory. Figure 3.4 shows the output of inference for a model that is expected
+to output a beta distributions (the coin model in section 4.1.2) - the points are close to the
+expected line, showing successful inference.
+
+(a) Q-Q plot
+
+(b) P-P plot
+
+Figure 3.4 – Plots to compare inferred distributions with the exact solutions
+
+For primitive continuous distributions, a smooth line can also be drawn since we have a function
+that can calculate the exact pdf or cdf. This can also be overlaid onto a histogram, to again
+
+CHAPTER 3. IMPLEMENTATION
+
+28
+
+compare two distributions. Figure 3.5 shows an exact beta distribution overlaid onto samples
+taken from the inferred distribution.
+
+Open Ppl.Plot
+let () =
+coin_inferred
+|> hist_continuous ~fname
+|> add_pdf ~dist:coin_exact
+|> show
+
+Figure 3.5 – The approximate and exact pdf of the output of inference for a biased coin model,
+with code to produce plot
+
+3.8
+
+Testing
+
+Automated testing of PPLs is difficult for reasons outlined in section 2.3.1. However, I still wrote
+basic unit tests. The test framework I used, Alcotest, lets me check that outputs of functions
+match expected values. This allows me to test all deterministic helper functions, e.g. normalise.
+It also lets me test the exact inference method, and very simple distributions and models which
+only contain a single value. I also used an additional library Quickcheck, to test that a specified
+invariant holds for a function - it uses randomly generated inputs to check the widest range
+of values. As an example (listing 16), for the normalise function, we expect that the output
+probabilities always sum to one, no matter the input array - the test is given below.
+let test_normalise_sum_to_1 =
+QCheck.Test.make ~count:1000 ~name:"test normalisation"
+QCheck.(list (pair int float)) (* type to randomly generate *)
+(fun l -> (List.sum ~f:snd (normalise l)) = 1.)
+Listing 16 – Testing the normalisation function for particles
+
+The test output and code coverage output can be seen in figure 3.6.
+
+CHAPTER 3. IMPLEMENTATION
+
+(a) Test report, abbreviated
+
+(b) Code coverage report
+
+Figure 3.6 – Output from running unit tests
+
+29
+
+Chapter 4
+Evaluation
+So far, I have developed a PPL that can be used to define arbitrary probabilistic models and
+perform Bayesian inference on them. To evaluate the performance of my PPL, I will present
+some examples to show programs written in my PPL translated into equivalent programs in
+other PPLs, and then measure time and memory consumption of inference1 . I will also determine
+the correctness of inference procedures by using hypothesis tests which use drawn samples to
+determine whether two distributions are the same or not.
+
+4.1
+
+Examples
+
+To show how my PPL would be used on real problems, I now outline a set of example problems.
+Several examples here will be simple, and have analytic solutions - this is so that I can then test
+the correctness of applying inference on them. More complex realistic models are also included
+to test performance. Full derivations of the solutions as well as mathematical descriptions of
+the models are given in appendix A.
+
+4.1.1
+
+Sprinkler
+
+The sprinkler model is a commonly used example in Bayesian inference due to it’s simplicity.
+It is an example of a Bayesian network, and can be visualised as in figure 4.1. The code in
+listing 17 shows the model in the diagram encoded as a program. This particular program can
+be used (by applying an inference function) to find the probability of rain given that the grass
+is wet.
+
+4.1.2
+
+Biased Coin
+
+Modelling a biased coin shows an example of a very simple model with a continuous posterior
+that can be calculated analytically [28]. The model is of a coin that is tossed n times to give x
+heads. We do not know if the coin is biased or not, and would like to find out the bias, p of
+1
+
+All tests are carried out on a single core of an Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+
+30
+
+31
+
+CHAPTER 4. EVALUATION
+
+let sprinkler_model =
+let* cloudy
+= bernoulli .8 in
+let* rain
+= bernoulli
+(if cloudy then .8 else .1) in
+let* sprinkler = bernoulli
+(if cloudy then .1 else .5) in
+let wet_grass = bernoulli
+(match rain,sprinkler with
+true,true -> .99
+| true,false -> .9
+| false,true -> .9
+| false,false -> 0.) in
+condition wet_grass
+(return rain)
+Listing 17 – Sprinkler model in code
+
+Figure 4.1 – Sprinkler model as a network
+let () =
+exact_inference sprinkler_model
+|> print_exact_bool
+(*false: 0.13706 true: 0.86294*)
+Listing 18 – Output of inference
+
+the coin, where p is the probability of heads, with p = 0.5 being an unbiased coin. To find the
+posterior, we use an uninformative prior (Θ), the uniform. This results in the posterior, the
+beta distribution, specifically Beta(x + 1, n − x + 1).
+The program in my PPL is shown in listing 19, and demonstrates setting up the model,
+performing inference as well as finding the mean of the posterior. The application is to find the
+chance of the next coin flip landing heads. This example uses n = 10 and x = 9, so the mean
+produced is roughly 0.83, the mean of Beta(10, 2).
+let coin_mean inference_algorithm =
+let coin heads =
+let* theta = continuous_uniform 0. 1. in
+observe heads (binomial 10 theta) (return theta) in
+let posterior_single_coin = infer (coin 9) inference_algorithm in
+sample_mean ~n:10000 posterior_single_coin
+(* 0.833 *)
+Listing 19 – Coin model
+
+The comparison given in Figure 4.2 shows how the same model is defined in other languages.
+Both languages use similar constructs, despite differing syntax. This example also shows that
+my PPL is similar to existing systems, and is not more verbose.
+
+32
+
+CHAPTER 4. EVALUATION
+
+var coin_model = function (method) {
+var coin = function () {
+var theta = uniform(0.0, 1.0);
+observe(
+Binomial({ n: 10, p: theta }),9
+);
+return theta;
+};
+return Infer(method, coin);
+};
+Listing 20 – WebPPL
+
+(defn coin_model [inference_method]
+(defquery coin
+(let [theta (sample (uniform 0 1))]
+(observe (binomial 10 theta) 9)
+(predict (theta))
+)
+)
+(doquery inference_method coin [])
+)
+Listing 21 – Anglican
+
+Figure 4.2 – The coin model in WebPPL (JS) and Anglican (Clojure)
+
+4.1.3
+
+HMM
+
+Hidden Markov models are slightly more involved models, where we have a sequence of hidden
+states, which emit observed states. There are two distributions involved here, the transition
+distribution, which defines how likely the next state is given the current state, and the emission
+distribution, which is the distribution over the observed states given the hidden state. The
+example in Listing 22 uses discrete distributions, but any type of distribution can be used. The
+exact posterior for simple models can be found using the forward-backward algorithm.
+type 'a hmm_model = {states: 'a list; observations: 'a list}
+let transition s = if s then bernoulli 0.7 else bernoulli 0.3
+let observe s = if s then bernoulli 0.9 else bernoulli 0.1
+let rec hmm n =
+let* prev =
+match n with
+| 1 -> return {states= [true]; observations= []}
+| _ -> hmm (n - 1)
+in
+let* new_state = transition (List.hd_exn prev.states) in
+let* new_obs = observe new_state in
+return
+{ states= new_state :: prev.states
+; observations= new_obs :: prev.observations }
+let model =
+let obs = [false; false; false] in
+let* r = hmm 3 in
+condition Stdlib.(r.observations = obs) (return @@ List.rev r.states)
+Listing 22 – Hidden Markov Model
+
+33
+
+CHAPTER 4. EVALUATION
+
+4.1.4
+
+Linear Regression
+
+This example shows how to use multiple data points to infer a continuous distribution. This
+example can be used to infer the parameters of a line through a set of 2-D points. The fold
+function can be used to condition on many observations easily. The fmap function is used to
+map outputs from a distribution. Since the linreg model produces tuples of parameters, we can
+create individual distributions over either one.
+open Ppl
+let linreg_model points =
+let linreg' =
+let* m = normal 0. 2. in
+let* c = normal 0. 2. in
+List.fold
+points
+~init:(return (m,c))
+~f:(fun d (x,y) -> observe y (Primitive.(normal (m*x+c) 1.)) d)
+let slope = fmap fst (linreg_model points)
+let y_intercept = fmap snd (linreg_model points)
+Listing 23 – Linear Regression
+
+4.1.5
+
+Infinite Mixture Model
+
+This example demonstrates a model which cannot be expressed in some PPLs such as STAN
+or Infer.Net, since it is a non-parametric Bayesian model. This is a Dirichlet Process mixture
+model with an infinite number of Gaussians[29]. It is used for the common task of clustering
+a set of data points without knowledge of the number of clusters. This means the number of
+clusters is allowed to grow with the dataset size. We use a mixture of Gaussians, meaning the
+likelihood of a point belonging to each cluster is given by different normal distributions. The full
+code for this model, along with comparisons to other languages is given in appendix A.5.
+
+4.2
+
+Statistical tests
+
+To evaluate the correctness of my PPL, I used statistical tests which measure goodness-of-fit,
+i.e. how similar two distributions are to each other. I compare the empirical distribution of
+10,000 samples from an approximated distribution to an exact distribution which is calculated
+analytically. Test statistic distributions (e.g. the χ2 distribution) were calculated using Owl,
+and empirical distributions generated using the EmpiricalDist modules.
+For all tests described below, I set the significance level, α = 0.05 and use null and alternative
+hypotheses as follows:
+
+34
+
+CHAPTER 4. EVALUATION
+H0 : The sample data follow the exact distribution
+H1 : The sample data do not follow the exact distribution
+
+4.2.1
+
+Chi-squared
+
+The χ2 test is a simple goodness-of-fit test which can test whether or not a given discrete
+distribution. The test statistic is as follows, with each i being a distinct element in the
+distribution, xi is the observed number of samples with the value i, and mi is the expected
+number of samples for the value i.
+X2 =
+
+(xi − mi )2
+mi
+i=1
+
+k
+X
+
+This test statistic is compared against the critical value (at the significance level) of the chisquared distribution, with the degrees of freedom being k − 1, where k is the number of possible
+values of the distribution.
+Results
+
+sprinkler
+
+rejection
+1.
+
+importance
+0.999527
+
+metropolis hastings
+1.
+
+particle filter
+0.999863
+
+Table 4.1 – p-values of χ2 test on different models using different inference procedures
+
+Table 4.1 shows the results of carrying out the test on several inference procedures for different
+discrete models. None of the values are below 0.05, so we cannot reject the null hypothesis, so we
+conclude that, at the 5% significance level, the distributions are not significantly different.
+
+4.2.2
+
+Kolmogorov-Smirnov
+
+The Kolmogorov-Smirnov test is a non parametric test which is used to compare a set of samples
+with a distribution - this is the one-sample K-S test. There is also a two-sample K-S test, which
+compares two sets of samples against each other. I use the one-sample test here to compare
+samples taken from the inferred posteriors to their exact analytic solutions.
+The test statistic is as follows, with Fn (x) being the empirical cumulative distribution of n
+samples, and F (x) being the exact cumulative distribution.
+Fn (x) =
+
+n
+1X
+I[−∞,x] (Xi )
+n i=1
+
+Dn = sup |Fn (x) − F (x)|
+x
+
+This test statistic is compared against the critical values of the Kolmogorov distribution, rejecting
+√
+the null hypothesis if nDn > Kα , where Kα is the critical value at the significance level α,
+and n is the number of samples.
+
+35
+
+CHAPTER 4. EVALUATION
+Results
+
+Table 4.2 shows that for all the continuous models considered, the p-value obtained from all tests
+are greater than then 0.05. This means we do not reject H0 for any model/inference procedure
+combination, so can be confident (at the 5% significance level) that the inference procedures
+are correct. This shows that the generated posterior is not significantly different from the real
+solution.
+coin
+
+rejection
+0.895793892046
+
+importance
+0.243719262886
+
+metropolis hastings
+0.391381549312
+
+particle filter
+0.544000635464
+
+Table 4.2 – p-values of K-S test on different models using different inference procedures
+
+4.3
+
+Convergence of sampling
+
+I also used the KL-divergence metric to determine the (dis)similarity of two distributions. The
+formula for KL Divergence of discrete distributions P and Q is easy to calculate by (4.3)
+P (x)
+DKL (P k Q) =
+P (x) log
+Q(x)
+x∈X
+
+!
+
+X
+
+The continuous version is similar, with p and q now being density functions as in (4.3).
+Z ∞
+
+p(x)
+p(x) log
+DKL (P k Q) =
+q(x)
+−∞
+
+!
+
+dx
+
+Since I only have a set of samples from q, this integral can’t be calculated exactly - there is
+no exact density function. However, there are ways to estimate density functions, as in (Perez
+2008) [30]. The first step is to approximate the cdf by finding the empirical cdf, Pe (4.1) then
+linearly interpolating between points to produce a continuous function Pc (4.2). Estimating the
+derivative of Pc then gives the pdf, P̂ (4.3).
+
+Pe (x) =
+
+Pc (x) =
+
+P̂ (x) =
+
+n
+1X
+U (x − xi ),
+n i=1
+
+
+
+0
+
+
+
+
+a x + bi
+
+i
+
+
+
+1
+
+where U is the step function
+
+(4.1)
+
+x < x0
+xi−1 ≤ x ≤ xi ,
+
+ai and bi chosen to make Pc continuous
+
+(4.2)
+
+for sufficiently small δ
+
+(4.3)
+
+xn+1 ≤ x
+
+Pc (x + δ) − Pc (x)
+,
+δ
+
+36
+
+CHAPTER 4. EVALUATION
+
+The final estimator (4.4) is given by using the exact pdf of q and performing Monte Carlo
+integration.
+n
+P̂ (xi )
+1X
+log
+D̂KL (P kQ) =
+n i=1
+q(xi )
+
+!
+
+(4.4)
+
+Both the metrics (discrete and continuous) were computed with code written using the
+EmpiricalDist modules.
+The idea behind conducting this test is ensuring that the KL divergence decreases as we take
+more samples from the posterior. This ensures that the solution converges to the correct
+distribution - a KL divergence of 0 implies the distributions are identical.
+Figure 4.3 shows the results of this test. For each inference procedure, we can see that the
+KL-divergence for each model generally decreases as we take more samples. Rejection sampling
+is consistently the worst performing inference procedure, with particle based methods such as
+smc or importance sampling generating more accurate distributions. These plots have all been
+smoothes by taking a moving average in order to reduce the impact of noise.
+In the case of the sprinkler model, there is a rise near the end, but this can be attributed to noise
+since the KL-divergence is actually lowest for that model, implying that inference performed
+best for it.
+Sprinkler model
+
+Coin model
+10−1
+
+KL divergence
+
+10−2
+10−2
+
+10−3
+
+10−3
+
+10−4
+10−5
+
+10−4
+
+10−6
+102
+
+103
+104
+Number of samples
+rejection
+
+105
+
+102
+
+importance
+
+103
+104
+Number of samples
+mh
+
+105
+
+smc
+
+Figure 4.3 – Plot of KL-divergence with increasing number of samples for different models and
+inference procedures
+
+37
+
+CHAPTER 4. EVALUATION
+
+4.4
+
+Performance
+
+I evaluated the performance of my ppl against Anglican and WebPPL. All of these languages
+are universal PPLs embedded in different host languages, so are comparable to my PPL. I only
+compare the inference algorithms for which there are comparable implementations in the other
+languages.
+Figures 4.4 and 4.5 shows how my PPL compares against these languages for a range of models
+and inference procedures. All the models have been introduced previously, and have been shown
+to produce correct results in my PPL when using the given inference procedures. I measure
+both running time and peak memory usage.
+Linear Regression
+
+Biased Coin
+
+1,000
+
+time (ms)
+
+800
+600
+400
+200
+0
+
+mh
+
+smc
+
+rej
+
+rej
+
+Sprinkler
+
+Hidden Markov Model
+
+1,000
+
+smc
+
+mh
+
+time (ms)
+
+800
+600
+400
+200
+0
+
+mh
+
+smc
+
+rej
+OwlPPL
+
+smc
+
+mh
+
+WebPPL
+
+rej
+
+Anglican
+
+Figure 4.4 – Time taken for inference against other languages for different models and inference
+algorithms, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the
+95% confidence interval
+
+These graphs show that my PPL performs reasonably well compared to webPPL in both
+memory and time. It is less efficient for some models, but not excessively so. In particular,
+
+38
+
+CHAPTER 4. EVALUATION
+
+·105
+
+Biased Coin
+
+·105
+
+Linear Regression
+
+memory
+
+4
+3
+2
+1
+0
+
+mh
+·105
+
+smc
+
+rej
+
+Hidden Markov Model
+
+smc
+
+mh
+·105
+
+rej
+
+Sprinkler
+
+memory
+
+4
+3
+2
+1
+0
+
+mh
+
+smc
+
+rej
+OwlPPL
+
+smc
+
+mh
+
+WebPPL
+
+rej
+
+Anglican
+
+Figure 4.5 – Memory Usage of my ppl, compared against other languages for different models,
+all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs.
+Error bars show the 95% confidence interval
+
+my implementation of a particle filter performs relatively poorly. This is possibly because
+when using a large number of particles, a large number of small memory allocations are made
+by OCaml, which introduced overhead both to my program and the garbage collector. The
+languages I compare with are both also garbage collected, but may be more optimised for this
+use case. Anglican is a Clojure library, which runs on the JVM, whereas WebPPL is run using
+nodejs, a JavaScript interpreter. It is possible there is an interpretive overhead with webPPL,
+explaining slower running times - however based on my results, it is not significant.
+I also measured the running time of inference with increased data used - I tested the linear
+regression model, increasing the length of the arrays used as input. Models which are conditioned
+on more data are expected to give more accurate results, and my results show that running time
+increases linearly with the size of data. Figure 4.6 shows that all the inference functions run in
+time linear to the size of the input, but the constant factors vary substantially - for example,
+
+39
+
+CHAPTER 4. EVALUATION
+
+Sequential Monte Carlo has a much steeper gradient than Metropolis-Hastings, for example, but
+both have the same shape. This also shows how some inference procedures take much more time
+than others, however, this often results in more accurate results. For example, smc is slower
+than rejection sampling here, but Figure 4.3 shows that smc produces posterior distributions
+which are closer to exact solutions. The y axis has a log scale, showing the large difference in
+running time for each method.
+Linear Regression
+105
+
+Time (ms)
+
+104
+
+103
+
+102
+
+101
+
+100
+
+0
+
+0.1
+
+0.2
+
+0.3
+mh
+
+0.4
+0.5
+0.6
+Number of Data Points
+rejection
+
+smc
+
+0.7
+
+0.8
+
+0.9
+4
+
+·10
+
+importance
+
+Figure 4.6 – Time taken for inference as a function of input data length as the mean of 10 runs
+each taking 1,000 samples from the posterior, shaded areas are the 95% confidence interval (±2σ)
+
+1
+
+Chapter 5
+Conclusion
+In this project, I have designed, developed and tested a probabilistic programming language
+embedding in OCaml. It has achieved all the core requirements as well as some of the extensions.
+The performance is reasonable when compared to similar systems (other universal PPLs). Code
+written in my PPL is also not overly verbose compared to these languages.
+Future work would mainly focus on how to improve inference. There are several algorithms I
+have implemented that would benefit from the use of multiple cores - which may be possible
+with the ongoing development of multi-core OCaml.
+Other, more efficient inference algorithms may also be able to be written. This may require
+changing the core data structure or adding more variants to give more information, for example
+adding variable names in order to keep track of the primitives being used, or allowing a user to
+specify guide distributions to create more specific proposal distributions for MCMC.
+One of my initial goals was for my PPL to be able to represent as many distributions (models)
+as possible. This is why I used a trace based approach inspired by Church rather than using a
+computation graph. However, there are universal PPLs which use dynamic computation graphs
+to make inference more efficient (e.g. Pyro). Since Owl contains a powerful computational graph
+implementation, this could be a further extension. I was not able to complete one extension due
+to the fact that I had not chosen this approach - the ability to visualise the model itself (e.g. as
+a network). If I used a graph approach, this would likely be possible.
+My visualisations, while basic, allow producing graphs of posterior distributions and exact
+distributions. Extensions include visualising higher-dimensional data.
+While there are many possible extensions to this project, it successfully achieved all the initial
+goals.
+
+[ Word count: 11531 ]
+40
+
+Bibliography
+[1] Oleg Kiselyov and Chung-Chieh Shan. Embedded probabilistic programming. In IFIP
+Working Conference on Domain-Specific Languages, pages 360–384. Springer, 2009.
+[2] Johannes Borgström, Ugo Dal Lago, Andrew D Gordon, and Marcin Szymczak. A lambdacalculus foundation for universal probabilistic programming. ACM SIGPLAN Notices,
+51(9):33–46, 2016.
+[3] Avi Pfeffer. The design and implementation of ibal: A general-purpose probabilistic
+language. Applied Sciences, 01 2000.
+[4] Claus Möbus. Structure and interpretation of webppl. 2018.
+[5] Noah Goodman, Vikash Mansinghka, Daniel M Roy, Keith Bonawitz, and Joshua B
+Tenenbaum. Church: a language for generative models. arXiv preprint arXiv:1206.3255,
+2012.
+[6] Shen SJ Wang and Matt P Wand. Using infer. net for statistical analyses. The American
+Statistician, 65(2):115–126, 2011.
+[7] Frank J Massey Jr. The kolmogorov-smirnov test for goodness of fit. Journal of the
+American statistical Association, 46(253):68–78, 1951.
+[8] Philip Wadler. Comprehending monads. In Proceedings of the 1990 ACM conference on
+LISP and functional programming, pages 61–78, 1990.
+[9] Michele Giry. A categorical approach to probability theory. In Categorical aspects of
+topology and analysis, pages 68–85. Springer, 1982.
+[10] Claire Jones and Gordon Plotkin. A probabilistic powerdomain of evaluations. In Proceedings. Fourth Annual Symposium on Logic in Computer Science, pages 186–187, 1989.
+[11] Norman Ramsey and Avi Pfeffer. Stochastic lambda calculus and monads of probability
+distributions. In Proceedings of the 29th ACM SIGPLAN-SIGACT symposium on Principles
+of programming languages, pages 154–165, 2002.
+[12] Liang Wang. Owl: A general-purpose numerical library in ocaml. CoRR, abs/1707.09616,
+2017.
+[13] Dustin Tran, Matthew D. Hoffman, Rif A. Saurous, Eugene Brevdo, Kevin Murphy, and
+David M. Blei. Deep probabilistic programming, 2017.
+
+41
+
+BIBLIOGRAPHY
+
+42
+
+[14] Judea Pearl. Reverend bayes on inference engines: A distributed hierarchical approach.
+In Proceedings of the Second AAAI Conference on Artificial Intelligence, AAAI’82, page
+133–136. AAAI Press, 1982.
+[15] Andrew D Gordon, Thomas A Henzinger, Aditya V Nori, and Sriram K Rajamani. Probabilistic programming. In Proceedings of the on Future of Software Engineering, pages
+167–181. 2014.
+[16] Nicholas Metropolis and S. Ulam. The monte carlo method. Journal of the American
+Statistical Association, 44(247):335–341, 1949.
+[17] Bernard D Flury. Acceptance–rejection sampling made easy. SIAM Review, 32(3):474–476,
+1990.
+[18] N. J. Gordon, D. J. Salmond, and A. F. M. Smith. Novel approach to nonlinear/nongaussian bayesian state estimation. IEE Proceedings F - Radar and Signal Processing,
+140(2):107–113, 1993.
+[19] Frank Wood, Jan Willem van de Meent, and Vikash Mansinghka. A new approach to
+probabilistic programming inference. In Proceedings of the 17th International conference
+on Artificial Intelligence and Statistics, pages 1024–1032, 2014.
+[20] David Siegmund. Note on a stochastic recursion, volume Volume 36 of Lecture Notes–
+Monograph Series, pages 547–554. Institute of Mathematical Statistics, Beachwood, OH,
+2001.
+[21] Martin Erwig and Steve Kollmansberger. Functional pearls: Probabilistic functional
+programming in haskell. J. Funct. Program., 16(1):21–34, January 2006.
+[22] Adam Ścibior, Zoubin Ghahramani, and Andrew D Gordon. Practical probabilistic programming with monads. In ACM SIGPLAN Notices, volume 50, pages 165–176. ACM,
+2015.
+[23] David Wingate, Andreas Stuhlmueller, and Noah Goodman. Lightweight implementations of
+probabilistic programming languages via transformational compilation. In Geoffrey Gordon,
+David Dunson, and Miroslav Dudík, editors, Proceedings of the Fourteenth International
+Conference on Artificial Intelligence and Statistics, volume 15 of Proceedings of Machine
+Learning Research, pages 770–778, Fort Lauderdale, FL, USA, 11–13 Apr 2011. PMLR.
+[24] Robert Zinkov and Chung chieh Shan. Composing inference algorithms as program
+transformations. ArXiv, abs/1603.01882, 2016.
+[25] Gregory F Cooper. The computational complexity of probabilistic inference using bayesian
+belief networks. Artificial intelligence, 42(2-3):393–405, 1990.
+[26] Brooks Paige, Frank Wood, Arnaud Doucet, and Yee Whye Teh. Asynchronous anytime
+sequential monte carlo, 2014.
+[27] Christophe Andrieu, Arnaud Doucet, and Roman Holenstein. Particle markov chain monte
+carlo methods. Journal of the Royal Statistical Society: Series B (Statistical Methodology),
+72(3):269–342, 2010.
+[28] Damon Wischik. Foundations of data science, 2019.
+
+BIBLIOGRAPHY
+
+43
+
+[29] Carl Edward Rasmussen. The infinite gaussian mixture model. In Proceedings of the
+12th International Conference on Neural Information Processing Systems, NIPS’99, page
+554–560, Cambridge, MA, USA, 1999. MIT Press.
+[30] Fernando Pérez-Cruz. Kullback-leibler divergence estimation of continuous distributions.
+In 2008 IEEE international symposium on information theory, pages 1666–1670. IEEE,
+2008.
+[31] Dave Moore and Maria I. Gorinova. Effect handling for composable program transformations
+in edward2. CoRR, abs/1811.06150, 2018.
+
+Appendix A
+Example Programs
+A.1
+
+Sprinkler
+
+A.2
+
+Coin
+
+The likelihood model (X) is a binomial.
+Prior: Θ ∼ Uniform(0, 1)
+Likelihood: X ∼ Binom(n, θ)
+We then use Bayes’ rule to calculate the posterior.
+1
+P (Θ = θ)P (X = x | θ)
+κ !
+1 n x
+θ (1 − θ)n−x
+=
+κ x
+1
+= 0 θx (1 − θ)n−x
+κ
+
+P (Θ = θ | X = x) =
+
+κ0 =
+
+Z 1
+φ=0
+
+φx (1 − φ)n−x dφ
+
+This is the beta distribution - Beta()
+
+A.3
+
+Linear Regression
+
+A.4
+
+Hidden Markov Model
+
+A.5
+
+Dirichlet Process
+
+44
+
+Appendix B
+Full Documentation
+Up – ppl » Ppl » Dist » PplOps
+
+B.1
+
+Module Dist.PplOps
+
+Operators for distributions
+type 'a dist
+val (+~) : int dist -> int dist -> int dist
+val (-~) : int dist -> int dist -> int dist
+val (*~) : int dist -> int dist -> int dist
+val (/~) : int dist -> int dist -> int dist
+val (+.~) : float dist -> float dist -> float dist
+val (-.~) : float dist -> float dist -> float dist
+val (*.~) : float dist -> float dist -> float dist
+val (/.~) : float dist -> float dist -> float dist
+val (&~) : bool dist -> bool dist -> bool dist
+val (|~) : bool dist -> bool dist -> bool dist
+val not : bool dist -> bool dist
+val (ˆ~) : string dist -> string dist -> string dist
+Up – ppl » Ppl » Dist
+
+B.2
+
+Module Ppl.Dist
+
+Module used for defining probabilistic models
+45
+
+APPENDIX B. FULL DOCUMENTATION
+Contains a type dist which is used to represent probabilistic models.
+•
+•
+•
+•
+
+Condition Operators
+Monad Functions
+Sampling
+Prior Distribution
+
+exception Undefined
+module Prob : Ppl__.Sigs.Prob
+type prob = Prob.t A type for which values need to sum to 1
+type likelihood = Prob.t A type for which values don’t need to sum to 1
+type 'a samples = ('a * prob) list A set of weighted samples, summing to one
+type _ dist = private
+| Return : 'a -> 'a dist
+distribution with a single value
+| Bind : 'a dist * ('a -> 'b dist) -> monadic bind
+'b dist
+| Primitive : 'a Primitive.t -> 'a
+primitive exact distribution
+dist
+| Conditional : ('a -> likelihood) * variant that defines likelihood model
+'a dist -> 'a dist
+Type for representing distributions
+Condition Operators
+val condition' : ('a -> float) -> 'a dist -> 'a dist
+val condition : bool -> 'a dist -> 'a dist
+val score : float -> 'a dist -> 'a dist
+val observe : 'a -> 'a Primitive.t -> 'b dist -> 'b dist
+val from_primitive : 'a Primitive.t -> 'a dist
+Monad Functions
+include Ppl__.Monad.Monad with type 'a t := 'a dist
+type 'a t
+val return : 'a -> 'a t
+val bind : 'a t -> ('a -> 'b t) -> 'b t
+val (>>=) : 'a t -> ('a -> 'b t) -> 'b t
+
+46
+
+APPENDIX B. FULL DOCUMENTATION
+
+47
+
+val let* : 'a t -> ('a -> 'b t) -> 'b t
+val fmap : ('a -> 'b) -> 'a t -> 'b t
+val liftM : ('a -> 'b) -> 'a t -> 'b t
+val liftM2 : ('a -> 'b -> 'c) -> 'a t -> 'b t -> 'c t
+val mapM : ('a -> 'b t) -> 'a list -> 'b list t
+val sequence : 'a t list -> 'a list t
+Primitives
+These functions create dist values which correspond to primitive distributions so that they can
+be used in models. Ok
+type 'a primitive
+val binomial : int -> float -> int primitive Create a binomial distribution, the output is the number of successes from n independent trials with probability of success
+p
+val normal : float -> float -> float primitive
+val categorical : ('a * float) list -> 'a primitive
+val discrete_uniform : 'a list -> 'a primitive
+val beta : float -> float -> float primitive
+val gamma : float -> float -> float primitive
+val continuous_uniform : float -> float -> float primitive
+val bernoulli : float -> bool dist
+val choice : float -> 'a dist -> 'a dist -> 'a dist
+Sampling
+val sample : 'a dist -> 'a
+val sample_n : int -> 'a dist -> 'a array
+val sample_with_score : 'a dist -> 'a * likelihood
+val dist_of_n_samples : int -> 'a dist -> 'a list dist
+Prior Distribution
+val prior' : 'a dist -> 'a dist
+val prior : 'a dist -> ('a * likelihood) dist
+
+APPENDIX B. FULL DOCUMENTATION
+
+48
+
+val prior_with_score : 'a dist -> ('a * likelihood) dist
+val support : 'a dist -> 'a list
+module PplOps : Ppl__.Sigs.Ops with type 'a dist := 'a dist Operators for distributions
+Up – ppl » Ppl » Inference
+
+Module Ppl.Inference
+
+B.3
+
+Implementation of inference algorithms
+Inference algorithms to be called on probabilistic models defined using Dist
+•
+•
+•
+•
+•
+•
+•
+•
+•
+
+Helpers
+Exact Inference
+Importance Sampling
+Rejetion Sampling
+Sequential Monte Carlo
+Metropolis Hastings
+Particle Independent Metropolis Hastings
+Particle Cascade
+Common
+
+exception Undefined
+type 'a samples = ('a * Dist.prob) list
+Helpers
+val unduplicate : 'a samples -> 'a samples
+val resample : 'a samples -> 'a samples Dist.dist
+val normalise : 'a samples -> 'a samples
+val flatten : ('a samples * Dist.prob) list -> 'a samples
+Exact Inference
+val enumerate : 'a Dist.dist -> float -> 'a samples
+val exact_inference : 'a Dist.dist -> 'a Dist.dist
+Importance Sampling
+val importance : int -> 'a Dist.dist -> 'a samples Dist.dist
+val importance' : int -> 'a Dist.dist -> 'a Dist.dist
+
+APPENDIX B. FULL DOCUMENTATION
+Rejetion Sampling
+type rejection_type =
+| Hard
+| Soft
+val pp_rejection_type : Stdlib.Format.formatter -> rejection_type -> unit
+val show_rejection_type : rejection_type -> string
+val create' : int -> 'a option Dist.dist -> 'a list -> 'a list
+val create : int -> 'a option Dist.dist -> 'a list
+val reject_transform_hard : ?threshold:float -> 'a Dist.dist -> ('a *
+Dist.prob) Dist.dist
+val reject'' : 'a Dist.dist -> 'a option Dist.dist
+val reject_transform_soft : 'a Dist.dist -> ('a * Dist.prob) Dist.dist
+val rejection_transform : ?n:int -> rejection_type -> 'a Dist.dist -> 'a
+Dist.dist
+val rejection_soft : 'a Dist.dist -> ('a * Dist.prob) option Dist.dist
+val rejection_hard : ?threshold:Core.Float.t -> 'a Dist.dist -> ('a *
+Dist.prob) option Dist.dist
+val rejection : ?n:int -> rejection_type -> 'a Dist.dist -> 'a Dist.dist
+Sequential Monte Carlo
+val smc : int -> 'a Dist.dist -> 'a samples Dist.dist
+val smc' : int -> 'a Dist.dist -> 'a Dist.dist
+val smcStandard : int -> 'a Dist.dist -> 'a samples Dist.dist
+val smcStandard' : int -> 'a Dist.dist -> 'a Dist.dist
+val smcMultiple : int -> int -> 'a Dist.dist -> 'a samples Dist.dist
+val smcMultiple' : int -> int -> 'a Dist.dist -> 'a Dist.dist
+Metropolis Hastings
+val mh' : int -> 'a Dist.dist -> 'a Dist.dist
+val mh'' : int -> 'a Dist.dist -> 'a Dist.dist
+val mh_sampler : int -> 'a Dist.dist -> 'a list Dist.dist
+val mh_transform : burn:int -> 'a Dist.dist -> 'a Dist.dist
+
+49
+
+APPENDIX B. FULL DOCUMENTATION
+Particle Independent Metropolis Hastings
+val pimh : int -> 'a Dist.dist -> 'a samples list Dist.dist
+val pimh' : int -> int -> 'a Dist.dist -> 'a Dist.dist
+Particle Cascade
+val resamplePC : ('a * float) list -> int -> ('a * Dist.prob) list
+Dist.dist
+val cascade : int -> 'a Dist.dist -> 'a samples Dist.dist
+val cascade' : int -> 'a Dist.dist -> 'a Dist.dist
+Common
+type infer_strat =
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+
+MH of int
+SMC of int
+PC of int
+PIMH of int
+Importance of int
+Rejection of int * rejection_type
+RejectionTrans of int * rejection_type
+Prior
+Enum
+Forward
+
+val pp_infer_strat : Stdlib.Format.formatter -> infer_strat -> unit
+val show_infer_strat : infer_strat -> string
+val print_infer_strat : infer_strat -> string
+val print_infer_strat_short : infer_strat -> string
+val infer : 'a Dist.dist -> infer_strat -> 'a Dist.dist
+val infer_sampler : 'a Dist.dist -> infer_strat -> unit -> 'a
+Up – ppl » Ppl » Primitive » PRIM_DIST
+
+B.4
+
+Module type Primitive.PRIM_DIST
+
+The signature for new primitives distributions
+type t
+
+50
+
+51
+
+APPENDIX B. FULL DOCUMENTATION
+val sample : unit -> t
+val pdf : t -> float
+val cdf : t -> float
+val ppf : t -> float
+val support : t support
+Up – ppl » Ppl » Primitive
+
+B.5
+
+Module Ppl.Primitive
+
+Module defining a type for primitive distributions
+•
+•
+•
+•
+
+New Distributions
+Predefined Distributions
+Basic Operations
+Other
+
+type 'a support =
+| DiscreteFinite of 'a list
+| DiscreteInfinite
+| ContinuousFinite of ('a * 'a) list
+| ContinuousInfinite
+| Merged of 'a support * 'a support
+
+A list of valid values
+discrete dist with infinite support e.g.
+poisson
+set of endpoints
+continuous dist with an infinite support e.g.
+combination of any of the above
+
+The type of supports - the values with a distribution can take
+module type PRIM_DIST = sig ... end The signature for new primitives distributions
+type 'a t Type of primitive dists wrapping a module
+New Distributions
+val create_primitive : sample:(unit -> 'a) -> pdf:('a -> float) -> cdf:('a ->
+float) -> support:'a support -> ppf:('a -> float) -> 'a t
+Predefined Distributions
+val binomial : int -> float -> int t
+val categorical : ('a * float) list -> 'a t
+val normal : float -> float -> float t
+val discrete_uniform : 'a list -> 'a t
+
+APPENDIX B. FULL DOCUMENTATION
+
+52
+
+val beta : float -> float -> float t
+val gamma : float -> float -> float t
+val poisson : float -> int t
+val continuous_uniform : float -> float -> float t
+Basic Operations
+val pdf : 'a t -> 'a -> float
+val logpdf : 'a t -> 'a -> float
+val cdf : 'a t -> 'a -> float
+val ppf : 'a t -> 'a -> float
+val sample : 'a t -> 'a
+val support : 'a t -> 'a support
+Other
+val merge_supports : ('a support * 'a support) -> 'a support
+Up – ppl » Ppl » Helpers
+
+B.6
+
+Module Ppl.Helpers
+
+Utilities for working with distributions
+A set of utilities for generating statistics and printing distributions
+• Samples
+• Printing
+• Others
+Samples
+val sample_mean : ?n:int -> float Dist.dist -> float
+val sample_variance : ?n:int -> float Dist.dist -> float
+val take_k_samples : int -> 'a Dist.dist -> 'a array
+val unduplicate : ('a * Dist.prob) list -> ('a * Dist.prob) list Removes duplicates and sums the probabilities associated so that each value appears once
+val flatten : (('a * Dist.prob) list * Dist.prob) list -> ('a * Dist.prob)
+list
+val normalise : ('a * Dist.prob) list -> ('a * Dist.prob) list
+
+APPENDIX B. FULL DOCUMENTATION
+
+53
+
+val weighted_dist : ?n:int -> 'a Dist.dist -> ('a, int) Core.Map.Poly.t
+Printing
+val print_exact_exn : (module Base.Stringable.S with type t = 'a) -> 'a
+Dist.dist -> unit
+val print_exact_bool : bool Dist.dist -> unit
+val print_exact_int : int Dist.dist -> unit
+val print_exact_float : float Dist.dist -> unit
+Others
+val time : (unit -> 'a) -> 'a * float
+val memo : ('a -> 'b) -> 'a -> 'b
+val memo_no_poly : (module Base__.Hashtbl_intf.Key.S with type t = 'a) -> ('a
+-> 'b) -> 'a -> 'b
+Up – ppl » Ppl » Evaluation
+
+B.7
+
+Module Ppl.Evaluation
+
+A module for evaluating the correctness of models and inference procedures
+Contains functionality to perform hypothesis tests and KL-divergences for both continuous and
+discrete distributions
+• KL-Divergence
+• Hypothesis Tests
+type 'a samples = 'a Empirical.Discrete.t
+type 'a dist = 'a Dist.dist
+KL-Divergence
+val kl_discrete : ?n:int -> 'a Primitive.t -> 'a dist -> float Find the KL divergence for two discrete distributions
+val kl_continuous : ?n:int -> float Primitive.t -> float dist -> float Find
+the KL divergence for two continuous distributions
+val kl_cum_discrete : int array -> bool Primitive.t -> bool dist -> (int *
+float) array
+
+APPENDIX B. FULL DOCUMENTATION
+
+54
+
+val kl_cum_continuous : int array -> float Primitive.t -> float dist -> (int *
+float) array
+Hypothesis Tests
+val kolmogorov_smirnov : ?n:int -> ?alpha:float -> float dist -> float Primitive.t ->
+Perform kolmogorov smirnov test, returns a hypothesis which is true if the null hypothesis
+is rejected
+
+val chi_sq : ?n:int -> ?alpha:float -> 'a dist -> 'a Primitive.t -> Owl_stats.hypothes
+Perform chi-squared test, returns a hypothesis which is true if the null hypothesis is
+rejected
+Up – ppl » Ppl » Plot
+
+B.8
+
+Module Ppl.Plot
+
+Plotting utilies
+Plot provides helper functions that wrap Owl_plplot to graph PPL distributions
+• Histograms
+• Other Plots
+type options = [
+| ‘X_label of string
+| ‘Y_label of string
+| ‘Title of string
+]
+Histograms
+val hist_dist_continuous : ?h:handle -> ?n:int -> ?fname:string ->
+?options:options list -> float dist -> handle
+val hist_dist_discrete : ?h:handle -> ?n:int -> ?fname:string ->
+?options:options list -> float dist -> handle
+Other Plots
+val qq_plot : ?h:handle -> ?n:int -> ?fname:string -> ?options:options list ->
+float dist -> float Primitive.t -> handle
+val pp_plot : ?h:handle -> ?n:int -> ?fname:string -> ?options:options list ->
+float dist -> float Primitive.t -> handle
+
+APPENDIX B. FULL DOCUMENTATION
+
+55
+
+val ecdf_continuous : ?h:handle -> ?n:int -> ?fname:string -> ?options:options
+list -> float Dist.dist -> handle
+val ecdf_discrete : ?h:handle -> ?n:int -> ?fname:string -> ?options:options
+list -> float dist -> handle
+val add_exact_pdf : ?scale:float -> dist:float Primitive.t -> handle ->
+handle
+val show : handle -> unit
+Up – ppl » Ppl » Empirical
+
+B.9
+
+Module Ppl.Empirical
+
+module type S = sig ... end
+module Discrete : S
+module ContinuousArr : sig ... end
+Up – ppl » Ppl » Empirical » Discrete
+
+B.10
+
+Module Empirical.Discrete
+
+type 'a t
+val from_dist : ?n:int -> 'a Dist.dist -> 'a t Create a empirical distribution from
+a distribution object, using n samples to approximate it
+val empty : 'a t Create an empty distribution
+val add_sample : 'a t -> 'a -> 'a t Add another sample to the distribution
+val get_num : 'a t -> 'a -> int Get the numer of samples with the value
+val get_prob : 'a t -> 'a -> float Get the probability of a particular value
+val to_pdf : 'a t -> 'a -> float Create a pdf function
+val print_map : (module Core.Pretty_printer.S with type t = 'a) -> 'a t -> unit
+print the entire distribution
+
+val to_arr : 'a t -> ('a * int) arrayval to_norm_arr : 'a t -> ('a * float) arrayval s
+Get the set of values for the distribution
+Up – ppl » Ppl » Empirical » ContinuousArr
+
+B.11
+
+Module Empirical.ContinuousArr
+
+type 'a t = {
+
+APPENDIX B. FULL DOCUMENTATION
+
+56
+
+samples : float array;
+n : int;
+max_length : int;
+}
+val empty : 'a t
+val from_dist : ?n:int -> float Dist.dist -> 'a t
+val add_sample : 'a t -> float -> 'b t
+val to_cdf_arr : 'a t -> float array * float array
+val to_pdf_arr : 'a t -> float array * float Core.Array.t
+val to_cdf : 'a t -> Core.Float.t -> Core.Float.t
+val to_pdf : 'a t -> Core.Float.t -> float
+val values : 'a t -> float Core.Array.t
+val print : 'a t -> Base.unit
+Up – ppl » Ppl » Empirical » S
+
+B.12
+
+Module type Empirical.S
+
+type 'a t
+val from_dist : ?n:int -> 'a Dist.dist -> 'a t Create a empirical distribution from
+a distribution object, using n samples to approximate it
+val empty : 'a t Create an empty distribution
+val add_sample : 'a t -> 'a -> 'a t Add another sample to the distribution
+val get_num : 'a t -> 'a -> int Get the numer of samples with the value
+val get_prob : 'a t -> 'a -> float Get the probability of a particular value
+val to_pdf : 'a t -> 'a -> float Create a pdf function
+val print_map : (module Core.Pretty_printer.S with type t = 'a) -> 'a t -> unit
+print the entire distribution
+
+val to_arr : 'a t -> ('a * int) arrayval to_norm_arr : 'a t -> ('a * float) arrayval s
+Get the set of values for the distribution
+
+Appendix C
+Project Proposal
+
+Computer Science Tripos – Part II – Project Proposal
+
+A probabilistic programming language
+in OCaml
+A. Roy, Christ’s College
+April 28, 2020
+
+Project Originator: Dr. R. Mortier
+Project Supervisor: Dr R. Mortier
+Director of Studies: Dr R. Mortier
+Project Overseers: Dr J. A. Crowcroft & Dr T. Sauerwald
+
+57
+
+APPENDIX C. PROJECT PROPOSAL
+
+58
+
+Introduction
+A probabilistic programming language (PPL) is a framework in which one can create statistical
+models and have inference run on them automatically. A PPL can take the form of its own
+language (i.e. a separate DSL), or be embedded within an existing language (such as OCaml).
+The ability to write probabilistic programs within OCaml would allow us to leverage the benefits
+of OCaml, such as expressiveness, a strong type system, and memory safety. The use of a
+numerical computation library, Owl, will allow us to perform inference in a performant way.
+PPLs work well when working with generative models, meaning the model describes how some
+data is generated. This means the model can be run ’forward’ to generate outputs based on the
+model. The more interesting application, however, is to run it ’backwards’ in order to infer a
+distribution for the model.
+The power of a probabilistic programming language comes in being able to describe models using
+the programming language - in my case, probabilistic models would be described in OCaml
+code, with basic distributions being able to be combined using functions and operators as in
+OCaml code.
+
+Starting Point
+There do exist PPLs for OCaml, such as IBAL [3], as well as PPLs for other languages, such as
+WebPPL - JS[4], Church - LISP[5] or Infer.Net - F#[6] to name a few. My PPL can draw on
+some of the ideas introduced by these languages, particularly in implementing efficient inference
+engines.
+I will be using an existing OCaml numerical computation library (Owl). This library does not
+contain methods for probabilistic programming in general, although it does contain modules
+which will help in the implementation of an inference engine such as efficient random number
+generation and lazy evaluation.
+I have experience with the core SML language, which will aid in learning basic OCaml due
+to similarities in the languages, however I will still have to learn the modules system. 1B
+Foundations of Data Science also gives me an understanding of basic statistics and bayesian
+inference. I do not have experience with domain specfic languages in OCaml, although the 1B
+compilers course did implement a compiler in OCaml.
+
+Substance and Structure of the Project
+I will be building a PPL in OCaml, essentially writing a domain specific language. There are 2
+main components to the system, namely the modelling API (language design) and the inference
+engine.
+
+APPENDIX C. PROJECT PROPOSAL
+
+59
+
+Modelling
+The modelling API is used to represent a statistical model. For example, in mathematical
+notation, a random variable representing a coin flip may be represented as X ∼ N (0, 1), but in
+a PPL we need to represent this as code. An example would be
+Variable<double> x = Variable.GaussianFromMeanAndVariance(0, 1)
+in the Infer.Net language. In OCaml, there will be many different options for representing
+distributions, and a choice will need to be made about whether to create a separate domain
+specific language (DSL) or whether to embed the language in OCaml as a library.
+I will also need to make sure the design of the modelling language is suitable for the implementation of the inference engine. For example, WebPPL[4] uses a continuation passing style
+transformation, recording continuations when probabilistic functions are called in order to build
+an execution trace. This then allows the engine to perform inference. A similar approach could
+be applied here. There are many alternative approaches to build execution traces, such as algebraic effects[31] or monads[22], and one such method will need to be chosen. However I decide
+to implement this, I will need to ensure that features of OCaml can be used appropriately.
+
+Inference Engine
+There are many different options for a possible inference engine. A decision also need to be
+made about whether to use a trace-based model (as mentioned) or a graph based model (such
+as Edward, where a computational graph is generated). This decision will need to be made
+before implementing the inference engine since it will affect the modelling language.
+In both these cases, I will need to decide how to convert from a program into a data structure
+that allows inference to be performed, and then actually carry it out. Ideally, the inference
+algorithm used is separated from the definition of the models, so that different algorithms can
+be chosen, or new algorithms added in the future.
+
+Evaluation
+The PPL developed here will be compared to existing PPLs - for example, IBAL (written in
+OCaml), comparing performance for programs describing the same models. I will also use
+the PPL developed on example problems in isolation to ensure it can be used correctly and
+delivers correct results. An example would be to use it on an established dataset (e.g. the
+stop-and-search dataset used in 1B Foundations of Data Science) to attempt to fit a model.
+I will also want to quantify exactly what kind of problems need to be supported by my PPL
+and make sure these kind of programs can be run. I will also support a minimum number of
+standard distributions, e.g. bernoulli, normal, geometric, etc. or enable users to define custom
+distributions.
+
+APPENDIX C. PROJECT PROPOSAL
+
+60
+
+Success Criteria
+The project will succeed if a usable probabilistic programming language is created. Usable is
+defined by the following:
+• Language Features: I will aim to support some subset of language features, such as ’if’
+statements (to allow models to be conditional), operators and functions. Some of these
+features may only be available by special added keywords (e.g. a custom ’if’ function).
+• Available distributions: I will aim to make sure my PPL has at minimum the bernoulli
+and normal distributions available as basic building blocks to build more complex probabilistic programs.
+• Correctness of inference: I will use the PPL developed on sample problems mentioned
+before to ensure correct results are produced. This would be determined by comparing to
+results produced in other PPLs. I will aim to include at least one inference algorithm.
+• Performance: This is a quantitative measure, comparing programs written in my PPL
+to equivalent programs in other PPLs. I can use the spacetime program to profile my
+OCaml code. Performing inference should be possible within a reasonable amount of time,
+even though the project does not have a significant focus on performance. I will also
+benchmark the performance with regards to scalability, i.e. ensure the performance is still
+reasonable as traces/graphs get larger.
+
+Extensions
+There are several extensions which could be considered, time permitting:
+1. There could be more options for the inference engine, i.e. implementing more than one
+inference algorithm. Different algorithms are suited to different inference tasks, so this
+would be a worthwhile extension
+2. Optimisations could be considered to ensure the performance of inference was better than
+other comparable languages - especially looking into making use of multicore systems.
+3. I could add more distributions, as well as the ability to create custom distributions
+4. Include the ability to visualise results using the plotting module in owl.
+5. Include the ability to visualise the model in which inference is being performed (e.g. the
+factor graph)
+
+Schedule
+Planned starting date is 28/10/19, the Monday after handing in project proposal. Work is
+broken up into roughly 2 week sections.
+
+APPENDIX C. PROJECT PROPOSAL
+
+61
+
+Michaelmas Term
+• Weeks 3-4 (28/10/19 – 10/11/19)
+Set up IDE and local environment - installing Owl and practicing using it. Read the
+first 10 chapters of Real World OCaml, available online. Read papers on past PPLs
+and implementations, both ocaml or otherwise. Set up project repository and directory
+structure.
+Milestone: learn Ocaml basics, set up project
+• Weeks 5-6 (11/10/19 – 24/11/19)
+Design a basic modelling API and write module/function signatures. Decide how to
+implement this (e.g. DSL vs library). Specify what language features I will include as a
+baseline. Research inference algorithms and make sure they will fit into the modelling
+API designed.
+Milestone: specification of which language features and inference algorithms will be implemented
+• Weeks 7-8 (25/10/19 – 08/12/19)
+Begin to implement the modelling API, and allow running a model ’forward’, i.e. generating
+samples.
+Milestone: A basic working DSL
+
+Christmas Holidays
+• Weeks 1-2 (09/12/19 – 22/12/19)
+Begin to implement a basic inference algorithm (such as MCMC) allowing programs to be
+run ’backwards’ to infer parameters.
+• Weeks 3-4 (23/12/19 – 05/01/20) [Christmas Break]
+• Weeks 5-6 (06/01/20 – 19/01/19)
+Aim to finish the main bulk of implementation and get a baseline system working by
+the end of this week and consider extensions if finished early. Begin writing up progress
+report.
+Milestone: finish baseline implementation
+
+Lent Term
+• Weeks 1-2 (20/01/19 – 02/02/20)
+Finish progress report and implementation as well as any extensions, time permitting.
+Use the PPL developed on example problems in order to evaluate it, comparing against
+problems in other languages.
+Milestone: Progress report deadline (31/01/19)
+• Weeks 3-4 (03/02/20 – 16/02/20)
+Prepare for the presentation, begin planning the dissertation, particularly the structure
+and the content I need to write for each section. Begin writing, starting with the first
+
+APPENDIX C. PROJECT PROPOSAL
+
+62
+
+sections (i.e. introduction and preparation).
+Milestone: Progress report presentations (06/02/20), finish introduction and preparation
+• Weeks 5-6 (17/02/20 – 01/02/20)
+Finish writing up the bulk of the implementation section.
+Milestone: Finish implementation section
+• Weeks 7-8 (02/03/20 – 15/03/20)
+Complete first draft of dissertation, finish the evaluation and conclusion sections and
+complete any unfinished tasks.
+Milestone: Finish first draft
+
+Easter Holidays
+• Weeks 1-6 (16/03/20 – 26/04/20)
+Improve dissertation based on supervisor feedback
+
+Easter Term
+• Weeks 1-2 (27/04/20 – 07/04/20)
+Finalise disseration after proof reading and hand in.
+Milestone: Electronic Submission deadline (08/04/20)
+
+Resources Required
+Hardware I intend to use my personal laptop for the main development and subsequent
+write up (HP Pavilion 15, 8GB RAM, i5-8265U CPU, running Ubuntu and Windows dual
+booted).
+Software The required software includes the ocaml compiler, with a build system (dune) and
+a package manager (opam). I will also use the IDE VSCode with an OCaml extension, as well
+as git for version control and latex for the write up.
+Backups For backups, I will use GitHub to host my git repository remotely, pushing frequently.
+I will also backup weekly to a USB stick in case of failures. The software I require is available
+on MCS machines, so I’ll be able to continue work in the event of a hardware failure with my
+laptop.
+
+

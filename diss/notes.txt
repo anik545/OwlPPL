@@ -32,7 +32,7 @@ bayesian inference under ppl
 2.8+2.7+2.9 -
 
 whole section on probabilistic programming
- -> two approches
+ -> two approaches
  -> im using trace driven, therefore these equations for inference
  -> explain why these inference algorithms
 
@@ -78,3 +78,11 @@ could get 4 plots into a single line
 personal reflection in conclusion
 
 dont talk about things as if they were easy
+
+talk about some real world applications 
+-> https://www.cs.cmu.edu/~fp/papers/toplas08.pdf pg1 has references
+
+talk about the name, owlppl
+
+add a pie chart of gprof output
+add a line chart of memory usage over time from spacetime.
