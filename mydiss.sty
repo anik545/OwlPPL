@@ -1,7 +1,8 @@
 \ProvidesPackage{mydiss}
 
 \usepackage{microtype}
-\usepackage{lmodern}
+\usepackage{newpxtext}
+\usepackage{euler}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{upquote}
@@ -25,6 +26,9 @@
 \usepackage{subfig}
 \usepackage{dirtree}
 \usepackage{wrapfig}
+\usepackage{excludeonly}
+\usepackage{enumitem}
+
 \usepgfplotslibrary{groupplots}
 \usepgfplotslibrary{fillbetween}
 \pgfplotsset{compat=1.13}
@@ -39,7 +43,7 @@
 \DeclareUnicodeCharacter{2060}{\nolinebreak}
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
 \providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
 \raggedbottom                           % try to avoid widows and orphans
 \sloppy
@@ -50,4 +54,40 @@
 % \addtolength{\evensidemargin}{-8mm}
 
 \renewcommand{\baselinestretch}{1.1}    % adjust line spacing to make
-                                        % more readable
+% more readable
+
+\numberwithin{listing}{chapter}
+
+\usepackage{titlesec}
+\usepackage{etoolbox}
+
+\makeatletter
+\patchcmd{\ttlh@hang}{\parindent\z@}{\parindent\z@\leavevmode}{}{}
+\patchcmd{\ttlh@hang}{\noindent}{}{}{}
+\makeatother
+
+% \titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\newcommand{\hsp}{\hspace{20pt}}
+\definecolor{gray75}{gray}{0.75}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
+
+% this alters "before" spacing (the second length argument) to 0
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+\titlespacing*{\section}{0pt}{0pt}{0pt}
+\titlespacing*{\subsection}{0pt}{0pt}{0pt}
+\titlespacing*{\subsubsection}{0pt}{0pt}{0pt}
+\titlespacing*{\paragraph}   {0pt}{0pt}{1em}
+
+
+% title spacing defaults
+% \titlespacing*{\chapter}     {0pt}{50pt}{40pt}
+% \titlespacing*{\section}     {0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
+% \titlespacing*{\subsection}   {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+% \titlespacing*{\subsubsection}{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+% \titlespacing*{\paragraph}   {0pt}{3.25ex plus 1ex minus .2ex}{1em}
+% \titlespacing*{\subparagraph} {\parindent}{3.25ex plus 1ex minus .2ex}{1em}
+
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+% \newcommand{\cmark}{\ding{52}}%
+\newcommand{\cmark}{{\color{green}\checkmark}}%
+\newcommand{\xmark}{{color{red} \ding{55}}}%

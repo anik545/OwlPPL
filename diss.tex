@@ -1,18 +1,19 @@
 %TC:group ocamlcode-in 0 0
+%TC:group table 1 1
+%TC:group tabular 1 1
 \documentclass[12pt,notitlepage,a4paper]{report}
 
 \usepackage{mydiss}
-
-\usepackage{excludeonly}
-\includeonly{chapters/introduction}
-% \includeonly{chapters/introduction,chapters/preparation,chapters/implementation}
+% \usepackage{euler}
+% \includeonly{chapters/introduction}
+\includeonly{chapters/introduction,chapters/preparation,chapters/implementation,chapters/conclusion}
+% \includeonly{chapters/introduction,chapters/preparation,chapters/implementation,chapters/evaluation}
 % \excludeonly{chapters/evaluation,chapters/appendices/documentation}
 %TC:ignore
 
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Title
-
 \pagestyle{empty}
 
 \hfill{\LARGE \bf Anik Roy}
@@ -38,11 +39,10 @@
 \pagestyle{plain}
 
 \include{chapters/frontmatter}
+\cleardoublepage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\cleardoublepage        % just to make sure before the page numbering
-% is changed
+% main chapters
 
 \setcounter{page}{1}
 \pagenumbering{arabic}
@@ -50,20 +50,10 @@
 
 %TC:endignore
 \include{chapters/introduction}
-% \cleardoublepage
-
 \include{chapters/preparation}
-% \cleardoublepage
-
 \include{chapters/implementation}
-% \cleardoublepage
-
 \include{chapters/evaluation}
-% \cleardoublepage
-
 \include{chapters/conclusion}
-% \cleardoublepage
-
 %TC:ignore
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
