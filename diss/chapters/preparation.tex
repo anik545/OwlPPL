@@ -64,6 +64,8 @@ type _ expr =
 With this GADT, we can ensure that booleans can't be combined with \texttt{Add}, and statically check that expressions are well-typed and will not fail to evaluate, which would not be possible with an ordinary ADT.
 	
 Type inference for GADTs is undecidable, and so type inference often fails when pattern matching on GADTs, especially for recursive functions. I often need to annotate functions as being explicitly polymorphic using the syntax \mintinline{ocaml}|let f: 'a.'a t -> 'a t = fun x -> ...|.
+
+$$\texttt{let f:}\overbrace{\texttt{'a.'a t -> 'a t}}^{\text{explicit for all 'a}}\texttt{= fun x -> ...}$$
 	
 \subsection{Monads}
 Monads are a design pattern commonly used in functional programming languages.

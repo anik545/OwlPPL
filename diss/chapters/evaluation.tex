@@ -14,14 +14,14 @@
 
 % show some output from merlin to show the fact that type inference works and is good?
 \chapter{Evaluation}
-So far, I have developed a PPL that can be used to define arbitrary probabilistic models and perform Bayesian inference on them. To evaluate the performance of my PPL, I will present some examples to show programs written in my PPL translated into equivalent programs in other PPLs, and then measure time and memory consumption of inference\footnote{All tests are carried out on a single core of an Intel\textsuperscript{(R)} Core\textsuperscript{(TM)} i5-7200U CPU @ 2.50GHz}. I will also determine the correctness of inference procedures by using hypothesis tests which use drawn samples to determine whether two distributions are the same or not.
+\textit{So far, I have developed a PPL that can be used to define arbitrary probabilistic models and perform Bayesian inference on them. To evaluate the performance of my PPL, I will present some examples to show programs written in my PPL translated into equivalent programs in other PPLs, and then measure time and memory consumption of inference\footnote{All tests are carried out on a single core of an Intel\textsuperscript{(R)} Core\textsuperscript{(TM)} i5-7200U CPU @ 2.50GHz}. I will also determine the correctness of inference procedures on simple problems by using hypothesis tests to assert posterior samples fit the expected distribution.}
 
 \section{Examples}
 To show how my PPL would be used on real problems, I now outline a set of example problems. Several examples here will be simple, and have analytic solutions - this is so that I can then test the correctness of applying inference on them. More complex realistic models are also included to test performance. Full derivations of the solutions as well as mathematical descriptions of the models are given in appendix \ref{app:examples}.
 
 \subsection{Sprinkler}
 % to show exact inference on discrete model
-The sprinkler model is a commonly used example in Bayesian inference due to it's simplicity. It is an example of a \textit{Bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}. The code in listing \ref{lst:sprinkler} shows the model in the diagram encoded as a program. This particular program can be used (by applying an inference function) to find the probability of rain given that the grass is wet.
+The sprinkler model is a commonly used example in Bayesian inference due to it's simplicity. It is an example of a \textit{Bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}. The code in listing \ref{lst:sprinkler} shows the model in the diagram encoded as a program. This particular program models the probability of rain given that the grass is wet.
 
 % \begin{noindent}
 \begin{figure*}[!htb]
@@ -53,13 +53,9 @@ let () =
 \subsection{Biased Coin} \label{sec:coin} 
 % to show analytically solvable continuous distribution
 % include graph of beta compared to computed posterior
-Modelling a biased coin shows an example of a very simple model with a continuous posterior that can be calculated analytically \cite{datasci}. 
+Modelling a biased coin shows an example of a very simple model with a continuous posterior that can be calculated analytically \cite{datasci}. The problem is that given a coin, we flip it 10 times and observe 9 heads. We not want to find out whether or not the coin is biased and with what weight (how likely is it to flip a heads). This model uses an uninformative prior, and the posterior over the weight of the coin is $\text{Beta}(10,2)$ (derivation given in \ref{app:coin})
 
-The model is of a coin that is tossed $n$ times to give $x$ heads. We do not know if the coin is biased or not, and would like to find out the bias, $p$ of the coin, where $p$ is the probability of heads, with $p=0.5$ being an unbiased coin.
-
-To find the posterior, we use an uninformative prior ($\Theta$), the uniform. This results in the posterior, the beta distribution, specifically Beta$(x+1,n-x+1)$.
-
-The program in my PPL is shown in listing \ref{lst:coin}, and demonstrates setting up the model, performing inference as well as finding the mean of the posterior. The application is to find the chance of the next coin flip landing heads. This example uses $n=10$ and $x=9$, so the mean produced is roughly 0.83, the mean of Beta$(10,2)$.
+The program in my PPL is shown in listing \ref{lst:coin}, and demonstrates setting up the model, performing inference as well as finding the mean of the posterior. The application is to find the chance of the next coin flip landing heads.
 
 \begin{listing}[!ht]
 	\ocamlcode{code_snippets/coin.ml}	
@@ -169,17 +165,21 @@ Table \ref{tab:ks-pvals} shows that for all the continuous models considered, th
 \section{Convergence of sampling}
 I also used the KL-divergence metric to determine the (dis)similarity of two distributions. The formula for KL Divergence of discrete distributions $P$ and $Q$ is easy to calculate by \eqref{eq:kl_disc}
 % 
-\[{D_{\text{KL}}(P\parallel Q)=\sum _{x\in {\mathcal {X}}}P(x)\log \left({\frac {P(x)}{Q(x)}}\right)}\] \label{eq:kl_disc}
+\begin{equation} \label{eq:kl_disc}
+	{D_{\text{KL}}(P\parallel Q)=\sum _{x\in {\mathcal {X}}}P(x)\log \left({\frac {P(x)}{Q(x)}}\right)} 
+\end{equation} 
 % 
 The continuous version is similar, with $p$ and $q$ now being density functions as in \eqref{eq:kl_cont}. 
 % 
-\[{D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx\] \label{eq:kl_cont}
+\begin{equation} \label{eq:kl_cont}	
+	{D_\text{KL}}(P\parallel Q)=\int _{-\infty }^{\infty }p(x)\log \left({\frac {p(x)}{q(x)}}\right)\,dx
+\end{equation} 
 % 
 % Since we cannot compute this integral exactly (we only have the exact density function for one of the distributions), I put the set of samples into discrete bins to approximate $q(x)$. I then used Monte Carlo integration to compute the integral. 
 Since I only have a set of samples from $q$, this integral can't be calculated exactly - there is no exact density function. However, there are ways to estimate density functions, as in (Perez 2008) \cite{perez2008kullback}. The first step is to approximate the cdf by finding the empirical cdf, $P_e$ \eqref{eq:pe} then linearly interpolating between points to produce a continuous function $P_c$ \eqref{eq:pc}. Estimating the derivative of $P_c$ then gives the pdf, $\hat{P}$ \eqref{eq:phat}. 
 % 
 \begin{align}
-	P_e(x)     & = \frac1{n}\sum_{i=1}^n U(x-x_i) ,        & \text{ where U is the step function}\label{eq:pe}      \\ 
+	P_e(x)     & = \frac1{n}\sum_{i=1}^n U(x-x_i) ,        & \text{ where $U$ is the step function}\label{eq:pe}    \\ 
 	P_c(x)     & = \begin{cases}                                                                                
 	0          & x<x_0                                                                                          \\
 	a_ix+b_i   & x_{i-1} \leq x \le x_i                                                                         \\
@@ -213,9 +213,9 @@ Figure \ref{fig:kl} shows the results of this test. For each inference procedure
 % probabilistic c (Paige14) makes the same comparison
 % TODO: measure performance with varying no. particles (measure KL with difference no. particles)
 
-I evaluated the performance of my ppl against Anglican and WebPPL. All of these languages are universal PPLs embedded in different host languages, so are comparable to my PPL. I only compare the inference algorithms for which there are comparable implementations in the other languages.
+I evaluated the performance of OwlPPL against Anglican and WebPPL. All of these languages are universal PPLs embedded in different host languages, so are comparable to my PPL. I only compare the inference algorithms for which there are comparable implementations in the other languages.
 
-Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares against these languages for a range of models and inference procedures. All the models have been introduced previously, and have been shown to produce correct results in my PPL when using the given inference procedures. I measure both running time and peak memory usage.
+Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares against these languages for a range of models and inference procedures. All the models have been introduced previously, and have been shown to produce correct results in my PPL when using the given inference procedures. I measure both running time\footnote{timed using libraries in respective languages} and peak memory usage\footnote{computed using \texttt{time -f "\%M"}}.
 
 \begin{figure}[!ht]
 	\centering
@@ -226,12 +226,17 @@ Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares aga
 
 \begin{figure}[!ht]
 	\centering
-	\input{tikz/mems_plot.tex}																									
-	\caption{Memory Usage of my ppl, compared against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
+	\input{tikz/mems_plot.tex}
+	\caption{Memory Usage of my PPL, compared against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:mem-perf}
 \end{figure}
 
-These graphs show that my PPL performs reasonably well compared to webPPL in both memory and time. It is less efficient for some models, but not excessively so. In particular, my implementation of a particle filter performs relatively poorly. This is possibly because when using a large number of particles, a large number of small memory allocations are made by OCaml, which introduced overhead both to my program and the garbage collector. The languages I compare with are both also garbage collected, but may be more optimised for this use case. Anglican is a Clojure library, which runs on the JVM, whereas WebPPL is run using nodejs, a JavaScript interpreter. It is possible there is an interpretive overhead with webPPL, explaining slower running times - however based on my results, it is not significant.
+These graphs show that OwlPPL performs consistently better that WebPPL in both memory and time. OwlPPL slightly outperforms anglican on the two continuous models, but is slower than Anglican for the discrete models. This may be because Anglican uses a more efficient representation for discrete distributions, and my representation may need to be optimised. Anglican is a Clojure library, which runs on the JVM, whereas WebPPL is run using nodejs, a JavaScript interpreter. It is possible there is an interpretive overhead with webPPL, explaining slower running times - however based on my results, it is not significant. 
+
+My PPL is significantly better than both Anglican and WebPPL in terms of peak memory usage. All three languages are garbage collected, but Ocaml does not run code through a virtual machine, and native binaries are generated. This could explain the lower memory usage, with the overheads of the JVS and the node runtime dominating in those languages.
+
+% SMC bad:
+% This is possibly because when using a large number of particles, a large number of small memory allocations are made by OCaml, which introduced overhead both to my program and the garbage collector.  The languages I compare with are both also garbage collected, but may be more optimised for this use case. 
 
 % TODO: add clustering model
 I also measured the running time of inference with increased data used - I tested the linear regression model, increasing the length of the arrays used as input. Models which are conditioned on more data are expected to give more accurate results, and my results show that running time increases linearly with the size of data. Figure \ref{fig:time-datasize} shows that all the inference functions run in time linear to the size of the input, but the constant factors vary substantially - for example, Sequential Monte Carlo has a much steeper gradient than Metropolis-Hastings, for example, but both have the same shape. This also shows how some inference procedures take much more time than others, however, this often results in more accurate results. For example, smc is slower than rejection sampling here, but Figure \ref{fig:kl} shows that smc produces posterior distributions which are closer to exact solutions. The y axis has a log scale, showing the large difference in running time for each method.

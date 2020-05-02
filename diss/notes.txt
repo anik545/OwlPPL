@@ -84,7 +84,8 @@ talk about some real world applications
 
 talk about the name, owlppl
 
-add a pie chart of gprof output
+add a pie chart of gprof output??
 add a line chart of memory usage over time from spacetime.
+on that line chart, add lines for the other languages as well
 
 ppl -> PPL

@@ -1,20 +1,33 @@
-% !TeX root = ../../diss.tex
+% !TeX root = ../a.tex
 
 \newcommand{\perfgraphm}[1]{
 	\pgfplotstableread[col sep = comma]{#1}\datatable
 	\pgfplotstablegetcolsof{\datatable}
 	\pgfmathtruncatemacro\numberofcols{(\pgfplotsretval-1)*0.5}
-																																																															    
+																																																																																								    
 	\pgfplotsinvokeforeach{1,...,\numberofcols}{
 		\pgfmathtruncatemacro\e{##1 + \numberofcols}
 		\pgfplotstablegetcolumnnamebyindex{##1}\of{\datatable}\to{\colname}
-		\addplot+[error bars/.cd, y dir=both, y explicit,  error bar style={color=black}] table [x expr=\coordindex,y index=##1, col sep=comma, y error index=\e] {#1};
+		\addplot+[			
+			% draw opacity=0,
+			error bars/.cd, 
+			y dir=both, 
+			y explicit,  
+			error bar style={color=black}
+		] 
+		table
+		[
+			x expr=\coordindex,
+			y index=##1, 
+			col sep=comma, 
+			y error index=\e
+		] {#1};
 		\addlegendentryexpanded{\colname}
 	}
 }
 
 \begin{tikzpicture}
-	\pgfplotstableread[col sep = comma]{data/perf/memory/mems_coin.csv}\t														
+	\pgfplotstableread[col sep = comma]{data/perf/memory/mems_coin.csv}\t
 	\begin{groupplot}[
 			group style={
 				group name=my plots,
@@ -23,14 +36,16 @@
 				ylabels at=edge left,
 				vertical sep=1.8cm,
 				horizontal sep=0.2cm,
-				yticklabels at=edge left
+				yticklabels at=edge left,
 			},
+			% enlarge x limits=0.5,
+			enlarge x limits={abs=0.3},
 			ylabel={memory},
 			ymin=0,ymax=460000,
-			ybar,
+			% ybar,
+			ybar=0,
 			xtick=data,
 			xticklabels from table={\t}{model},
-			enlarge x limits={abs=0.3},
 			title={Title}
 		]
 		\nextgroupplot[title=Biased Coin, legend to name=leg]
@@ -51,4 +66,4 @@
 	\node[below] at (c3 |- current bounding box.south)
 	{\pgfplotslegendfromname{leg}};
 \end{tikzpicture}
-
+						
