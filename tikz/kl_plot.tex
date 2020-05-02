@@ -1,7 +1,7 @@
 % !TeX root = ../a.tex
 
 \newcommand{\kls}[1]{
-																																										
+																																														
 	\pgfplotstableread[col sep = comma]{#1}\datatable
 	\pgfplotstablegetcolsof{\datatable}
 	\pgfmathtruncatemacro\numberofcols{\pgfplotsretval-1}
@@ -13,6 +13,7 @@
 }
 
 \begin{tikzpicture}
+	\pgfplotsset{every axis plot/.append style={line width=1pt}}
 	\begin{groupplot}[			
 			group style={
 				group name=my plots,
@@ -28,7 +29,7 @@
 			height=8cm,
 			ylabel={KL divergence},
 			xlabel={Number of samples},
-			ymode=log, 
+			ymode=log,
 			xmode=log
 		]
 		%
@@ -61,5 +62,5 @@
 	\coordinate (c3) at ($(c1)!.5!(c2)$);
 	\node[below] at (c3 |- current bounding box.south)
 	{\pgfplotslegendfromname{leg1}};
-																																																																																								
+																																																																																												
 \end{tikzpicture}

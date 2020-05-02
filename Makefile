@@ -61,7 +61,7 @@ submit: diss.pdf ar899.tar.gz
 	cp out/diss.pdf ../ar899.pdf
 	cp ar899.tar.gz ../ar899.tar.gz
 
-upload: diss.pdf ar899.tar.gz
+upload: submit
 	scp out/diss.pdf srcf:~/public_html
 	scp ar899.tar.gz srcf:~/public_html
 
