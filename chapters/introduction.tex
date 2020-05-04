@@ -1,10 +1,10 @@
 % !TeX root = ../diss.tex
 \chapter{Introduction}
 
-\textit{This dissertation presents a universal probabilistic programming language, OwlPPL, implemented as a domain specific language embedded within OCaml. I discuss the design decisions involved in developing this system and evaluate its performance and suitability as a tool to be used in data science}.
+\textit{This dissertation presents a universal probabilistic programming language, OwlPPL, implemented as a domain specific language embedded within OCaml. I discuss the design decisions involved in developing this system. and evaluate its performance and suitability as a tool to be used in data science}.
 
 \section{Motivation}
-Creating statistical models and performing inference on these models is key to data science. Such modelling involves formulating a prior belief over some parameters, the generative model ($p(x)$), and a set of conditions ($p(y|x)$) which specify the likelihood of observed data given the parameters. The goal is then to find the posterior, the (inferred) distribution over the parameters given the data we observe ($p(y|x)$). In general, this kind of Bayesian inference is intractable, so we must use methods which approximate the posterior.
+Creating statistical models and performing inference on these models is key to data science. Such modelling involves formulating a prior belief over some parameters, the generative model ($p(x)$), and a set of conditions ($p(y|x)$) which specify the likelihood of observed data given the parameters. The goal is then to find the posterior, the (inferred) distribution over the parameters given the data we observe ($p(x|y)$). In general, this kind of Bayesian inference is intractable, so we must use methods which approximate the posterior.
 
 A probabilistic programming languages (PPL) is a language used to create complex models through composition of simpler models and probability distributions, and allows inference to be performed automatically on these models. The problem of efficient inference is then separated from the specification of the model. Inference code can be written and optimised once, independent of specific models and probabilistic models can be written by domain experts, without having to worry about hand-writing inference. The inference `engine' can also implement many different inference algorithms, allowing selection of methods appropriate to the models being used.
 
@@ -29,12 +29,9 @@ There are many examples of PPLs, both as DSLs embedded into other languages (inc
 		STAN \cite{carpenter2017stan}      & N/A                  & \xmark             & \cmark                            & 2012          \\
 		Anglican \cite{anglican-smc}       & Clojure              & \cmark             & \cmark                            & 2014          \\
 		WebPPL \cite{mobus2018structure}   & JavaScript (node)    & \cmark             & \cmark                            & 2018          \\
+		Pyro \cite{bingham2019pyro}        & Python               & \cmark             & \cmark                            & 2019          \\
+		OwlPPL                             & OCaml                & \cmark             & \cmark                            & 2020          \\
 	\end{tabular}
 	\caption{A collection of PPLs}
 	\label{tab:ppl-summ}
 \end{table}
-% mention what has been done - core and some extensions
-% (here or abstract)
-
-
-% TODO: mention "challenges", show non-trivial

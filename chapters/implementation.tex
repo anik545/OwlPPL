@@ -72,7 +72,7 @@ An extension goal achieved here is to allow users to define their own primitive 
 	
 The type of a primitive distribution is 
 \begin{center}
-																										
+																												
 	\mintinline{ocaml}| type 'a prim_dist = (module PRIM_DIST with type t='a)|
 \end{center}
 with the \texttt{PRIM\_DIST} signature defined as in listing \ref{lst:prim-sig}.
@@ -85,7 +85,7 @@ with the \texttt{PRIM\_DIST} signature defined as in listing \ref{lst:prim-sig}.
 		\label{lst:prim-sig}
 	\end{minipage}
 	\begin{minipage}{0.5\textwidth}
-		\ocamlcode{code_snippets/new_dist.ml}	
+		\ocamlcode{code_snippets/new_dist.ml}
 		\captionof{listing}{Adding a new distribution as a primitive}
 		\label{lst:new-dist}
 	\end{minipage}
@@ -481,7 +481,7 @@ For primitive continuous distributions, a smooth line can also be drawn since we
 
 Testing systems which are inherently random can be tricky, as it is difficult to test behaviour that is expected to change from one execution to the next. For a PPL, the most important functions to test are inference procedures, and ensuring the posterior samplers that are returned are correct. The issue is that the sequence of samples generated will change every run.
 
-One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. The desired property here is that the samples fit a distribution, not that the same sequence is generated. For example, for sampling from $X ~ Bernoulli(0.5)$, we might observe true,false,true,false. However, the sequence of false,true,false,true would also satisfy the distribution (and be correct), but would fail the test. Even with a fixed random seed, a change in code may cause new outputs even though the fundamental statistical property desired hasn't changed.
+One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. The desired property here is that the samples fit a distribution, not that the same sequence is generated. For example, for sampling from $X \tilde Bernoulli(0.5)$, we might observe true,false,true,false. However, the sequence of false,true,false,true would also satisfy the distribution (and be correct), but would fail the test. Even with a fixed random seed, a change in code may cause new outputs even though the fundamental statistical property desired hasn't changed.
 
 Another approach is to perform a hypothesis test such as kolmogorov-smirnov \cite{massey1951kolmogorov}, to ensure distributions produced by my library are equal to what is expected. The null hypothesis is that the samples do not fit the distribution, and we aim to reject this. A problem with tests of this kind is that they are expected to fail sometimes. They can either give a false positive where we reject a true null hypothesis (Type 1 error) or fail to reject a false null hypothesis (Type 2 error). In unit testing terms, our tests will sometimes fail for functions that work, and sometimes succeed for functions that are subtly broken. So unit tests based on hypothesis tests will be flaky. In fact, we expect these tests to fail a certain percentage of the time - if they do not sometimes fail there is a problem with our program.
 % maybe put the type 1/type 2 error diagram here?
