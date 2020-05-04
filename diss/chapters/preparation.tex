@@ -50,15 +50,15 @@ I have chosen to use the OCaml language to implement my PPL. There are many feat
 The main data structure I use to represent distributions is a generalised algebraic data type (GADT). GADTs are similar to ADTs (sum types), as they have a set of constructors, but these constructors can have their output types annotated with different return types. This makes GADTs more general than normal ADTs, whose return types are all the same. An example is a GADT to represent expressions, and the corresponding ADT:
 
 % \begin{noindent}
-\begin{listing}
-\centering
-\begin{cminted}{ocaml}
-type _ expr = 
-    F : float -> float expr
-  | B : bool -> bool expr
-  | Add: float expr * float expr -> float expr
-\end{cminted}
-\end{listing}
+% \begin{listing}
+% \centering
+% \begin{cminted}{ocaml}
+% type _ expr = 
+%     F : float -> float expr
+%   | B : bool -> bool expr
+%   | Add: float expr * float expr -> float expr
+% \end{cminted}
+% \end{listing}
 % \end{noindent}
 
 % \begin{noindent}
@@ -85,7 +85,7 @@ type _ expr =
 			Add(F 0.5, B true)
 		\end{ocamlcode-in}
 	\end{minipage}
-	captionof{listing}{GADT vs ADT}
+	\captionof{listing}{GADT vs ADT}
 \end{figure*}
 % \end{noindent}
 
@@ -104,7 +104,7 @@ It has been shown that probability distributions form a monad, \cite{giry1982cat
 	
 	
 \paragraph{Custom let operators}
-Ocaml 4.08 allows me to define definitions for custom let operators. This is used to provide syntactic sugar for working with monads, and is similar to do-notation in Haskell. The reference documentation \footnote{\url{http://caml.inria.fr/pub/distrib/ocaml-4.08/ocaml-4.08-refman.html}} outlines this, and a monad should provide a module which implements the (let*) and (and*) operators. The (let*) operator is the standard bind function - it takes the identifier bound to as the first argument to the function in bind. The (and*) operator is the product operation, it takes two monads and returns the monad pair - it has signature \texttt{'a m -> 'b m -> ('a * 'b) m}, where m is the monad type. An example, using the Option monad is given below to show the transformation that takes place. This syntax allows the user to not have to use the bind (or the alias \texttt{>>=}) explicitly, and offers a more intuitive syntax.
+Ocaml 4.08 allows me to define definitions for custom let operators. This is used to provide syntactic sugar for working with monads, and is similar to do-notation in Haskell. The reference documentation \footnote{\url{http://caml.inria.fr/pub/distrib/ocaml-4.08/ocaml-4.08-refman.html}} outlines this, and a monad should provide a module which implements the (let*) and (and*) operators. The (let*) operator is the standard bind function - it takes the identifier bound to as the first argument to the function in bind. The (and*) operator is the product operation, it takes two monads and returns the monad pair - it has signature \texttt{'a m -> 'b m -> ('a * 'b) m}, where m is the monad type. An example, using the Option monad is given below to show the transformation that takes place. This syntax allows the user to not have to use the bind (often aliased by >>=) or product functions explicitly, and offers a more intuitive syntax.
 	
 % TODO: add text within frame
 % \begin{noindent}
@@ -115,9 +115,9 @@ Ocaml 4.08 allows me to define definitions for custom let operators. This is use
 		\begin{ocamlcode-in}
 			open Option
 			(* new syntax *)
-			let add_options x y = 
+			let add_options x y z = 
 			  let* a = x in
-			  let* b = y in
+			  and* b = y in
 			  Some (a+b)
 		\end{ocamlcode-in}
 	\end{minipage}
@@ -127,8 +127,8 @@ Ocaml 4.08 allows me to define definitions for custom let operators. This is use
 			open Option
 			(* old syntax *)
 			let add_options x y = 
-			  x >>= (fun a -> 
-			    y >>= (fun b ->
+			  (product x y)
+			    >>= (fun (a,b) -> 
 			      Some (a+b)))
 		\end{ocamlcode-in}
 	\end{minipage}
