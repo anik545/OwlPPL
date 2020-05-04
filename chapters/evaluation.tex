@@ -28,8 +28,8 @@ The sprinkler model is a commonly used example in Bayesian inference due to it's
 	\centering
 	\begin{minipage}{0.47\linewidth}
 		\ocamlcode{code_snippets/sprinkler.ml}	
-		\captionof{listing}{Sprinkler model in code}
-		\label{lst:sprinkler}						
+		\captionof{listing}{Sprinkler model in OwlPPL}
+		\label{lst:sprinkler}
 	\end{minipage}
 	\begin{minipage}{0.47\linewidth}
 		\includegraphics[width=\linewidth]{figs/sprinkler-network.png}
@@ -231,9 +231,9 @@ Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares aga
 	\label{fig:mem-perf}
 \end{figure}
 
-These graphs show that OwlPPL performs consistently better that WebPPL in both memory and time. OwlPPL slightly outperforms anglican on the two continuous models, but is slower than Anglican for the discrete models. This may be because Anglican uses a more efficient representation for discrete distributions, and my representation may need to be optimised. Anglican is a Clojure library, which runs on the JVM, whereas WebPPL is run using nodejs, a JavaScript interpreter. It is possible there is an interpretive overhead with webPPL, explaining slower running times - however based on my results, it is not significant. 
+These graphs show that OwlPPL performs consistently better that WebPPL in both memory and time. OwlPPL slightly outperforms anglican on the two continuous models, but is slower than Anglican for the discrete models. This may be because Anglican uses a more efficient representation for discrete distributions, and my representation may need to be optimised. Anglican is a Clojure library, which runs on the JVM, whereas WebPPL is run using nodejs, a JavaScript interpreter. It is possible there is an interpretive overhead with webPPL, explaining slower running times. 
 
-My PPL is significantly better than both Anglican and WebPPL in terms of peak memory usage. All three languages are garbage collected, but Ocaml does not run code through a virtual machine, and native binaries are generated. This could explain the lower memory usage, with the overheads of the JVS and the node runtime dominating in those languages.
+My PPL is significantly better than both Anglican and WebPPL in terms of peak memory usage. All three languages are garbage collected, but Ocaml does not run code through a virtual machine, and native binaries are generated. This could explain the lower memory usage, with the overheads of the JVM and the node runtime dominating in those languages.
 
 % SMC bad:
 % This is possibly because when using a large number of particles, a large number of small memory allocations are made by OCaml, which introduced overhead both to my program and the garbage collector.  The languages I compare with are both also garbage collected, but may be more optimised for this use case. 
