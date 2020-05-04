@@ -21,6 +21,7 @@ type _ dist =
   (* | Bind_var: 'a var_dist * ('a -> 'b dist) -> 'b dist *)
   | Primitive : 'a Primitive.t -> 'a dist
   | Conditional : ('a -> prob) * 'a dist -> 'a dist
+  | Independent : 'a dist * 'b dist -> ('a * 'b) dist
 
 (* | Conditional: ('a -> float) * 'a var_dist -> 'a dist *)
 (* | Observe: 'a Primitive.primitive * 'a * 'a dist -> 'a dist *)
@@ -49,10 +50,12 @@ include Make_Extended (struct
   let bind d f = Bind (d, f)
 end)
 
-let ( and* ) d1 d2 =
+(* let ( and* ) d1 d2 =
   let* x = d1 in
   let* y = d2 in
-  Return (x, y)
+  Return (x, y) *)
+
+let ( and* ) d1 d2 = Independent (d1, d2)
 
 let discrete_uniform xs = Primitive (Primitive.discrete_uniform xs)
 
@@ -93,17 +96,18 @@ let beta a b = Primitive (Primitive.beta a b)
 
 let continuous_uniform a b = Primitive (Primitive.continuous_uniform a b)
 
-let rec sample : 'a. 'a dist -> 'a = function
+let rec sample : type a. a dist -> a = function
   | Return x -> x
   | Bind (d, f) ->
       let y = f (sample d) in
       sample y
   | Primitive d -> Primitive.sample d
+  | Independent (d1, d2) -> (sample d1, sample d2)
   | Conditional (_, _) -> raise Undefined
 
 (* | Independent (d1,d2) -> sample d1, sample d2 *)
 
-let rec sample_n : 'a. int -> 'a dist -> 'a array =
+let rec sample_n : type a. int -> a dist -> a array =
  fun n -> function
   | Return x -> Array.init n (fun _ -> x)
   | Bind (d, f) ->
@@ -111,9 +115,10 @@ let rec sample_n : 'a. int -> 'a dist -> 'a array =
       Array.map sample y
   | Primitive d -> Array.init n (fun _ -> Primitive.sample d)
   | Conditional (_, _) -> raise Undefined
+  | Independent (d1, d2) -> Core.Array.zip_exn (sample_n n d1) (sample_n n d2)
 
 (* same as sample (prior_with_score d) *)
-let rec sample_with_score : 'a. 'a dist -> 'a * likelihood = function
+let rec sample_with_score : type a. a dist -> a * likelihood = function
   | Return x -> (x, one)
   | Bind (d, f) ->
       let y, s = sample_with_score d in
@@ -128,6 +133,10 @@ let rec sample_with_score : 'a. 'a dist -> 'a * likelihood = function
   | Conditional (lik, d) ->
       let x, s = sample_with_score d in
       (x, s *. lik x)
+  | Independent (d1, d2) ->
+      let x1, s1 = sample_with_score d1 in
+      let x2, s2 = sample_with_score d2 in
+      ((x1, x2), s1 *. s2)
 
 let rec prior' : 'a. 'a dist -> 'a dist = function
   | Conditional (_, d) -> prior' d
@@ -147,7 +156,7 @@ let rec prior : 'a. 'a dist -> ('a * prob) dist = function
       return (x, one)
 
 (* same as sample_with_score *)
-let rec prior_with_score : 'a. 'a dist -> ('a * prob) dist = function
+let rec prior_with_score : type a. a dist -> (a * prob) dist = function
   | Conditional (c, d) ->
       let* x, s = prior_with_score d in
       return (x, s *. c x)
@@ -159,16 +168,14 @@ let rec prior_with_score : 'a. 'a dist -> ('a * prob) dist = function
       let* x = Primitive d in
       return (x, of_float @@ Primitive.pdf d x)
   | Return x -> return (x, one)
-
-(* | Independent(d1,d2) -> 
-   let* x,s1 = prior_with_score d1 
-   and* y,s2 = prior_with_score d2 in
-   ((x,y),s1*.s2) *)
+  | Independent (d1, d2) ->
+      let* x, s1 = prior_with_score d1 and* y, s2 = prior_with_score d2 in
+      return ((x, y), s1 *. s2)
 
 let dist_of_n_samples n (d : 'a dist) : 'a list dist =
   sequence @@ Core.List.init n ~f:(fun _ -> d)
 
-let rec support : 'a. 'a dist -> 'a list = function
+let rec support : type a. a dist -> a list = function
   | Bind (d, f) ->
       let supp = support d in
       Core.List.concat_map ~f:(fun x -> support (f x)) supp
@@ -178,6 +185,7 @@ let rec support : 'a. 'a dist -> 'a list = function
       | DiscreteFinite xs -> xs
       | _ -> raise Undefined )
   | Return x -> [ x ]
+  | Independent (d1, d2) -> Core.List.zip_exn (support d1)  (support d2)
 
 module PplOps = struct
   let ( +~ ) = liftM2 Base.Int.( + )

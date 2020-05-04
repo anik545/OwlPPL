@@ -12,3 +12,6 @@ let resample xs =
   let old_dist = categorical xs in
   (* generate new particles from th *)
   sequence @@ List.init n ~f:(fun _ -> fmap (fun x -> (x, one)) old_dist)
+
+let cartesian l l' =
+  List.concat (List.map ~f:(fun e -> List.map ~f:(fun e' -> (e, e')) l') l)

@@ -77,34 +77,23 @@ A set of weighted samples, summing to one
 
 \protect\hyperlink{type-dist}{}\texttt{type\ \_\ dist}\texttt{\ =\ private\ }
 
-\begin{longtable}[c]{@{}ll@{}}
-\toprule
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
 \protect\hyperlink{type-dist.Return}{}\texttt{\textbar{}\ }\texttt{Return\ :\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}a\ dist}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+
 distribution with a single value
-\strut\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+
 \protect\hyperlink{type-dist.Bind}{}\texttt{\textbar{}\ }\texttt{Bind\ :\ \textquotesingle{}a\ dist\ *\ (\textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b\ dist)\ -\textgreater{}\ \textquotesingle{}b\ dist}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+
 monadic bind
-\strut\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+
 \protect\hyperlink{type-dist.Primitive}{}\texttt{\textbar{}\ }\texttt{Primitive\ :\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}a\ dist}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+
 primitive exact distribution
-\strut\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+
 \protect\hyperlink{type-dist.Conditional}{}\texttt{\textbar{}\ }\texttt{Conditional\ :\ (\textquotesingle{}a\ -\textgreater{}\ likelihood)\ *\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}
-\strut\end{minipage} &
-\begin{minipage}[t]{0.47\columnwidth}\raggedright\strut
+
 variant that defines likelihood model
-\strut\end{minipage}\tabularnewline
-\bottomrule
-\end{longtable}
+
+\protect\hyperlink{type-dist.Independent}{}\texttt{\textbar{}\ }\texttt{Independent\ :\ \textquotesingle{}a\ dist\ *\ \textquotesingle{}b\ dist\ -\textgreater{}\ (\textquotesingle{}a\ *\ \textquotesingle{}b)\ dist}
 
 Type for representing distributions
 
@@ -145,6 +134,8 @@ Functions}{Monad Functions}}\label{distux5fmonad}}
 \protect\hyperlink{val-mapM}{}\texttt{val\ mapM\ :\ (\textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}b\ t)\ -\textgreater{}\ \textquotesingle{}a\ list\ -\textgreater{}\ \textquotesingle{}b\ list\ t}
 
 \protect\hyperlink{val-sequence}{}\texttt{val\ sequence\ :\ \textquotesingle{}a\ t\ list\ -\textgreater{}\ \textquotesingle{}a\ list\ t}
+
+\protect\hyperlink{val-andux2a}{}\texttt{val\ and*\ :\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}b\ dist\ -\textgreater{}\ (\textquotesingle{}a\ *\ \textquotesingle{}b)\ dist}
 
 \hypertarget{distux5fprims}{\subsubsection{\texorpdfstring{\protect\hyperlink{distux5fprims}{}Primitives}{Primitives}}\label{distux5fprims}}
 

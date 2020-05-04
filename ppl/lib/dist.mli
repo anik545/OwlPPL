@@ -25,6 +25,7 @@ type _ dist = private
   | Primitive : 'a Primitive.t -> 'a dist  (** primitive exact distribution *)
   | Conditional : ('a -> likelihood) * 'a dist -> 'a dist
       (** variant that defines likelihood model *)
+  | Independent : 'a dist * 'b dist -> ('a * 'b) dist
 
 (* | Conditional: ('a -> float) * 'a var_dist -> 'a dist *)
 

@@ -3,7 +3,7 @@ open Core
 open Dist
 
 (* sequential monte carlo - particle filter *)
-let rec smc : 'a. int -> 'a dist -> 'a samples dist =
+let rec smc : type a. int -> a dist -> a samples dist =
  fun n -> function
   (* at each piece of evidence/data, update each particle by the weight given by c *)
   | Conditional (c, d) ->
@@ -37,6 +37,12 @@ let rec smc : 'a. int -> 'a dist -> 'a samples dist =
       |> sequence
   (* initialise n particles with the same value and weight *)
   | Return x -> List.init n ~f:(fun _ -> return (x, Prob.one)) |> sequence
+  | Independent (d1, d2) ->
+      let* particles1 = smc n d1 in
+      let* particles2 = smc n d2 in
+      cartesian particles1 particles2
+      |> List.map ~f:(fun ((x1, p1), (x2, p2)) -> ((x1, x2), Prob.(p1 *. p2)))
+      |> return
 
 let smc' n d =
   let* l = smc n d in
