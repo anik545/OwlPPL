@@ -44,6 +44,8 @@ val from_primitive : 'a Primitive.t -> 'a dist
 
 include Monad.Monad with type 'a t := 'a dist
 
+val ( and* ) : 'a dist -> 'b dist -> ('a * 'b) dist
+
 (** {2:dist_prims Primitives} 
     These functions create {!type-dist} values which correspond to primitive distributions 
     so that they can be used in models. Ok

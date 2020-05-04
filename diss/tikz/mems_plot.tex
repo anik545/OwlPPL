@@ -4,7 +4,7 @@
 	\pgfplotstableread[col sep = comma]{#1}\datatable
 	\pgfplotstablegetcolsof{\datatable}
 	\pgfmathtruncatemacro\numberofcols{(\pgfplotsretval-1)*0.5}
-																																																																																								    
+																																																																																									    
 	\pgfplotsinvokeforeach{1,...,\numberofcols}{
 		\pgfmathtruncatemacro\e{##1 + \numberofcols}
 		\pgfplotstablegetcolumnnamebyindex{##1}\of{\datatable}\to{\colname}
@@ -39,6 +39,7 @@
 				yticklabels at=edge left,
 			},
 			% enlarge x limits=0.5,
+			typeset ticklabels with strut,
 			enlarge x limits={abs=0.3},
 			ylabel={memory},
 			ymin=0,ymax=460000,

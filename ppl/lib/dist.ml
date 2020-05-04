@@ -25,8 +25,8 @@ type _ dist =
 (* | Conditional: ('a -> float) * 'a var_dist -> 'a dist *)
 (* | Observe: 'a Primitive.primitive * 'a * 'a dist -> 'a dist *)
 (* TODO: uncomment + fix *)
-(* | Independent: 'a dist * 'b dist -> ('a * 'b) dist
-   let (and+) d1 d2 = Independent(d1,d2) *)
+(* | Independent : 'a dist * 'b dist -> ('a * 'b) dist *)
+
 (* let observe x dst d = Observe(dst,x,d) *)
 let condition' c d = Conditional (Core.Fn.compose of_float c, d)
 
@@ -48,6 +48,11 @@ include Make_Extended (struct
 
   let bind d f = Bind (d, f)
 end)
+
+let ( and* ) d1 d2 =
+  let* x = d1 in
+  let* y = d2 in
+  Return (x, y)
 
 let discrete_uniform xs = Primitive (Primitive.discrete_uniform xs)
 

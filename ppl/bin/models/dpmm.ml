@@ -39,9 +39,12 @@ let dp_mixture data =
 open Ppl
 open Core
 
-let rec stick (b :: breaks) (a :: atoms) =
-  let* keep = bernoulli b in
-  if keep then return a else stick breaks atoms
+let rec stick bs ats =
+  match (bs, ats) with
+  | b :: breaks, a :: atoms ->
+      let* keep = bernoulli b in
+      if keep then return a else stick breaks atoms
+  | _ -> failwith "fail"
 
 let breaks _ = memo (fun _ -> sample (beta 1. 1.))
 
@@ -95,7 +98,7 @@ let ns = sample_mean ~n:1000 (infer (fmap count_unique dpMixture) (MH 2000))
 
 let () =
   Array.iter
-    ~f:(fun l ->
+    ~f:(fun _ ->
       List.iter s ~f:(printf "%d ");
       printf "\n")
     dd

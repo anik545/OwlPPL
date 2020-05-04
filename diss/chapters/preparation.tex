@@ -47,24 +47,51 @@ Using OCaml 4.08 allows me to use new features of OCaml, in particular the abili
 I have chosen to use the OCaml language to implement my PPL. There are many features of OCaml which make it suitable for writing a DSL. Using OCaml, I can make sure that expressions in the DSL are well-typed, so that programs don't fail to run. OCaml's algebraic datatypes make it easy to represent probabilistic programs as trees, and pattern matching makes it easy to `interpret' and transform these trees. The module system also makes sure that certain types are hidden from the user, which ensures only valid values are created by the user.
 
 \subsection{GADTs}
-The main data structure I use to represent distributions is a generalised algebraic data type (GADT). GADTs are similar to ADTs (sum types), as they have a set of constructors, but these constructors can have their output types annotated with different return types. This makes GADTs more general than normal ADTs, whose return types are all the same. An example is a datatype to represent expressions:
+The main data structure I use to represent distributions is a generalised algebraic data type (GADT). GADTs are similar to ADTs (sum types), as they have a set of constructors, but these constructors can have their output types annotated with different return types. This makes GADTs more general than normal ADTs, whose return types are all the same. An example is a GADT to represent expressions, and the corresponding ADT:
 
 % \begin{noindent}
 \begin{listing}
 \centering
 \begin{cminted}{ocaml}
 type _ expr = 
-    F : float -> float t 
-  | B : bool -> bool t 
-  | Add: float t * float t -> float t
+    F : float -> float expr
+  | B : bool -> bool expr
+  | Add: float expr * float expr -> float expr
 \end{cminted}
 \end{listing}
 % \end{noindent}
-	
+
+% \begin{noindent}
+\begin{figure*}[!hbt]
+	\begin{minipage}{0.5\linewidth}
+		\begin{ocamlcode-in}
+			type _ expr = 
+			    F   : float -> float expr
+			  | B   : bool -> bool expr
+			  | Add : float expr * float expr 
+			        -> float expr
+			(* correctly doesn't type check *)
+			Add(F 0.5, B true)
+		\end{ocamlcode-in}
+	\end{minipage}
+	\begin{minipage}{0.5\linewidth}
+		\begin{ocamlcode-in}
+			type 'a expr = 
+			    F   of float 
+			  | B   of bool 
+			  | Add of float expr * float expr 
+			
+			(* type checks but wont evaluate *)
+			Add(F 0.5, B true)
+		\end{ocamlcode-in}
+	\end{minipage}
+	captionof{listing}{GADT vs ADT}
+\end{figure*}
+% \end{noindent}
+
 With this GADT, we can ensure that booleans can't be combined with \texttt{Add}, and statically check that expressions are well-typed and will not fail to evaluate, which would not be possible with an ordinary ADT.
 	
-Type inference for GADTs is undecidable, and so type inference often fails when pattern matching on GADTs, especially for recursive functions. I often need to annotate functions as being explicitly polymorphic using the syntax \mintinline{ocaml}|let f: 'a.'a t -> 'a t = fun x -> ...|.
-
+Type inference for GADTs is undecidable, and so type inference often fails when pattern matching on GADTs, especially for recursive functions. I often need to annotate functions as being explicitly polymorphic using the syntax
 $$\texttt{let f:}\overbrace{\texttt{'a.'a t -> 'a t}}^{\text{explicit for all 'a}}\texttt{= fun x -> ...}$$
 	
 \subsection{Monads}
@@ -91,7 +118,7 @@ Ocaml 4.08 allows me to define definitions for custom let operators. This is use
 			let add_options x y = 
 			  let* a = x in
 			  let* b = y in
-			  x+y
+			  Some (a+b)
 		\end{ocamlcode-in}
 	\end{minipage}
 	\begin{minipage}{0.45\textwidth}
@@ -102,7 +129,7 @@ Ocaml 4.08 allows me to define definitions for custom let operators. This is use
 			let add_options x y = 
 			  x >>= (fun a -> 
 			    y >>= (fun b ->
-			      a+b))
+			      Some (a+b)))
 		\end{ocamlcode-in}
 	\end{minipage}
 	\captionof{listing}{New let syntax which makes monadic binds easier to express}
@@ -148,7 +175,7 @@ This represents marginalising $x$ out of the joint distribution by summing over 
 % 	\item X is distributed according to 
 % \end{itemize} 
 
-This requires us to compute the cdf
+% This requires us to compute the cdf
 % TODO: put inversion sampling here?
 % 
 In the PPL setting, the prior is the generative model we define. Conditioning statements define the likelihood model. Running the program forward without inference produces samples from the prior. Running inference on the program should then produces a new distribution, the posterior. Since the exact distribution can't be computed, inference algorithms I implement will return distributions which can only be sampled from. Other statistics can then be computed only by taking a large number of samples.
@@ -162,7 +189,9 @@ In the PPL setting, the prior is the generative model we define. Conditioning st
 
 Inference algorithms are ways to systematically generate samples from posterior distributions given a likelihood function and a prior distribution. In probabilistic programming, a model consists of latent (internal) variables and observed variables, and a single execution of a model (a program) can be thought of as an assignment to each of these variables, known as an \textit{execution trace}. This can be defined mathematically as below, by Bayes' rule:
 % 
-\[p(x_{1:N}\mid y_{1:N})\propto \tilde{p}(y_{1:N},x_{1:N})\]\label{eq:trace}
+\begin{equation} \label{eq:trace}
+	p(x_{1:N}\mid y_{1:N})\propto \tilde{p}(y_{1:N},x_{1:N})
+\end{equation}
 % 
 Note that the trace may have a different number of variables each time a model is run, due to the fact that we allow general models which allow for unbounded recursion. 
 
