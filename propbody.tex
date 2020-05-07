@@ -11,7 +11,7 @@
 	{\large 2349E}
 	\vspace{0.1in}
 	% {\large \today} \\
-							
+			
 \end{center}
 \vspace{0.4in}
 
@@ -44,11 +44,11 @@ The power of a probabilistic programming language comes in being able to describ
 
 \section*{Starting Point}
 
-There do exist PPLs for OCaml, such as IBAL \cite{ibal}, as well as PPLs for other languages, such as WebPPL - JS\cite{mobus2018structure}, Church - LISP\cite{goodman2012church} or Infer.Net - F\#\cite{wang2011using} to name a few. My PPL can draw on some of the ideas introduced by these languages, particularly in implementing efficient inference engines.
+There do exist PPLs for OCaml, such as IBAL \cite{ibal}, as well as PPLs for other languages, such as WebPPL - JS \cite{mobus2018structure}, Church - LISP \cite{goodman2012church} or Infer.Net - F\# \cite{wang2011using} to name a few. My PPL can draw on some of the ideas introduced by these languages, particularly in implementing efficient inference engines.
 
 I will be using an existing OCaml numerical computation library (Owl). This library does not contain methods for probabilistic programming in general, although it does contain modules which will help in the implementation of an inference engine such as efficient random number generation and lazy evaluation.
 
-I have experience with the core SML language, which will aid in learning basic OCaml due to similarities in the languages, however I will still have to learn the modules system. 1B Foundations of Data Science also gives me an understanding of basic statistics and bayesian inference. I do not have experience with domain specfic languages in OCaml, although the 1B compilers course did implement a compiler in OCaml.
+I have experience with the core SML language, which will aid in learning basic OCaml due to similarities in the languages, however I will still have to learn the modules system. 1B Foundations of Data Science also gives me an understanding of basic statistics and Bayesian inference. I do not have experience with domain specific languages in OCaml, although the 1B compilers course did implement a compiler in OCaml.
 
 \section*{Substance and Structure of the Project}
 
@@ -61,7 +61,7 @@ The modelling API is used to represent a statistical model. For example, in math
 \end{verbatim}
 in the Infer.Net language. In OCaml, there will be many different options for representing distributions, and a choice will need to be made about whether to create a separate domain specific language (DSL) or whether to embed the language in OCaml as a library. 
 
-I will also need to make sure the design of the modelling language is suitable for the implementation of the inference engine. For example, WebPPL\cite{mobus2018structure} uses a continuation passing style transformation, recording continuations when probabilistic functions are called in order to build an execution trace. This then allows the engine to perform inference. A similar approach could be applied here. There are many alternative approaches to build execution traces, such as algebraic effects\cite{DBLP:journals/corr/abs-1811-06150} or monads\cite{scibior2015practical}, and one such method will need to be chosen. However I decide to implement this, I will need to ensure that features of OCaml can be used appropriately.
+I will also need to make sure the design of the modelling language is suitable for the implementation of the inference engine. For example, WebPPL \cite{mobus2018structure} uses a continuation passing style transformation, recording continuations when probabilistic functions are called in order to build an execution trace. This then allows the engine to perform inference. A similar approach could be applied here. There are many alternative approaches to build execution traces, such as algebraic effects \cite{DBLP:journals/corr/abs-1811-06150} or monads \cite{scibior2015practical}, and one such method will need to be chosen. However I decide to implement this, I will need to ensure that features of OCaml can be used appropriately.
 
 \subsection*{Inference Engine}
 There are many different options for a possible inference engine. A decision also need to be made about whether to use a trace-based model (as mentioned) or a graph based model (such as Edward, where a computational graph is generated). This decision will need to be made before implementing the inference engine since it will affect the modelling language.
@@ -104,7 +104,7 @@ Planned starting date is {28/10/19}, the Monday after handing in project proposa
 \subsection*{Michaelmas Term}
 \begin{itemize}
 	\item {\bf Weeks 3-4 (28/10/19 -- 10/11/19)} \\ Set up IDE and local environment - installing Owl and practicing using it. Read the first 10 chapters of Real World OCaml, available online. Read papers on past PPLs and implementations, both ocaml or otherwise. Set up project repository and directory structure.
-	      \\ \textit{Milestone: learn Ocaml basics, set up project}
+	      \\ \textit{Milestone: learn OCaml basics, set up project}
 	\item \textbf{Weeks 5-6 (11/10/19 -- 24/11/19)}\\ Design a basic modelling API and write module/function signatures. Decide how to implement this (e.g. DSL vs library). Specify what language features I will include as a baseline. Research inference algorithms and make sure they will fit into the modelling API designed.
 	      \\ \textit{Milestone: specification of which language features and inference algorithms will be implemented}
 	\item \textbf{Weeks 7-8 (25/10/19 -- 08/12/19)}\\ Begin to implement the modelling API, and allow running a model 'forward', i.e. generating samples.

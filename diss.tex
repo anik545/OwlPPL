@@ -1,18 +1,18 @@
 %TC:group ocamlcode-in 0 0
+%TC:group minted 1 0
 %TC:group figure 0 0
 \documentclass[12pt,notitlepage,a4paper]{report}
 
 \usepackage{mydiss}
 
-% \includeonly{chapters/evaluation}
-% \includeonly{chapters/conclusion}
-% \includeonly{chapters/introduction,chapters/preparation,chapters/implementation,chapters/conclusion}
-% \includeonly{chapters/introduction,chapters/preparation,chapters/implementation,chapters/evaluation}
-% \includeonly{chapters/introduction,chapters/preparation,chapters/implementation,chapters/evaluation,chapters/conclusion}
-% \excludeonly{chapters/evaluation,chapters/appendices/documentation}
+
+\includeonly{chapters/evaluation}
+% \includeonly{chapters/appendices/documentation,chapters/appendices/examples}
 %TC:ignore
 
 \begin{document}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Title
 \pagestyle{empty}
@@ -22,7 +22,7 @@
 \vspace*{\fill}
 \begin{center}
 	\huge
-	\textbf{A probabilistic programming language in Ocaml}\\
+	\textbf{A probabilistic programming language in OCaml}\\
 	\vspace*{8mm}
 	{\LARGE Computer Science Tripos - Part II} \\
 	{\LARGE Christ's College} \\

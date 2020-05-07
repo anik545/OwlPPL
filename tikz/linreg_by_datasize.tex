@@ -1,7 +1,7 @@
-% !TeX root = ../diss.tex
+% !TeX root = ../a.tex
 
 \begin{tikzpicture}
-		
+																																							
 	\begin{groupplot}[
 			group style={
 				group name=my plots,
@@ -17,41 +17,49 @@
 			xmin=0,xmax=10000,
 			ylabel={Time (ms)},
 			xlabel={Number of Data Points},
-			% no markers,
+			no markers,
 			ymode=log,
 			% xmode=log
 		]
 		%
 		\nextgroupplot[title=Linear Regression, legend style={at={($(0,0)+(2cm,2cm)$)}, legend columns=4},legend to name=leg1]
 		\coordinate (c1) at (rel axis cs:0,1);
+		% 
+		\addplot [name path=upper,draw=none,forget plot] table[x index=0, y index=1, col sep=comma, y expr=\thisrowno{1}+\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_mh.csv};
+		\addplot [name path=lower,draw=none,forget plot] table[x index=0, y index=1, col sep=comma ,y expr=\thisrowno{1}-\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_mh.csv};
+		\addplot [fill=blue!25, fill opacity=0.75,forget plot] fill between[of=upper and lower];
 		\addplot [blue,mark=*] table [x index=0, y index=1, col sep=comma] {data/perf/by_datasize/linreg_by_data_length_mh.csv};
 		\addlegendentryexpanded{mh}
 		% 
+		\addplot [name path=upper1,draw=none,forget plot] table[x index=0, y index=1, col sep=comma, y expr=\thisrowno{1}+\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_rejection.csv};
+		\addplot [name path=lower1,draw=none,forget plot] table[x index=0, y index=1, col sep=comma ,y expr=\thisrowno{1}-\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_rejection.csv};
+		\addplot [fill=red!25, fill opacity=0.75,forget plot] fill between[of=upper1 and lower1];
 		\addplot [red,mark=*] table [x index=0, y index=1, col sep=comma] {data/perf/by_datasize/linreg_by_data_length_rejection.csv};
 		\addlegendentryexpanded{rejection}
 		% 
+		\addplot [name path=upper2,draw=none,forget plot] table[x index=0, y index=1, col sep=comma, y expr=\thisrowno{1}+\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_smc.csv};
+		\addplot [name path=lower2,draw=none,forget plot] table[x index=0, y index=1, col sep=comma ,y expr=\thisrowno{1}-\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_smc.csv};
+		\addplot [fill=brown!25, fill opacity=0.75,forget plot] fill between[of=upper2 and lower2];
 		\addplot [brown,mark=*] table [x index=0, y index=1, col sep=comma] {data/perf/by_datasize/linreg_by_data_length_smc.csv};
 		\addlegendentryexpanded{smc}
 		% 
+		\addplot [name path=upper3,draw=none,forget plot] table[x index=0, y index=1, col sep=comma, y expr=\thisrowno{1}+\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_importance.csv};
+		\addplot [name path=lower3,draw=none,forget plot] table[x index=0, y index=1, col sep=comma ,y expr=\thisrowno{1}-\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_importance.csv};
+		\addplot [fill=black!25, fill opacity=0.75,forget plot] fill between[of=upper3 and lower3];
 		\addplot [black,mark=*] table [x index=0, y index=1, col sep=comma] {data/perf/by_datasize/linreg_by_data_length_importance.csv};
 		\addlegendentryexpanded{importance}
 		% 
-		\addplot [name path=upper,draw=none] table[x index=0, y index=1, col sep=comma, y expr=\thisrowno{1}+\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_mh.csv};
-		\addplot [name path=lower,draw=none] table[x index=0, y index=1, col sep=comma ,y expr=\thisrowno{1}-\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_mh.csv};
-		\addplot [fill=blue!25] fill between[of=upper and lower];
+		\addplot [name path=upper3,draw=none,forget plot] table[x index=0, y index=1, col sep=comma, y expr=\thisrowno{1}+\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_pc.csv};
+		\addplot [name path=lower3,draw=none,forget plot] table[x index=0, y index=1, col sep=comma ,y expr=\thisrowno{1}-\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_pc.csv};
+		\addplot [fill=magenta, fill opacity=0.5,forget plot] fill between[of=upper3 and lower3];
+		\addplot [magenta,mark=*] table [x index=0, y index=1, col sep=comma] {data/perf/by_datasize/linreg_by_data_length_pc.csv};
+		\addlegendentryexpanded{pc}
 		% 
-		\addplot [name path=upper1,draw=none] table[x index=0, y index=1, col sep=comma, y expr=\thisrowno{1}+\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_rejection.csv};
-		\addplot [name path=lower1,draw=none] table[x index=0, y index=1, col sep=comma ,y expr=\thisrowno{1}-\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_rejection.csv};
-		\addplot [fill=red!25] fill between[of=upper1 and lower1];
-		% 
-		\addplot [name path=upper2,draw=none] table[x index=0, y index=1, col sep=comma, y expr=\thisrowno{1}+\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_smc.csv};
-		\addplot [name path=lower2,draw=none] table[x index=0, y index=1, col sep=comma ,y expr=\thisrowno{1}-\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_smc.csv};
-		\addplot [fill=brown!25] fill between[of=upper2 and lower2];
-		% 
-		\addplot [name path=upper3,draw=none] table[x index=0, y index=1, col sep=comma, y expr=\thisrowno{1}+\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_importance.csv};
-		\addplot [name path=lower3,draw=none] table[x index=0, y index=1, col sep=comma ,y expr=\thisrowno{1}-\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_importance.csv};
-		\addplot [fill=black!25] fill between[of=upper3 and lower3];
-				
+		\addplot [name path=upper3,draw=none,forget plot] table[x index=0, y index=1, col sep=comma, y expr=\thisrowno{1}+\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_pimh.csv};
+		\addplot [name path=lower3,draw=none,forget plot] table[x index=0, y index=1, col sep=comma ,y expr=\thisrowno{1}-\thisrowno{2}] {data/perf/by_datasize/linreg_by_data_length_pimh.csv};
+		\addplot [fill=olive, fill opacity=0.5,forget plot] fill between[of=upper3 and lower3];
+		\addplot [olive,mark=*] table [x index=0, y index=1, col sep=comma] {data/perf/by_datasize/linreg_by_data_length_pimh.csv};
+		\addlegendentryexpanded{pimh}
 		% \nextgroupplot[title=Mixture Model,
 		% 	legend style={at={($(0,0)+(2cm,2cm)$)}, legend columns=4},
 		% legend to name=leg1]
@@ -59,7 +67,7 @@
 		% \ts{data/perf/by_datasize/linreg_by_data_length.csv}
 		% % \addplot table [x index=0, y index=1, col sep=comma] {data/kl/sprinkler_mh.csv};
 		% % \addlegendentry{mh}
-				
+																																																																														
 	\end{groupplot}
 	\coordinate (c3) at ($(c1)!.5!(c2)$);
 	\node[below] at (c3 |- current bounding box.south)

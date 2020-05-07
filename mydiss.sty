@@ -11,13 +11,11 @@
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
 \usepackage{tikz}
-\usepackage[hidelinks]{hyperref}
 \usepackage[parfill]{parskip}
-\usepackage{enumitem}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage[outputdir=out]{minted}
 \usepackage{graphicx}
-\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
 \usepackage[margin=2cm,headheight=13.6pt]{geometry}
 \usepackage[margin=10pt,font=small,labelfont=bf,labelsep=endash,textfont=it]{caption}
 \usepackage{longtable,booktabs}
@@ -28,6 +26,10 @@
 \usepackage{wrapfig}
 \usepackage{excludeonly}
 \usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{etoolbox}
+\usepackage{placeins}
+\usepackage{pgf}
 
 \usepgfplotslibrary{groupplots}
 \usepgfplotslibrary{fillbetween}
@@ -58,8 +60,6 @@
 
 \numberwithin{listing}{chapter}
 
-\usepackage{titlesec}
-\usepackage{etoolbox}
 
 \makeatletter
 \patchcmd{\ttlh@hang}{\parindent\z@}{\parindent\z@\leavevmode}{}{}
@@ -77,7 +77,6 @@
 \titlespacing*{\subsection}{0pt}{0pt}{0pt}
 \titlespacing*{\subsubsection}{0pt}{0pt}{0pt}
 \titlespacing*{\paragraph}   {0pt}{0pt}{1em}
-
 
 % title spacing defaults
 % \titlespacing*{\chapter}     {0pt}{50pt}{40pt}
