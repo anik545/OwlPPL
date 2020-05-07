@@ -1,2 +1,2 @@
-,rejection,importance,metropolis hastings,particle filter
-coin,0.895793892046,0.243719262886,0.391381549312,0.544000635464
+,rejection,importance,metropolis hastings,particle filter,particle cascade,particle-independent metropolis-hastings
+coin,0.,0.113,0.0307,0.00541,0.0025,7e-57

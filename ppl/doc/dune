@@ -13,7 +13,7 @@
   (progn
    (chdir
     %{workspace_root}
-    (bash "htmldoc $(cat doc/include_docs) -t pdf -f %{target} "))
+    (bash "htmldoc --size a4 --no-toc --header . --footer : --continuous $(cat doc/include_docs) -t pdf -f %{target} "))
    (bash "cp %{target} /home/anik/Files/work/project/diss/htmldocs.pdf"))))
 
 (rule

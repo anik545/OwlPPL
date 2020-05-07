@@ -121,35 +121,16 @@ let by_data_length_linreg_single_inf ?(num_times = 3) ?(num_x = 20) inf :
   let data = Array.(transpose_exn @@ append [| ns |] @@ transpose_exn d) in
   Array.append [| header |] (map_2d data ~f:string_of_float)
 
-(* let () =
-   by_particles Models.single_coin (fun n -> SMC n)
-   |> write_to_csv ~fname:"smc_by_particles"
-
-
-   let () =
-   by_particles Models.single_coin (fun n -> PIMH n)
-   |> write_to_csv ~fname:"pimh_by_particles" *)
-
-(* let x = sample_mean ~n:20 @@ fmap fst3 @@ infer (Models.linreg (list_gen(100000))) (MH 500) *)
-(* let x = sample_mean ~n:20000 @@ infer (Models.single_coin) (MH 10000) *)
-(* let ()  = printf "%f\n" @@ x *)
-
-(* let () =
-  by_data_length_linreg ()
-  |> write_to_csv ~fname:"linreg_by_data_length_smc.csv" *)
-
-(* let () =
-  let inf = Importance 10 in
-  by_data_length_linreg_single_inf inf
-  |> write_to_csv
-       ~fname:("linreg_by_data_length_" ^ print_infer_strat_short inf ^ ".csv") *)
-let mh, imp, rej, smc = (MH 500, Importance 50, Rejection (100, Soft), SMC 50)
+let mh, imp, rej, smc, pc, pimh =
+  (MH 500, Importance 50, Rejection (100, Soft), SMC 50, PC 10, PIMH 10)
 
 let str_to_inf = function
   | "mh" -> mh
   | "imp" -> imp
   | "rej" -> rej
   | "smc" -> smc
+  | "pc" -> pc
+  | "pimh" -> pimh
   | s -> failwith (s ^ " is not an inference method")
 
 let infs =

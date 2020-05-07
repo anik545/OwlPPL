@@ -4,7 +4,7 @@ let sprinkler_model =
    (if cloudy then .8 else .1) in
   let* sprinkler = bernoulli 
    (if cloudy then .1 else .5) in
-  let wet_grass = bernoulli 
+  let* wet_grass = bernoulli 
     (match rain,sprinkler with
          true,true -> .99
        | true,false -> .9

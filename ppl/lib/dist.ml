@@ -185,7 +185,7 @@ let rec support : type a. a dist -> a list = function
       | DiscreteFinite xs -> xs
       | _ -> raise Undefined )
   | Return x -> [ x ]
-  | Independent (d1, d2) -> Core.List.zip_exn (support d1)  (support d2)
+  | Independent (d1, d2) -> Core.List.zip_exn (support d1) (support d2)
 
 module PplOps = struct
   let ( +~ ) = liftM2 Base.Int.( + )

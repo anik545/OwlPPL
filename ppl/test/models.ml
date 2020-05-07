@@ -80,3 +80,45 @@ let linreg obs =
   let points d obs = condition' (fun (a, b, c) -> summer obs a b c) d in
   let posterior = points linear obs in
   posterior
+
+let transition = function
+  | true -> categorical @@ List.zip_exn [ true; false ] [ 0.7; 0.3 ]
+  | false -> categorical @@ List.zip_exn [ true; false ] [ 0.3; 0.7 ]
+
+let emission = function
+  | true -> Primitive.categorical @@ List.zip_exn [ true; false ] [ 0.9; 0.1 ]
+  | false -> Primitive.categorical @@ List.zip_exn [ true; false ] [ 0.1; 0.9 ]
+
+let initial = return [ true ]
+
+let obs = [ true; true; true ]
+
+let hmm_general transition emission observed_values start =
+  let score y x = Primitive.pdf (emission x) y in
+  let expand d y =
+    condition' (fun l -> score y (List.hd_exn l))
+    @@ let* rest = d in
+       let* x = transition (List.hd_exn rest) in
+       return (x :: rest)
+  in
+  let states = List.fold_left ~f:expand ~init:start observed_values in
+  liftM List.rev states
+
+let hmm = hmm_general transition emission obs initial
+
+let hmm_1 = fmap (fun l -> List.nth_exn l 1) hmm
+
+let hmm_1_exact =
+  Primitive.categorical [ (true, 0.92528736); (false, 0.07471264) ]
+
+let hmm_2 = fmap (fun l -> List.nth_exn l 2) hmm
+
+let hmm_3 = fmap (fun l -> List.nth_exn l 3) hmm
+
+let hmm_exact =
+  (* true; false *)
+  [
+    [ 0.92528736; 0.07471264 ];
+    [ 0.68390805; 0.31609195 ];
+    [ 0.84482759; 0.15517241 ];
+  ]

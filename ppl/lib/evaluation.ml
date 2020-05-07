@@ -150,8 +150,8 @@ let kolmogorov_smirnov ?(n = 10000) ?(alpha = 0.01) d d' =
   (* let ecdf_map d: (float, float) Core.Map = Core.Map.of_sorted_array (module Float) (Owl_stats.ecdf (take_k_samples n d)) in *)
   (* let ecdf x = ecdf_map d in *)
   let h = Owl_stats.ks_test ~alpha (take_k_samples n d) (Primitive.cdf d') in
-  if h.reject then Printf.printf "two dists are not equal with p=%f\n" h.p_value
-  else Printf.printf "two dists are equal with p=%f\n" h.p_value;
+  if h.reject then Printf.printf "two dists are equal with p=%.60f\n" h.p_value
+  else Printf.printf "two dists are not equal with p=%.60f\n" h.p_value;
   h
 
 (* d is inferred dist, d' is exact dist, default 1% signifigance level *)
@@ -175,9 +175,9 @@ let chi_sq ?(n = 10000) ?(alpha = 0.01) d d' : Owl_stats.hypothesis =
       ~f:(fun x -> ((num_observed x -. num_expected x) ** 2.) /. num_expected x)
   in
   let df = Float.of_int @@ (List.length supp - 1) in
-  printf "ts: %f" test_stat;
-  let p = Owl_stats.chi2_cdf ~df test_stat in
+  printf "ts: %f\n" test_stat;
+  let p = 1. -. Owl_stats.chi2_cdf ~df test_stat in
   if Float.(p < alpha) then
-    Printf.printf "two dists are not equal with p=%f\n" p
-  else Printf.printf "two dists are equal with p=%f\n" p;
+    Printf.printf "two dists are equal with p=%.60f\n%!" p
+  else Printf.printf "two dists are not equal with p=%.60f\n%!" p;
   { reject = Float.(p > test_stat); p_value = p; score = p }

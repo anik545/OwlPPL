@@ -13,7 +13,6 @@ type infer_strat =
   | PIMH of int
   | Importance of int
   | Rejection of int * rejection_type
-  | RejectionTrans of int * rejection_type
   | Prior
   | Enum
   | Forward (* forward sampling in webppl, no sampling *)
@@ -26,7 +25,6 @@ let print_infer_strat = function
   | PIMH _ -> "particle-independent metropolis-hastings"
   | Importance _ -> "importance"
   | Rejection _ -> "rejection"
-  | RejectionTrans _ -> "rejection"
   | Prior -> "prior"
   | Enum -> "enumeration"
   | Forward -> "forward"
@@ -38,22 +36,20 @@ let print_infer_strat_short = function
   | PIMH _ -> "pimh"
   | Importance _ -> "importance"
   | Rejection _ -> "rejection"
-  | RejectionTrans _ -> "rejection"
   | Prior -> "prior"
   | Enum -> "enumeration"
   | Forward -> "forward"
 
-let infer dist = function
-  | MH n -> mh_transform ~burn:n dist
-  | SMC n -> smcStandard' n dist
-  | PC n -> cascade' n dist
-  | PIMH n -> pimh' n n dist
-  | Importance n -> importance' n dist
-  | Rejection (n, s) -> rejection s dist ~n
-  | RejectionTrans (n, s) -> rejection_transform s dist ~n
-  | Enum -> exact_inference dist
-  | Prior -> prior' dist
-  | Forward -> prior' dist
+let infer model = function
+  | MH n -> mh_transform ~burn:n model
+  | SMC n -> smcStandard' n model
+  | PC n -> cascade' n model
+  | PIMH n -> pimh' n n model
+  | Importance n -> importance' n model
+  | Rejection (n, s) -> rejection s model ~n
+  | Enum -> exact_inference model
+  | Prior -> prior' model
+  | Forward -> prior' model
 
 let infer_sampler dist strat =
   let new_dist = infer dist strat in

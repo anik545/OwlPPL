@@ -6,17 +6,18 @@
 exception Undefined
 
 module Prob : Sigs.Prob
+(** The module used to represent probability, can be switched to use log probs *)
 
 type prob = Prob.t
-(** A type for which values need to sum to 1  *)
+(** A type for which values need to sum to 1 (not an enforced property) *)
 
 type likelihood = Prob.t
-(** A type for which values don't need to sum to 1  *)
+(** A type for which values don't need to sum to 1 (not an enforced property) *)
 
 type 'a samples = ('a * prob) list
 (** A set of weighted samples, summing to one *)
 
-(** Type for representing distributions *)
+(** GADT for representing distributions, private to avoid direct manipulation *)
 type _ dist = private
   | Return : 'a -> 'a dist  (** distribution with a single value *)
   (* bind is lazy since it contains a function *)
@@ -26,30 +27,40 @@ type _ dist = private
   | Conditional : ('a -> likelihood) * 'a dist -> 'a dist
       (** variant that defines likelihood model *)
   | Independent : 'a dist * 'b dist -> ('a * 'b) dist
+      (** for combining two independent distributions *)
 
-(* | Conditional: ('a -> float) * 'a var_dist -> 'a dist *)
+(**/**)
+
+val from_primitive : 'a Primitive.t -> 'a dist
+
+(**/**)
 
 (** {2:dist_monad Condition Operators} *)
 
 val condition' : ('a -> float) -> 'a dist -> 'a dist
+(** most general condition operator *)
 
 val condition : bool -> 'a dist -> 'a dist
+(** hard conditioning *)
 
 val score : float -> 'a dist -> 'a dist
+(** soft conditioning *)
 
 val observe : 'a -> 'a Primitive.t -> 'b dist -> 'b dist
+(** soft conditioning for observations from a known distribution *)
 
-val from_primitive : 'a Primitive.t -> 'a dist
-
-(** {2:dist_monad Monad Functions} *)
+(** {2:dist_monad Monad Functions} 
+    Monad functions
+*)
 
 include Monad.Monad with type 'a t := 'a dist
+(** @inline *)
 
 val ( and* ) : 'a dist -> 'b dist -> ('a * 'b) dist
 
 (** {2:dist_prims Primitives} 
     These functions create {!type-dist} values which correspond to primitive distributions 
-    so that they can be used in models. Ok
+    so that they can be used in models.
 *)
 include
   Sigs.Primitive_Distributions with type 'a primitive := 'a dist
@@ -57,27 +68,46 @@ include
 
 val bernoulli : float -> bool dist
 
+(**/**)
+
 val choice : float -> 'a dist -> 'a dist -> 'a dist
+
+(**/**)
 
 (** {2:dist_sample Sampling} *)
 
 val sample : 'a dist -> 'a
+(**  *)
 
 val sample_n : int -> 'a dist -> 'a array
+(**  *)
 
 val sample_with_score : 'a dist -> 'a * likelihood
+(**  *)
+
+(**/**)
 
 val dist_of_n_samples : int -> 'a dist -> 'a list dist
+(**  *)
+
+(**/**)
 
 (** {2:prior Prior Distribution} *)
 
 val prior' : 'a dist -> 'a dist
 
+(**/**)
+
 val prior : 'a dist -> ('a * likelihood) dist
+(**  *)
+
+(**/**)
 
 val prior_with_score : 'a dist -> ('a * likelihood) dist
+(**  *)
 
 val support : 'a dist -> 'a list
+(**  *)
 
 module PplOps : Sigs.Ops with type 'a dist := 'a dist
-(** Operators for distributions *)
+(** Common operators for combining distributions *)

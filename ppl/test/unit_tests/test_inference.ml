@@ -65,8 +65,6 @@ let infer_strats =
     Importance 100;
     Rejection (100, Hard);
     Rejection (100, Soft);
-    RejectionTrans (100, Hard);
-    RejectionTrans (100, Soft);
     Prior;
     Enum;
     Forward;

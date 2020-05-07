@@ -49,7 +49,17 @@ let rec cascade : 'a. int -> 'a dist -> 'a samples dist =
       return (List.zip_exn ys ws)
   | d -> sequence @@ List.init n ~f:(fun _ -> fmap (fun x -> (x, Prob.one)) d)
 
-let cascade' n d =
+let cascade'' n d =
   let* l = cascade n d in
   let l = List.map ~f:(fun (x, y) -> (x, Dist.Prob.to_float y)) l in
+  (* printf "%d\n%!" (List.length l); *)
   categorical l
+
+let cascade' n d =
+  let rec sample1 () =
+    try sample @@ cascade'' n d
+    with _ -> (* printf "fail cascade%!"; *)
+              sample1 ()
+  in
+  let* _ = return () in
+  return (sample1 ())

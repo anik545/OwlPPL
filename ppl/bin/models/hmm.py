@@ -16,7 +16,7 @@ print(p)
 print()
 model1 = hmm.MultinomialHMM(n_components=2)
 model1.n_features = 2
-obs = [True, True, True, False]
+obs = [True, False, False, False]
 obs = list(map(lambda x: 1 if x else 0, obs))
 # states are true=1 and false=0
 # false, true

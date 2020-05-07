@@ -32,9 +32,7 @@ let rec enumerate : type a. a dist -> float -> (a * prob) list =
     | Return x -> [ (x, Prob.of_float multiplier) ]
     | Independent (d1, d2) ->
         cartesian (enumerate d1 multiplier) (enumerate d2 multiplier)
-        |> List.map ~f:(fun ((x1, p1), (x2, p2)) ->
-               printf "%f %f\n" (Prob.to_float p1) (Prob.to_float p2);
-               ((x1, x2), Prob.(p1 *. p2)))
+        |> List.map ~f:(fun ((x1, p1), (x2, p2)) -> ((x1, x2), Prob.(p1 *. p2)))
 
 let exact_inference d =
   enumerate d 1. |> unduplicate |> normalise

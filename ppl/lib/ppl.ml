@@ -1,25 +1,30 @@
-(** DSL for Probabilistic Programming
+(** A shallowly embedded DSL for Probabilistic Programming
 
-    Universal PPL in OCaml
+    This is a library for universal probabilistic programming using distributions as monads. 
+    Includes several approximate inference algorithms. 
+    Contains utilities to plot distributions and evaluate correctness of inference.
 *)
 
-(** {2:submods Submodules } *)
+(** {2:core Core } *)
 
-module Plot = Plot
+module Dist = Dist
 module Primitive = Primitive
-module Evaluation = Evaluation
 module Empirical = Empirical
 module Inference = Inference
-module Dist = Dist
+
+(** {2:core Extra } *)
+
+module Plot = Plot
+module Evaluation = Evaluation
 module Helpers = Helpers
+
+(**/**)
 
 module Samples : Empirical.S = Empirical.Discrete
 
 module CSamples = Empirical.ContinuousArr
-
-(* */** *)
 include Dist
 include Inference
 include Helpers
 
-(* */** *)
+(**/**)

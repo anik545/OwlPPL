@@ -4,40 +4,45 @@ open Ppl
 open Evaluation
 open Core
 
+let root_dir = "/home/anik/Files/work/project/diss/data/hypothesis"
+
 let coin, coin_soln = Models.(single_coin, single_coin_exact)
 
 let sprinkler, sprinkler_soln = Models.(grass_model, grass_model_exact)
 
-let model_with_soln_discrete = [ ("sprinkler", sprinkler, sprinkler_soln) ]
+let hmm, hmm_soln = Models.(hmm_1, hmm_1_exact)
 
-let model_with_soln_continuous = [ ("coin", coin, coin_soln) ]
+let models_with_soln_discrete =
+  [ ("sprinkler", sprinkler, sprinkler_soln); ("hmm", hmm, hmm_soln) ]
+
+let models_with_soln_continuous = [ ("coin", coin, coin_soln) ]
 
 (* TODO: get these working with the models *)
-let infs = [ Rejection (300, Soft); Importance 100; MH 500; SMC 100 ]
+let infs_chi =
+  [ Rejection (300, Soft); Importance 100; MH 500; SMC 100; PC 100; PIMH 10 ]
 
-let infs_ks = [ Rejection (300, Soft); Importance 100; MH 500; SMC 100 ]
+let infs_ks =
+  [ Rejection (10, Soft); Importance 100; MH 500; SMC 100; PC 100; PIMH 10 ]
 
 let apply_infs model infs = List.map infs ~f:(fun i -> infer model i)
 
-let do_chi () =
-  let inferreds =
-    List.map model_with_soln_discrete ~f:(fun (n, d, exact) ->
-        (n, apply_infs d infs, exact))
-  in
-  let pvals =
-    List.map inferreds ~f:(fun (n, ds, exact) ->
-        (n, List.map ds ~f:(fun d -> chi_sq ~n:100000 d exact)))
-  in
-  pvals
+type 'a hyp_test =
+  ?n:int -> ?alpha:float -> 'a dist -> 'a Primitive.t -> Owl_stats.hypothesis
 
-let do_ks () =
+let run_test ?(n' = 100000) (method' : 'a hyp_test) models infs =
   let inferreds =
-    List.map model_with_soln_continuous ~f:(fun (n, d, exact) ->
-        (n, apply_infs d infs_ks, exact))
+    List.map models ~f:(fun (n, d, exact) -> (n, apply_infs d infs, exact))
   in
   let pvals =
     List.map inferreds ~f:(fun (n, ds, exact) ->
-        (n, List.map ds ~f:(fun d -> kolmogorov_smirnov d exact)))
+        printf "!!!!!!%s!!!!!!\n%!" n;
+        let x = ref 0 in
+        ( n,
+          List.map ds ~f:(fun d ->
+              printf "----- %s ----\n%!"
+                (show_infer_strat (List.nth_exn infs !x));
+              incr x;
+              method' ~n:n' d exact) ))
   in
   pvals
 
@@ -59,32 +64,24 @@ let print_line oc (line : string * Owl_stats.hypothesis list) =
   in
   fprintf oc "%s\n" s
 
-let args = Sys.get_argv ()
-
-let root_dir = "/home/anik/Files/work/project/diss/data/hypothesis"
-
-(* chi *)
-let chi () =
-  let fname =
-    if Array.length args >= 2 then (Sys.get_argv ()).(1)
-    else sprintf "%s/hypothesis-chi.csv" root_dir
-  in
+let print_test_to_file method' models infs fname =
+  let fname = sprintf "%s/%s" root_dir fname in
+  let ks = run_test ~n':1000 method' models infs in
   let oc = Out_channel.create fname in
-  let ks = do_chi () in
   print_headers oc infs;
   List.iter ks ~f:(fun line -> print_line oc line);
   Out_channel.close oc
 
-(* ks *)
-let ks () =
-  let fname =
-    if Array.length args >= 3 then (Sys.get_argv ()).(2)
-    else sprintf "%s/hypothesis-ks.csv" root_dir
-  in
-  let oc = Out_channel.create fname in
-  let ks = do_ks () in
-  print_headers oc infs_ks;
-  List.iter ks ~f:(fun line -> print_line oc line);
-  Out_channel.close oc
+let args = Sys.get_argv ()
 
-let () = chi ()
+let () =
+  match args.(1) with
+  | "chi" ->
+      print_test_to_file chi_sq models_with_soln_discrete infs_chi
+        "hypothesis-chi.csv"
+  | "ks" ->
+      print_test_to_file kolmogorov_smirnov models_with_soln_continuous infs_ks
+        "hypothesis-ks.csv"
+  | _ -> printf "invalid test type"
+
+(* chi () *)

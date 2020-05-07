@@ -1,13 +1,92 @@
+
 \chapter{Example Programs} \label{app:examples}
+\textit{Here I give more detail about the models I used to evaluate OwlPPL, as well as derivations for the analytic solutions used where appropriate. I also list the code in Anglican and WebPPL that was compared against.}
+
 \section{Sprinkler} \label{app:sprinkler}
-\section{Coin} \label{app:coin}
-The likelihood model ($X$) is a binomial.
+
+
+This example implements a simple Bayesian network conditioned on a single value. It consists of 4 boolean random variables:
+% 
+\begin{center}
+	\begin{tabular}{cccc}
+		C - cloudy          &   
+		R - raining         &   
+		S - sprinkler is on &   
+		W - grass is wet
+	\end{tabular}
+\end{center}
+% 
+Where the grass being wet is dependent on whether or not it is raining or the sprinkler is on, and subsequently the probability of rain and the sprinkler is dependent on whether or not it is cloudy. The network diagram is given in Figure \ref{fig:sprinkler-network}.
+\subsection{Code}
+\begin{figure}[!ht]
+	\begin{minipage}{0.5\linewidth}
+		\jscode[label=WebPPL]{code_snippets/webppl/sprinkler.js}
+		% \captionof{listing}{Sprinkler model in WebPPL}
+	\end{minipage}
+	\begin{minipage}{0.5\linewidth}
+		\clojurecode[label=Anglican]{code_snippets/anglican/sprinkler.clj}
+		% \captionof{listing}{Sprinkler model in Anglican}
+	\end{minipage}
+	\captionof{listing}{Sprinkler model in in Anglican and WebPPL}
+\end{figure}
+
+\subsection{Exact Posterior}
+The joint probability function is:
+\[
+	P(C,S,R,W) = P(W\mid S,R)\cdot P(S\mid C)\cdot P(R\mid C)\cdot P(C)
+\]
+
+\begin{table}[!h]
+	\begin{minipage}{0.5\textwidth}
+		\centering
+		\begin{tabular}{c|c|c|c|c}
+			C & R & S & W & Probability \\\hline
+			F & F & F & T & 0.0         \\
+			F & F & T & T & 0.081       \\
+			F & T & F & T & 0.009       \\
+			F & T & T & T & 0.0099      \\
+			T & F & F & T & 0.0         \\
+			T & F & T & T & 0.0144      \\
+			T & T & F & T & 0.5184      \\
+			T & T & T & T & 0.06336     \\
+		\end{tabular}	
+	\end{minipage}
+	\begin{minipage}{0.5\textwidth}
+		\centering
+		\begin{tabular}{c|c|c|c|c}
+			C & R & S & W & Probability \\\hline												
+			F & F & F & F & 0.09        \\
+			F & F & T & F & 0.009       \\
+			F & T & F & F & 0.001       \\
+			F & T & T & F & 0.0001      \\
+			T & F & F & F & 0.144       \\
+			T & F & T & F & 0.0016      \\
+			T & T & F & F & 0.0576      \\
+			T & T & T & F & 0.00064     \\
+		\end{tabular}	
+	\end{minipage}
+	\label{tab:joint}
+\end{table}
+
+We require the probability that it is raining given that the grass is wet. This is found by summing over all the values for the extra variables we aren't interested in \eqref{eq:sprinkler-sum}. The probability of false can be calculated similarly or by subtracting from 1.
+\begin{align}	
+	P(R=T\mid W=T) & = \frac{P(R=T,W=T)}{P(W=T)}=\frac{\sum _{C,S\in \{T,F\}}P(C,S,R=T,W=T)}{\sum_{C,R,S\in \{T,F\}}P(C,S,R,W=T)} \label{eq:sprinkler-sum}           \\
+	               & = 0.8629428                                                                                                                           \nonumber \\
+	P(R=F\mid W=T) & = 1 - 0.8629428                                                                                                                       \nonumber \\                                                                                                                          
+	               & = 0.1370572                                                                                                                           \nonumber 
+\end{align}	
+
+
+
+\section{Biased Coin} \label{app:coin}
+This example is of a coin which is flipped $n$ times and lands on heads $x$ times. We require the distribution over the weight of the coin (i.e. show likely it is to land on heads again). The likelihood model ($X$) is a binomial, and I use an uninformative prior, the uniform.
 % 
 \begin{alignat*}{3}
 	\text{Prior:~}      & \Theta &   & \sim \text{Uniform}(0,1)    \\
 	\text{Likelihood:~} & X      &   & \sim \text{Binom}(n,\theta) 
 \end{alignat*}
-% 
+%
+\subsection{Exact Posterior} 
 We then use Bayes' rule to calculate the posterior.
 \begin{align*}
 	P(\Theta=\theta \mid X=x) & = \frac{1}{\kappa}P(\Theta=\theta)P(X=x\mid\theta)     \\ 
@@ -16,7 +95,132 @@ We then use Bayes' rule to calculate the posterior.
 \end{align*}
 
 \[\kappa'=\int_{\phi=0}^1\phi^x(1-\phi)^{n-x}~d\phi\]
-This is the beta distribution - Beta()
-\section{Linear Regression} \label{app:linreg}
+By matching parameters, we can see this is the beta distribution - $\text{Beta}(x+1,n-x+1)$. 
+
 \section{Hidden Markov Model} \label{app:hmm}
-\section{Dirichlet Process} \label{app:dp}
+The HMM I use is defined as below:
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{ccc}
+		Set of hidden states & Set of observed states & Starting state \\
+		\{True, False\},     & \{True, False\}        & True           \\
+	\end{tabular}
+\end{table}
+
+
+
+Transition matrix: 
+\begin{equation}
+	T=\begin{pmatrix}
+	0.7 & 0.3 \\
+	0.3 & 0.7 
+	\end{pmatrix}
+\end{equation}
+
+Emission matrix: 
+\begin{equation}
+	O=\begin{pmatrix}
+	0.9 & 0.1 \\
+	0.1 & 0.9 
+	\end{pmatrix}
+\end{equation}
+	
+\subsection{Code Samples}
+\begin{listing}[!htb]
+	\centering
+	\begin{minipage}{14.5cm}
+		\jscode[label=WebPPL]{code_snippets/webppl/hmm.js}
+	\end{minipage}
+	% \caption{HMM in WebPPL}
+	% \end{listing}
+	% \begin{listing}[!htb]
+	\centering
+	\begin{minipage}{12cm}
+		\vspace{5mm}
+		% \inputminted{clj}{code_snippets/anglican/hmm.clj}
+		\clojurecode[label=Anglican]{code_snippets/anglican/hmm.clj}	
+	\end{minipage}
+	\captionof{listing}{HMM in Anglican and WebPPL}
+\end{listing}
+\FloatBarrier
+\subsection{Exact Posterior}
+With 3 observations, we can find the posterior for each individual hidden state using the forward backward algorithm. 
+For given observations, $o_{1:T}:=o_{1},\dots ,o_{T}$, for the hidden state at each time-step $t$, $X_{t}\in \{X_{1},\dots ,X_{T}\}$, we compute the distribution $P(X_{t}\ |\ o_{1:T})$ using \eqref{eq:fb}.
+% 
+\begin{align}
+	\text{Forward:~~}  & P(X_{t}\ |\ o_{1:t})                                                                                    \nonumber     \\
+	\text{Backward:~~} & P(o_{t+1:T}\ |\ X_{t})                                                                                 \nonumber      \\
+	\text{Combined:~~} & P(X_{t}\ |\ o_{1:T})=P(X_{t}\ |\ o_{1:t},o_{t+1:T})\propto P(o_{t+1:T}\ |\ X_{t})\cdot P(X_{t}|o_{1:t}) \label{eq:fb} 
+\end{align}
+
+I use an example with three hidden states. The final posterior over each of the three states (not including the starting state) given the observations \texttt{[False,False,False]} is:
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{c|c|c}
+		State & True       & False      \\\hline
+		1     & 0.92528736 & 0.07471264 \\
+		2     & 0.68390805 & 0.31609195 \\
+		3     & 0.84482759 & 0.15517241 \\
+	\end{tabular}
+\end{table}
+	
+
+% \begin{figure}[!ht]
+% 	\begin{minipage}{0.5\linewidth}
+% 		\jscode{code_snippets/webppl/hmm.js}
+% 		\captionof{listing}{HMM in WebPPL}
+% 	\end{minipage}
+% 	\begin{minipage}{0.5\linewidth}
+% 		\clojurecode{code_snippets/anglican/hmm.clj}
+% 		\captionof{listing}{HMM in Anglican}
+% 	\end{minipage}
+% \end{figure}
+	
+	
+\section{Linear Regression} \label{app:linreg}
+% do model setup here
+For a standard linear regression for 2 dimensional data, the setup is 
+\[y=\beta_1 x_1 + \beta_0 + \epsilon \]
+where the $\beta$s are the terms to be determined, and the $\epsilon$ represents random error. The frequentist approach is to minimise the sum of least squares between the known values and the predicted outputs, to find a single best set of values for the parameters. In Bayesian linear regression, we also use some prior distributions to augment the data. Here, I use \eqref{eq:bayeslin} as the likelihood model, with \eqref{eq:priorm} and \eqref{eq:priorm} being the priors over the slope and y-intercept.
+\begin{align}
+	\beta_0 & \sim N(0,1)\label{eq:priorm}                                    \\
+	\beta_1 & \sim N(0,1)\label{eq:priorc}                                    \\
+	y       & \sim N(\beta_0 + \beta_1 x_1 + \epsilon, 1.)\label{eq:bayeslin} 
+\end{align}
+
+\FloatBarrier
+\subsection{Code Samples}
+\begin{figure}[!ht]
+	\begin{minipage}{0.5\linewidth}
+		\jscode[label=WebPPL]{code_snippets/webppl/linreg.js}
+		% \captionof{listing}{Linear Regression in WebPPL}
+	\end{minipage}
+	\begin{minipage}{0.5\linewidth}
+		\clojurecode[label=Anglican]{code_snippets/anglican/linreg.clj}
+		% \captionof{listing}{Linear Regression in Anglican}
+	\end{minipage}
+	\captionof{listing}{Linear Regression in Anglican and WebPPl}
+\end{figure}
+\FloatBarrier
+
+\section{Infinite Mixture Model} \label{app:dp}
+% do model setup here
+
+\subsection{Code Samples}
+
+\begin{listing}
+	\ocamlcode{code_snippets/dpmm.ml}
+	\captionof{listing}{OwlPPL}
+\end{listing}
+
+\begin{listing}
+	\jscode{code_snippets/webppl/dpmm.js}
+	\captionof{listing}{WebPPL}
+\end{listing}
+
+\begin{listing}
+	\clojurecode{code_snippets/anglican/dpmm.clj}
+	\captionof{listing}{Anglican}
+\end{listing}

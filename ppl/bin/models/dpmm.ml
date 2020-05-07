@@ -58,18 +58,24 @@ let get_stick_index = memo (fun (_ : int) -> getBag)
 
 (* -- | DP mixture example from http://dl.acm.org/citation.cfm?id=2804317 *)
 let dpMixture =
+  let rec sample_index residual idx =
+    let* keep = bernoulli (residual idx) in
+    if keep then return idx else sample_index residual (idx + 1)
+  in
   let clusters =
-    let classgen = sample_index (breaks ()) 0 in
+    let classgen = sample_index (memo (fun _ -> sample (beta 1. 1.))) 0 in
     (* kinda like lazy lists, take an index  *)
-    let vars = memo (fun _ -> 1. /. sample (gamma 1. 1.)) in
-    let means = memo (fun i -> sample @@ normal 0. (vars i)) in
+    let* vars = return @@ memo (fun _ -> 10. /. sample (gamma 1. 10.)) in
+    let* means = return @@ memo (fun i -> sample @@ normal 0. (vars i)) in
     return (classgen, vars, means)
   in
-  let obs = [ 1.; 1.1; 1.2; -1.; -1.5; -2.; 0.001; 0.01; 0.005; 0. ] in
+  let obs = [ 1.; 1.1; 1.2; 3.1; 3.2; 3.15; 3.24 ] in
   (* let n = List.length obs in *)
   let start = fmap (fun x -> (x, [])) clusters in
 
   let score y (_cluster, var, mean) =
+    printf "prob of %f in cluster %d (~N(%f,%f)) is %f\n" y _cluster mean var
+      (Primitive.pdf Primitive.(normal mean (sqrt var)) y);
     Primitive.pdf Primitive.(normal mean (sqrt var)) y
   in
 
@@ -82,31 +88,36 @@ let dpMixture =
        let point = (cluster, vars cluster, means cluster) in
        return (clusters, point :: rest))
   in
-  let points = List.fold_left obs ~f:build ~init:start in
-  fmap (fun x -> List.rev (List.map ~f:(fun (x, _, _) -> x) (snd x))) points
+  List.fold_left obs ~f:build ~init:start
+
+let cluster_assignments =
+  dpMixture
+  |> fmap (fun x -> List.rev (List.map ~f:(fun (x, _, _) -> x) (snd x)))
+
+let cluster_parameters =
+  dpMixture
+  |> fmap (fun x -> List.rev (List.map ~f:(fun (_, m, s) -> (m, s)) (snd x)))
 
 let count_unique lst =
   let unique_set = Stdlib.Hashtbl.create (List.length lst) in
   List.iter ~f:(fun x -> Stdlib.Hashtbl.replace unique_set x ()) lst;
   float_of_int @@ Stdlib.Hashtbl.length unique_set
 
-let s, p = sample_with_score (infer dpMixture (Importance 100))
+let i = infer cluster_assignments (Importance 100)
 
-let dd = take_k_samples 100 (infer dpMixture Prior)
+let i' = infer cluster_parameters (MH 1000)
 
-let ns = sample_mean ~n:1000 (infer (fmap count_unique dpMixture) (MH 2000))
+let dd = take_k_samples 100 i'
+
+let ns =
+  sample_mean ~n:100000
+    (infer (fmap count_unique cluster_assignments) (MH 2000))
 
 let () =
   Array.iter
-    ~f:(fun _ ->
-      List.iter s ~f:(printf "%d ");
+    ~f:(fun i ->
+      List.iter i ~f:(fun (x, _) -> printf "%f " x);
       printf "\n")
     dd
 
-let () =
-  List.iter s ~f:(printf "%d ");
-  printf "\n"
-
-let () = printf "%f" (Prob.to_float p)
-
-let () = printf "%f" ns
+let () = printf "%f\n" ns

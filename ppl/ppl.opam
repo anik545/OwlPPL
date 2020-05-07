@@ -3,7 +3,7 @@ name: "OwlPPL"
 version: "0.1"
 synopsis: "A DSL for probabilistic programming"
 description: """
-A Universal Probabilistic Programming Language for Ocaml. Produced for a final year Computer Science project.
+A Universal Probabilistic Programming Language for OCaml. Produced for a final year Computer Science project.
 """
 maintainer: "Anik Roy"
 authors: "ar899@cam.ac.uk"

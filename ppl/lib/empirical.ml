@@ -1,9 +1,9 @@
-open Dist
 (** A module for empirical distributions generated from samplers  
 
-    A asd 
+    Contains a signature as well as two implementations, for continuous and discrete distributions respectively
 *)
 
+open Dist
 open Core
 
 (* poly version *)
@@ -30,14 +30,12 @@ module type S = sig
 
   (* val to_cdf: 'a t -> ('a -> float) *)
   (* val print: 'a t -> unit *)
+
   val print_map : (module Pretty_printer.S with type t = 'a) -> 'a t -> unit
   (** print the entire distribution *)
 
   val to_arr : 'a t -> ('a * int) array
-  (**  *)
-
-  val to_norm_arr : 'a t -> ('a * float) array
-  (**  *)
+  (** Get array of samples *)
 
   val support : 'a t -> 'a list
   (** Get the set of values for the distribution *)
@@ -97,13 +95,13 @@ module Discrete : S = struct
 
   let to_arr samples = Array.of_list @@ Map.Poly.to_alist samples
 
-  let to_norm_arr samples =
+  (* let to_norm_arr samples =
     let total =
       Map.Poly.fold samples ~f:(fun ~key:_ ~data sofar -> sofar + data) ~init:0
     in
     Array.map
       ~f:(fun (x, s) -> (x, float_of_int s /. float_of_int total))
-      (to_arr samples)
+      (to_arr samples) *)
 end
 
 module ContinuousArr = struct
