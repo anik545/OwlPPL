@@ -155,7 +155,7 @@ let chi_sq ?(n = 10000) ?(alpha = 0.01) d d' : Owl_stats.hypothesis =
   in
   let df = Float.of_int @@ (List.length supp - 1) in
   printf "ts: %f\n" test_stat;
-  let p = 1. -. Owl_stats.chi2_cdf ~df test_stat in
+  let p = Owl_stats.chi2_cdf ~df test_stat in
   if Float.(p < alpha) then
     Printf.printf "two dists are not equal with p=%.60f\n%!" p
   else Printf.printf "two dists are probably equal with p=%.60f\n%!" p;

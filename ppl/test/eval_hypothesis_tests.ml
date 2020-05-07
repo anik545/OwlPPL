@@ -15,10 +15,10 @@ let hmm, hmm_soln = Models.(hmm_1, hmm_1_exact)
 let linreg, linreg_soln = Models.(linreg_m, linreg_m_exact)
 
 let models_with_soln_discrete =
-  [ ("sprinkler", sprinkler, sprinkler_soln); ("hmm", hmm, hmm_soln) ]
+  [ ("Sprinkler", sprinkler, sprinkler_soln); ("HMM", hmm, hmm_soln) ]
 
 let models_with_soln_continuous =
-  [ ("coin", coin, coin_soln) (* ("linreg", linreg, linreg_soln)  *) ]
+  [ ("Biased Coin", coin, coin_soln) (* ("linreg", linreg, linreg_soln)  *) ]
 
 (* TODO: get these working with the models *)
 let infs_chi =

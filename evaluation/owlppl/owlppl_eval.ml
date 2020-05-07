@@ -11,7 +11,7 @@ let model =
   match model with
   | "hmm" -> ignore_output Hmm.hmm_model
   | "linreg" -> ignore_output Linreg.linreg_model
-  | "dpmm" -> ignore_output Dpmm.dpMixture
+  | "dpmm" -> ignore_output Dpmm.dpmm
   | "coin" -> ignore_output Coin.coin_mean
   | "sprinkler" -> ignore_output Sprinkler.grass_model
   | _ -> raise @@ Invalid_argument model

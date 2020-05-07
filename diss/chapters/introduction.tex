@@ -17,8 +17,9 @@ There are many examples of PPLs, both as DSLs embedded into other languages (inc
 
 \begin{table}
 	\centering
-	\begin{tabular}{l|l|l|p{3cm}|l}
-		\textbf{PPL}                       & \textbf{Embedded In} & \textbf{Universal} & \textbf{Continuous Distributions} & \textbf{Year} \\ \hline
+	\begin{tabular}{@{}lllp{3cm}l@{}}
+		\toprule
+		\textbf{PPL}                       & \textbf{Embedded In} & \textbf{Universal} & \textbf{Continuous Distributions} & \textbf{Year} \\ \midrule
 		%  &                      &                    & \textbf{Distributions}            & -    \\\hline
 		BUGS \cite{gilks1994bugs}          & N/A                  & \xmark             & \cmark                            & 1994          \\
 		IBAL \cite{ibal}                   & OCaml                & \xmark             & \xmark                            & 2000          \\
@@ -30,7 +31,7 @@ There are many examples of PPLs, both as DSLs embedded into other languages (inc
 		Anglican \cite{anglican-smc}       & Clojure              & \cmark             & \cmark                            & 2014          \\
 		WebPPL \cite{mobus2018structure}   & JavaScript (node)    & \cmark             & \cmark                            & 2018          \\
 		Pyro \cite{bingham2019pyro}        & Python               & \cmark             & \cmark                            & 2019          \\
-		OwlPPL                             & OCaml                & \cmark             & \cmark                            & 2020          \\
+		OwlPPL                             & OCaml                & \cmark             & \cmark                            & 2020          \\\bottomrule
 	\end{tabular}
 	\caption{A collection of PPLs}
 	\label{tab:ppl-summ}
