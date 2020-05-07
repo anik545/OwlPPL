@@ -1,8 +1,8 @@
 (copy_files# unit_tests/*)
 
 (executables
- (names eval_hypothesis_tests eval_kl_tests eval_complexity)
- (modules eval_hypothesis_tests models eval_kl_tests eval_complexity)
+ (names eval_hypothesis_tests eval_kl_tests eval_complexity misc)
+ (modules eval_hypothesis_tests models eval_kl_tests eval_complexity misc)
  (libraries core owl ppl alcotest))
 
 (tests

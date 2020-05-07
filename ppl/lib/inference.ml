@@ -19,15 +19,15 @@ type infer_strat =
 [@@deriving show]
 
 let print_infer_strat = function
-  | MH _ -> "metropolis hastings"
-  | SMC _ -> "particle filter"
-  | PC _ -> "particle cascade"
-  | PIMH _ -> "particle-independent metropolis-hastings"
-  | Importance _ -> "importance"
-  | Rejection _ -> "rejection"
-  | Prior -> "prior"
-  | Enum -> "enumeration"
-  | Forward -> "forward"
+  | MH _ -> "Metropolis Hastings"
+  | SMC _ -> "Particle Filter"
+  | PC _ -> "Particle Cascade"
+  | PIMH _ -> "Particle-Independent Metropolis-Hastings"
+  | Importance _ -> "Importance Sampling"
+  | Rejection _ -> "Rejection Sampling"
+  | Prior -> "Prior"
+  | Enum -> "Enumeration"
+  | Forward -> "Forward Sampling"
 
 let print_infer_strat_short = function
   | MH _ -> "mh"

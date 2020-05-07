@@ -39,6 +39,17 @@ let options_with_defaults options defaults =
   (* for now, just put newer options at the end to override defaults with set is called *)
   defaults @ options
 
+let pdf_continuous ?h ?(n = 5000) ?(fname = "fig.png") ?(options = []) d =
+  let options =
+    options_with_defaults options
+      [ `Title "CDF"; `X_label "X"; `Y_label "Density" ]
+  in
+  let open Empirical.ContinuousArr in
+  let d = from_dist ~n d in
+  let pl = create_with_opts h fname options in
+  Plot.plot_fun ~h:pl (to_pdf d) (-3.) 3.;
+  pl
+
 let hist_dist_continuous ?h ?(n = 5000) ?(fname = "fig.png") ?(options = []) d =
   let options =
     options_with_defaults options
@@ -120,12 +131,20 @@ let pp_plot ?h ?(n = 1000) ?(fname = "fig.png") ?(options = []) d d' =
   Plot.probplot ~h:pl ~dist:cdf_d (one_row_mat samples_d');
   pl
 
-let add_exact_pdf ?(scale = 1.) ~dist h =
+let add_exact_pdf ?(scale = 1.) ?(start = 0.) ?(fin = 1.) ~dist h =
   Owl_plplot.Plot.(
     plot_fun ~h
       ~spec:[ RGB (0, 0, 255); LineWidth 2. ]
       (fun x -> scale *. Primitive.pdf dist x)
-      0. 1.);
+      start fin);
+  h
+
+let add_exact_cdf ?(scale = 1.) ?(start = 0.) ?(fin = 1.) ~dist h =
+  Owl_plplot.Plot.(
+    plot_fun ~h
+      ~spec:[ RGB (0, 0, 255); LineWidth 2. ]
+      (fun x -> scale *. Primitive.cdf dist x)
+      start fin);
   h
 
 let show = Owl_plplot.Plot.output

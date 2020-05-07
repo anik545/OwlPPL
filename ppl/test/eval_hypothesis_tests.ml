@@ -12,17 +12,20 @@ let sprinkler, sprinkler_soln = Models.(grass_model, grass_model_exact)
 
 let hmm, hmm_soln = Models.(hmm_1, hmm_1_exact)
 
+let linreg, linreg_soln = Models.(linreg_m, linreg_m_exact)
+
 let models_with_soln_discrete =
   [ ("sprinkler", sprinkler, sprinkler_soln); ("hmm", hmm, hmm_soln) ]
 
-let models_with_soln_continuous = [ ("coin", coin, coin_soln) ]
+let models_with_soln_continuous =
+  [ ("coin", coin, coin_soln) (* ("linreg", linreg, linreg_soln)  *) ]
 
 (* TODO: get these working with the models *)
 let infs_chi =
   [ Rejection (300, Soft); Importance 100; MH 500; SMC 100; PC 100; PIMH 10 ]
 
 let infs_ks =
-  [ Rejection (10, Soft); Importance 100; MH 500; SMC 100; PC 100; PIMH 10 ]
+  [ Rejection (300, Soft); Importance 1000; MH 500; SMC 100; PC 100; PIMH 10 ]
 
 let apply_infs model infs = List.map infs ~f:(fun i -> infer model i)
 
@@ -66,7 +69,7 @@ let print_line oc (line : string * Owl_stats.hypothesis list) =
 
 let print_test_to_file method' models infs fname =
   let fname = sprintf "%s/%s" root_dir fname in
-  let ks = run_test ~n':1000 method' models infs in
+  let ks = run_test ~n':50 method' models infs in
   let oc = Out_channel.create fname in
   print_headers oc infs;
   List.iter ks ~f:(fun line -> print_line oc line);

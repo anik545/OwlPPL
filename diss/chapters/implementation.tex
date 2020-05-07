@@ -58,7 +58,7 @@ An embedded PPL can be thought of as being the same as the host language, except
 The problem of designing a PPL is then finding a way to model the nondeterminism in the sample operator and integrate the information from the condition operator to guide inference and the execution traces explored. Most universal PPLs use a feature that enables exploring subcomputations - the different execution traces. This can be done using continuation passing style (CPS) transformations, as in WebPPL and Church \cite{mobus2018structure,goodman2012church}, or algebraic effects as in Pyro \cite{bingham2019pyro}. In order to achieve a similar effect, I model conditional distributions as monads in OwlPPL, as in \cite{scibior2015practical}, and realise probabilistic programs as a GADT.
 
 \paragraph{Log Probabilities} 
-Calculating probabilities can often lead to underflow, since it is common to multiply many small probabilities together. To avoid this, I use logs of probabilities internally and add logs where I would multiply the original probabilities. This behaviour can be changed by changing the module used by the \texttt{Dist} module. 
+Calculating probabilities can often lead to underflow, since it is common to multiply many small probabilities together. To avoid this, I use logs of probabilities internally and add logs where I would multiply the original probabilities. This behaviour can be changed by changing the \texttt{Prob} module used by the \texttt{Dist} module - the documentation for \texttt{Prob} is in appendix \ref{app:docs}.
 	
 \section{Representing Distributions}
 In order to define my DSL, I use 3 different data structures to represent the different types of distribution I use:
@@ -75,7 +75,7 @@ An extension goal achieved here is to allow users to define their own primitive 
 	
 The type of a primitive distribution is 
 \begin{center}
-																																																																										
+																																																																														
 	\mintinline{ocaml}| type 'a prim_dist = (module PRIM_DIST with type t='a)|
 \end{center}
 with the \texttt{PRIM\_DIST} signature defined as in listing \ref{lst:prim-sig}.
@@ -172,8 +172,16 @@ Another issue is that flattening distributions is inefficient since duplicate va
 Although this is not the final data structure I chose for general probabilistic models, it is the one I used for discrete empirical distributions.
 
 \subsubsection{GADT} \label{sec:gadt}
-% TODO: check this
-The structure that I selected to represent general models is a generalised algebraic data type. GADTs are often used to implement interpreters in functional languages, and have been used to represent probabilistic models. The GADT I implement here (and some inference algorithms) is based on (Scibior et al. 2015)\cite{scibior2015practical}. This represents a model in a very general way, and can then be `interpreted' by a sampler or an inference algorithm. For sampling, I traverse the model, ignoring conditionals to enable forward sampling from the prior. For inference, I provide some inference functions as transforming the conditional distributions to distributions without any conditional statements, allowing sampling to be performed as normal. Some inference functions are also implemented by generating an empirical distribution that can be sampled from similarly. Primitive distributions also have a special variant (which takes a different \texttt{primitive} type). We can find the exact pdf/cdf of these distributions, unlike the \texttt{dist} type, which can only be sampled from. Listing \ref{lst:gadt1} shows each of the variants. The monad functions are also provided, which construct the corresponding variant in the GADT. \texttt{Return} represents a distribution with only one value, and \texttt{Bind} contains a distribution and a function, which represents that function being applied to the output from that distribution.
+
+The structure that I selected to represent general models is a generalised algebraic data type. GADTs are often used to implement interpreters in functional languages, and have been used to represent probabilistic models. The GADT I implement here (and some inference algorithms) is based on (Scibior et al. 2015)\cite{scibior2015practical}. This represents a model in a very general way, and can then be `interpreted' by a sampler or an inference algorithm. For sampling, I traverse the model, ignoring conditionals to enable forward sampling from the prior. 
+
+For inference, I provide some inference functions as transforming the conditional distributions to distributions without any conditional statements, allowing sampling to be performed as normal. Some inference functions are also implemented by generating an empirical distribution that can be sampled from similarly.
+
+Listing \ref{lst:gadt1} shows each of the variants. The monad functions are also provided, which construct the corresponding variants in the GADT. \texttt{Return} represents a distribution with only one value, and \texttt{Bind} contains a distribution and a function, which represents that function being applied to the output from that distribution, and is also bound to \texttt{(let*)}. The product function is used for models with independent sub-parts, such as drawing samples from many independently distributed variables, and could be used to parallelise models. The \texttt{Independent} variant is also bound to \texttt{(\and*)}.
+
+Primitive distributions have a variant which takes the primitive distribution type. We can find the exact pdf/cdf of these distributions, unlike the more general \texttt{dist} type, which can only be sampled from.
+
+The \texttt{Conditional} variant is used to assign scores (likelihoods) to execution traces, and contains a function which takes an element produced by a model and returns a score for the corresponding trace. I define several wrappers over this variant to represent different types of conditioning, outlines in section \ref{sec:condition}.
 
 \begin{listing}[!ht]
 	\ocamlcode{code_snippets/gadt.ml}	
@@ -487,7 +495,7 @@ Testing systems which are inherently random can be tricky, as it is difficult to
 
 One approach is to set a fixed random seed and make sure the same sequence of results are produced. The aim of a unit test, however, is to make sure that a desired property does not change from one version of the code to the next. The desired property here is that the samples fit a distribution, not that the same sequence is generated. For example, for sampling from $X \sim Bernoulli(0.5)$, we might observe true,false,true,false. However, the sequence of false,true,false,true would also satisfy the distribution (and be correct), but would fail the test. Even with a fixed random seed, a change in code may cause new outputs even though the desired statistical property hasn't changed.
 
-Another approach is to perform a hypothesis test such as Kolmogorov-Smirnov \cite{massey1951kolmogorov}, to ensure distributions produced by my library are equal to what is expected. The null hypothesis is that the samples do not fit the distribution, and we aim to reject this. A problem with tests of this kind is that they are expected to fail sometimes. There are two possible errors:
+Another approach is to perform a hypothesis test such as Kolmogorov-Smirnov \cite{massey1951kolmogorov}, to ensure distributions produced by my library are equal to what is expected. The alternative hypothesis is that the samples do not fit the distribution, and we aim to not accept this. A problem with tests of this kind is that they are expected to fail sometimes. There are two possible errors:
 \begin{itemize}
 	\item \textit{Type 1 error} - false positive where we reject a true null hypothesis, equal to the significance level of the test.
 	\item \textit{Type 2 error} - false negative where we fail to reject a false null hypothesis.

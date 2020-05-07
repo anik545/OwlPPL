@@ -110,59 +110,77 @@ The prior for this model is a Dirichlet process \cite{teh2010dirichlet}, which d
 
 
 \section{Statistical tests}
-To evaluate the correctness of my PPL, I used statistical tests which measure goodness-of-fit, i.e. how similar two distributions are to each other. I compare the empirical distribution of 10,000 samples from an approximated distribution to an exact distribution which is calculated analytically. Test statistic distributions (e.g. the $\chi^2$ distribution) were calculated using \texttt{Owl}, and empirical distributions generated using the \texttt{EmpiricalDist} modules.
+To evaluate the correctness of my PPL, I used statistical tests which measure goodness-of-fit, i.e. how similar two distributions are to each other. I compare the empirical distribution of 10,000 samples from an approximated distribution to an exact distribution which is calculated analytically. Test distributions (e.g. the $\chi^2$ distribution) were calculated using \texttt{Owl}, and functions to calculate the test statistics and p-values are given in the \texttt{Evaluation} module.
 
 For all tests described below, I set the significance level $\alpha = 0.05$ and use null and alternative hypotheses as follows:
 
-$H_0:$ The sample data do not follow the desired distribution\\
-$H_1:$ The sample data follow the desired distribution
+$H_0:$ The sample data follow the desired distribution\\
+$H_1:$ The sample data do not follow the desired distribution
 
 \subsection{Chi-squared}
 
-The $\chi^2$ test is a simple goodness-of-fit test which can test whether or not a given discrete distribution. The test statistic is as follows, with each $i$ being a distinct element in the distribution, $x_i$ is the observed number of samples with the value $i$, and $m_i$ is the expected number of samples for the value $i$.
+The $\chi^2$ test is a simple goodness-of-fit test which can test discrete distributions. The test statistic is as follows, with each $i$ being a distinct element in the distribution, $x_i$ is the observed number of samples with the value $i$, and $m_i$ is the expected number of samples for the value $i$.
 % 
 \[X^{2}=\sum _{i=1}^{k}{\frac {(x_{i}-m_{i})^{2}}{m_{i}}}\]
 % 
-This test statistic is compared against the critical value (at the significance level) of the chi-squared distribution, with the degrees of freedom being $k-1$, where k is the number of possible values of the distribution.
+This test statistic is compared against the critical value (at the significance level) of the chi-squared distribution, with $k-1$ degrees of freedom , where k is the number of possible values of the distribution.
+
 \subsubsection{Results}
 \begin{table}[!ht]
 	\centering
-	\csvautotabular{data/hypothesis/hypothesis-chi.csv}
+	% \csvautotabular{data/hypothesis/hypothesis-chi.csv}
+	\pgfplotstableread[col sep=comma,]{data/hypothesis/hypothesis-chi.csv}\normal
+	\pgfplotstabletranspose[colnames from = 0]\transpose\normal
+	\pgfplotstabletypeset[
+		string type,
+		every row/.style={/pgf/number format/sci},
+		every head row/.style={before row=\toprule, after row=\midrule},
+		every last row/.style={after row=\bottomrule},
+		every col no 0/.style={
+			column name={Inference Method}
+		},
+	]\transpose
 	\caption{p-values of $\chi^2$ test on different models using different inference procedures}
 	\label{tab:chi-pvals}
 \end{table}
-
-Table \ref{tab:chi-pvals} shows the results of carrying out the test on several inference procedures for different discrete models. All of the values are below 0.05, so we reject the null hypothesis in each case. Therefore we conclude that, at the 5\% significance level, the distributions are significantly similar.
-
+				
+Table \ref{tab:chi-pvals} shows the results of carrying out the test on all inference procedures for different discrete models. All of the values are below 0.05, so we reject the null hypothesis in each case. Therefore we conclude that, at the 5\% significance level, the distributions are significantly similar.
+				
 \subsection{Kolmogorov-Smirnov}
-
+				
 The Kolmogorov-Smirnov test is a non parametric test which is used to compare a set of samples with a distribution - this is the one-sample K-S test. There is also a two-sample K-S test, which compares two sets of samples against each other. I use the one-sample test here to compare samples taken from the inferred posteriors to their exact analytic solutions.
-
+				
 The test statistic is as follows, with $F_n(x)$ being the empirical cumulative distribution of n samples, and $F(x)$ being the exact cumulative distribution.
 \begin{align*}
 	F_{n}(x) & =\frac{1}{n}\sum_{i=1}^{n}I_{[-\infty ,x]}(X_{i}) \\
 	D_{n}    & =\sup_{x}|F_{n}(x)-F(x)|                          
 \end{align*}
 This test statistic is compared against the critical values of the Kolmogorov distribution, rejecting the null hypothesis if $\sqrt{n}D_n > K_\alpha$, where $K_\alpha$ is the critical value at the significance level $\alpha$, and $n$ is the number of samples.
-
+				
 \subsubsection{Results}
-
-Table \ref{tab:ks-pvals} shows that for all the continuous models considered, the p-value obtained from all tests are greater than then 0.05. This means we do not reject $H_0$ for any model/inference procedure combination, so can be confident (at the 5\% significance level) that the inference procedures are correct. This shows that the generated posterior is not significantly different from the real solution.
-
+				
+Table \ref{tab:ks-pvals} shows that for the biased coin model, the p-value obtained from all tests are greater than then 0.05. This means we do not reject $H_0$ for any inference procedure, so we can be confident (at the 5\% significance level) that the inference procedures are correct. We can be more sure of some inference procedures, indicated by higher p-values. These results show that there is no significant difference between the generated posterior and the real solution.
+				
 \begin{table}[!ht]
 	\centering
-	% \begin{tabular}{|l|l|l|l|l|}
-	% 	\hline
-	% 	            & rejection & importance & metropolis-hastings & particle filter \\ \hline
-	% 	single coin &           &            &                     &                 \\ \hline
-	% 	hmm         &           &            &                     &                 \\ \hline
-	% \end{tabular}
-	\csvautotabular{data/hypothesis/hypothesis-ks.csv}
+	% \csvautotabular{data/hypothesis/hypothesis-ks.csv}
+	\pgfplotstableread[col sep=comma,]{data/hypothesis/hypothesis-ks.csv}\normal
+	\pgfplotstabletranspose[colnames from = 0]\transpose\normal
+	\pgfplotstabletypeset[
+		string type,
+		every col no 1/.style={precision=1,column type/.add={|}{}}
+		every row/.style={/pgf/number format/sci},
+		every head row/.style={before row=\toprule, after row=\midrule},
+		every last row/.style={after row=\bottomrule},
+		every col no 0/.style={
+			column name={Inference Method}
+		},
+	]\transpose
 	\caption{p-values of K-S test on different models using different inference procedures}
 	\label{tab:ks-pvals}
 \end{table}
-
-
+				
+				
 \section{Convergence of sampling}
 I also used the KL-divergence metric to determine the (dis)similarity of two distributions. The formula for KL Divergence of discrete distributions $P$ and $Q$ is easy to calculate by \eqref{eq:kl_disc}
 % 
@@ -197,61 +215,61 @@ The final estimator \eqref{eq:final_kl_est} is given by using the exact pdf of $
 \end{equation}
 % 
 Both the metrics (discrete and continuous) were computed with code written using the \texttt{EmpiricalDist} modules.
-
+				
 The idea behind conducting this test is ensuring that the KL divergence decreases as we take more samples from the posterior. This ensures that the solution converges to the correct distribution - a KL divergence of 0 implies the distributions are identical. 
-
+				
 \begin{figure}[H]
 	\centering
 	\input{tikz/kl_plot.tex}
 	\caption{Plot of KL-divergence with increasing number of samples for different models and inference procedures - average over 20 runs}
 	\label{fig:kl}
 \end{figure}
-
+				
 Figure \ref{fig:kl} shows the results of this test. For each inference procedure, we can see that the KL-divergence for each model generally decreases as we take more samples. Rejection sampling is consistently the worst performing inference procedure, with particle based methods such as smc or importance sampling generating more accurate distributions. These plots have all been smoothed by taking a moving average in order to reduce the impact of noise.
-
-
-
+				
+				
+				
 \section{Performance}
 % probabilistic c (Paige14) makes the same comparison
 % TODO: measure performance with varying no. particles (measure KL with difference no. particles)
-
+				
 I evaluated the performance of OwlPPL against Anglican and WebPPL. All of these languages are universal PPLs embedded in different host languages, so are comparable to my PPL. I only compare the inference algorithms for which there are comparable implementations in the other languages.
-
+				
 Figures \ref{fig:time-perf} and \ref{fig:mem-perf} shows how my PPL compares against these languages for a range of models and inference procedures. All the models have been introduced previously, and have been shown to produce correct results in my PPL when using the given inference procedures. I measure both running time\footnote{timed using libraries in respective languages} and peak memory usage\footnote{computed using \texttt{time -f "\%M"}}.
-
+				
 \begin{figure}[!ht]
 	\centering
 	\input{tikz/times_plot.tex}
 	\caption{Time taken for inference against other languages for different models and inference algorithms, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:time-perf}
 \end{figure}
-
+				
 \begin{figure}[!ht]
 	\centering
 	\input{tikz/mems_plot.tex}
 	\caption{Memory Usage of my PPL, compared against other languages for different models, all using an MCMC algorithm, taking 10,000 samples from the posterior, averaged over 20 runs. Error bars show the 95\% confidence interval}
 	\label{fig:mem-perf}
 \end{figure}
-
+				
 These graphs show that OwlPPL performs consistently better that WebPPL in both memory and time. OwlPPL slightly outperforms Anglican on the two continuous models, but is slower than Anglican for the discrete models. This may be because Anglican uses a more efficient representation for discrete distributions, and my representation may need to be optimised. Anglican is a Clojure library, which runs on the JVM, whereas WebPPL is run using nodejs, a JavaScript interpreter. It is possible there is an interpretive overhead with webPPL, explaining slower running times. 
-
+				
 My PPL is significantly better than both Anglican and WebPPL in terms of peak memory usage. All three languages are garbage collected, but OCaml does not run code through a virtual machine, and native binaries are generated. This could explain the lower memory usage, with the overheads of the JVM and the node runtime dominating in those languages.
-
+				
 % SMC bad:
 % This is possibly because when using a large number of particles, a large number of small memory allocations are made by OCaml, which introduced overhead both to my program and the garbage collector.  The languages I compare with are both also garbage collected, but may be more optimised for this use case. 
-
+				
 % TODO: add clustering model
 I also measured the running time of inference with increased data used - I tested the linear regression model, increasing the length of the arrays used as input. Models which are conditioned on more data are expected to give more accurate results, and my results show that running time increases linearly with the size of data. Figure \ref{fig:time-datasize} shows that all the inference functions run in time linear to the size of the input, but the constant factors vary substantially - for example, Sequential Monte Carlo has a much steeper gradient than Metropolis-Hastings, for example, but both have the same shape. This also shows how some inference procedures take much more time than others, however, this often results in more accurate results. For example, smc is slower than rejection sampling here, but Figure \ref{fig:kl} shows that smc produces posterior distributions which are closer to exact solutions. The y axis has a log scale, showing the large difference in running time for each method.
-
+				
 \begin{figure}[!ht]
 	\centering
 	\input{tikz/linreg_by_datasize.tex}
 	\caption{Time taken for inference as a function of input data length as the mean of 10 runs each taking 1,000 samples from the posterior, shaded areas are the 95\% confidence interval ($\pm 2\sigma$)}
 	\label{fig:time-datasize}
 \end{figure}
-
+				
 % For sequential Monte Carlo algorithms, I compared running times with regards to the number of particles used.
-
+				
 % don't have just one subsection
 % do i need to talk about profiling at all - what does it show?
 % \subsection{Profiling}

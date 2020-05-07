@@ -22,7 +22,7 @@ let inference_alg =
   match inference with
   | "mh" -> MH 1000
   | "smc" -> SMC 20
-  | "rej" -> Rejection (1000, Hard)
+  | "rej" -> Rejection (4000, Hard)
   | "imp" -> Importance 1000
   | "pimh" -> PIMH 100
   | "pc" -> PC 100

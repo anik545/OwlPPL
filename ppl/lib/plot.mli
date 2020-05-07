@@ -15,6 +15,14 @@ type options = [ `X_label of string | `Y_label of string | `Title of string ]
 
 (** {2:histograms Histograms}  *)
 
+val pdf_continuous :
+  ?h:handle ->
+  ?n:int ->
+  ?fname:string ->
+  ?options:[ `Title of string | `X_label of string | `Y_label of string ] list ->
+  float dist ->
+  handle
+
 val hist_dist_continuous :
   ?h:handle ->
   ?n:int ->
@@ -73,7 +81,22 @@ val ecdf_discrete :
   handle
 (** *)
 
-val add_exact_pdf : ?scale:float -> dist:float Primitive.t -> handle -> handle
+val add_exact_pdf :
+  ?scale:float ->
+  ?start:float ->
+  ?fin:float ->
+  dist:float Primitive.t ->
+  handle ->
+  handle
+(** *)
+
+val add_exact_cdf :
+  ?scale:float ->
+  ?start:float ->
+  ?fin:float ->
+  dist:float Primitive.t ->
+  handle ->
+  handle
 (** *)
 
 val show : handle -> unit

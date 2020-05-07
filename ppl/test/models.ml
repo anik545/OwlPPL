@@ -22,7 +22,7 @@ let single_coin =
 (* here, x=9, n=10 *)
 let single_coin_exact = Primitive.beta 10. 2.
 
-(* SPRINKLER *)
+(* ---------- SPRINKLER ---------- *)
 let flip = bernoulli
 
 let grass_model =
@@ -44,9 +44,7 @@ let grass_model =
 let grass_model_exact =
   Primitive.categorical [ (true, 0.704225); (false, 0.295775) ]
 
-(* HMM *)
-
-(* linear regression *)
+(* ---------- LINEAR REGRESSION ---------- *)
 
 (* let linreg obs =
   let linear =
@@ -80,6 +78,18 @@ let linreg obs =
   let points d obs = condition' (fun (a, b, c) -> summer obs a b c) d in
   let posterior = points linear obs in
   posterior
+
+(* y=2x+1 *)
+let obs =
+  List.init 20 ~f:(fun i ->
+      let i = float_of_int i in
+      (i, (i *. 2.) +. 1.))
+
+let linreg_m = fmap fst3 (linreg obs)
+
+let linreg_m_exact = Primitive.normal 2. 1.
+
+(* ---------- HMM ---------- *)
 
 let transition = function
   | true -> categorical @@ List.zip_exn [ true; false ] [ 0.7; 0.3 ]

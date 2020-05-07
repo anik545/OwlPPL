@@ -32,10 +32,33 @@
 \begin{document}
 \begin{figure}[]
 	\centering
-	\input{tikz/linreg_by_datasize.tex}
+	% \input{tikz/linreg_by_datasize.tex}
 	% \input{chapters/tikz/kl_plot.tex}
 	% \includegraphics[width=\textwidth]{tikz/kl_plot.tex}
+																											
 	\caption{}
 	\label{}
 \end{figure}
+
+\begin{table}[!ht]
+	\centering
+	% \csvautotabular{data/hypothesis/hypothesis-ks.csv}
+	% \pgfplotstableread[col sep=comma,]{data/hypothesis/hypothesis-ks.csv}\normal
+	% \pgfplotstabletranspose[colnames from = 0]\transpose\normal
+	% \pgfplotstabletypeset[
+			
+	% 	string type,
+	% 	columns/0/.style={string type,column type=l},
+	% 	every head row/.style={before row=\toprule, after row=\midrule},
+	% 	every last row/.style={after row=\bottomrule},
+	% 	every col no 0/.style={
+	% 		string type,
+	% 		column name={Inference Method}
+	% 	},
+	% ]\transpose
+																																		
+	% \caption{p-values of K-S test on different models using different inference procedures}
+	% \label{tab:ks-pvals}
+\end{table}
+
 \end{document}

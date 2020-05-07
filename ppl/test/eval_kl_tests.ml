@@ -110,13 +110,16 @@ let x_vals =
   Owl.Arr.to_array (Owl.Arr.logspace ~base:10. 2. 5. 100)
   |> Array.map ~f:(fun x -> int_of_float x)
 
-let mh, imp, rej, smc = (MH 1000, Importance 10, Rejection (10, Soft), SMC 10)
+let mh, imp, rej, smc, pimh, pc =
+  (MH 1000, Importance 10, Rejection (10, Soft), SMC 10, PIMH 10, PC 10)
 
 let str_to_inf = function
   | "mh" -> mh
   | "imp" -> imp
   | "rej" -> rej
   | "smc" -> smc
+  | "pc" -> pc
+  | "pimh" -> pimh
   | s -> failwith (s ^ " is not an inference method")
 
 let infs =

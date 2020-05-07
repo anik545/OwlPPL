@@ -87,30 +87,8 @@ let kl_cum_continuous ns p q =
   while !i < total_n do
     q_emp := C.add_sample !q_emp (sample q);
     if Array.mem ns !i ~equal:Int.equal then (
-      (* let kl =
-         let support_q = Array.to_list @@ C.values !q_emp in
-         let support_q = List.dedup_and_sort ~compare:Float.compare support_q in
-         let pdf_q = C.to_pdf !q_emp in
-         let k = ref 1. in
-         let f x =
-          let p_x = pdf_p x in
-          let ret =
-            match pdf_q x with
-            | 0. -> 0.
-            | q_x ->
-              p_x *. log (p_x /. q_x)
-          in
-          if Float.is_finite ret then (k:=!k+.1.; ret) else 0.
-         in
-         (* TODO: is this right - should I be dividing by i? *)
-         List.sum
-          (module Float)
-          ~f support_q /. !k
-         in *)
       let kl = kl_cont (C.values !q_emp) p in
-      (* TODO: is this right - should I be dividing by i? *)
       arr.(!j) <- (!i, kl);
-      (* arr.(!j) <- (!i, kl /. float_of_int !i); *)
       incr j )
     else ();
     incr i
@@ -150,8 +128,9 @@ let kolmogorov_smirnov ?(n = 10000) ?(alpha = 0.01) d d' =
   (* let ecdf_map d: (float, float) Core.Map = Core.Map.of_sorted_array (module Float) (Owl_stats.ecdf (take_k_samples n d)) in *)
   (* let ecdf x = ecdf_map d in *)
   let h = Owl_stats.ks_test ~alpha (take_k_samples n d) (Primitive.cdf d') in
-  if h.reject then Printf.printf "two dists are equal with p=%.60f\n" h.p_value
-  else Printf.printf "two dists are not equal with p=%.60f\n" h.p_value;
+  if h.reject then
+    Printf.printf "two dists are not equal with p=%.60f\n" h.p_value
+  else Printf.printf "two dists are equal with p=%.60f\n" h.p_value;
   h
 
 (* d is inferred dist, d' is exact dist, default 1% signifigance level *)
@@ -178,6 +157,6 @@ let chi_sq ?(n = 10000) ?(alpha = 0.01) d d' : Owl_stats.hypothesis =
   printf "ts: %f\n" test_stat;
   let p = 1. -. Owl_stats.chi2_cdf ~df test_stat in
   if Float.(p < alpha) then
-    Printf.printf "two dists are equal with p=%.60f\n%!" p
-  else Printf.printf "two dists are not equal with p=%.60f\n%!" p;
+    Printf.printf "two dists are not equal with p=%.60f\n%!" p
+  else Printf.printf "two dists are probably equal with p=%.60f\n%!" p;
   { reject = Float.(p > test_stat); p_value = p; score = p }
