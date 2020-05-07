@@ -1,41 +1,15 @@
 \documentclass[12pt,notitlepage,a4paper]{report}
 
-\usepackage[outputdir=out]{minted}
-\usepackage{lmodern}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{verbatim}
-\usepackage{csvsimple}
-\usepackage{pgfplots}
-\usepackage{pgfplotstable}
-\usepackage{tikz}
-\usepackage[hidelinks]{hyperref}
-\usepackage[parfill]{parskip}
-\usepackage{enumitem}
-\usepackage{hyperref}
-\usepackage{graphicx}
-\usepackage{upquote}
-\usepackage{amsmath}
-\usepackage{xcolor}
-\usepackage[margin=2cm,headheight=13.6pt]{geometry}
-\usepackage{microtype}
-\usepackage{longtable,booktabs}
-\usepackage{amssymb,amsmath}
-\usepackage{subfig}
-% \usepackage{tikzscale}
-\usepgfplotslibrary{groupplots}
-\usepgfplotslibrary{fillbetween}
-
-\pgfplotsset{compat=1.13}
+\usepackage{mydiss}
 
 %TC:ignore
+
 \begin{document}
 \begin{figure}[]
 	\centering
+	% \input{tikz/kl_plot.tex}
 	% \input{tikz/linreg_by_datasize.tex}
-	% \input{chapters/tikz/kl_plot.tex}
-	% \includegraphics[width=\textwidth]{tikz/kl_plot.tex}
-																											
+	% \includegraphics[width=\textwidth]{tikz/kl_plot.tex}																									
 	\caption{}
 	\label{}
 \end{figure}
@@ -43,22 +17,24 @@
 \begin{table}[!ht]
 	\centering
 	% \csvautotabular{data/hypothesis/hypothesis-ks.csv}
-	% \pgfplotstableread[col sep=comma,]{data/hypothesis/hypothesis-ks.csv}\normal
-	% \pgfplotstabletranspose[colnames from = 0]\transpose\normal
-	% \pgfplotstabletypeset[
-			
-	% 	string type,
-	% 	columns/0/.style={string type,column type=l},
-	% 	every head row/.style={before row=\toprule, after row=\midrule},
-	% 	every last row/.style={after row=\bottomrule},
-	% 	every col no 0/.style={
-	% 		string type,
-	% 		column name={Inference Method}
-	% 	},
-	% ]\transpose
-																																		
-	% \caption{p-values of K-S test on different models using different inference procedures}
-	% \label{tab:ks-pvals}
+	\pgfplotstableread[col sep=comma,]{data/hypothesis/hypothesis-ks.csv}\normal
+	\pgfplotstabletranspose[colnames from = 0]\transpose\normal
+	\pgfplotstabletypeset[
+		% string type,
+		% every col no 1/.style={precision=1}
+		% every row/.style={/pgf/number format/sci},
+		every head row/.style={before row=\toprule, after row=\midrule},
+		every last row/.style={after row=\bottomrule},
+		every col no 0/.style={
+			string type,
+			column name={Inference Method},
+			column type={@{}l}},
+		column type={c@{}},
+		precision=4,
+		fixed zerofill=true
+	]\transpose
+	\caption{p-values of K-S test on different models using different inference procedures}
+	\label{tab:ks-pvals}
 \end{table}
 
 \end{document}

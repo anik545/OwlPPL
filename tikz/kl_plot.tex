@@ -1,7 +1,7 @@
 % !TeX root = ../a.tex
 
 \newcommand{\kls}[1]{
-																																																
+																																																								
 	\pgfplotstableread[col sep = comma]{#1}\datatable
 	\pgfplotstablegetcolsof{\datatable}
 	\pgfmathtruncatemacro\numberofcols{\pgfplotsretval-1}
@@ -44,23 +44,33 @@
 		% \addlegendentry{mh}
 		% \addplot table [x index=0, y index=1, col sep=comma] {data/kl/smc_coin.csv};
 		% \addlegendentry{smc}
+		\addplot table [x index=0, y index=1, col sep=comma] {data/kl/pc_coin.csv};
+		\addlegendentry{pc}
+		\addplot table [x index=0, y index=1, col sep=comma] {data/kl/pimh_coin.csv};
+		\addlegendentry{pimh}
+														
 		\nextgroupplot[title=Sprinkler model,
-			legend style={at={($(0,0)+(2cm,2cm)$)}, legend columns=4},
+			legend style={at={($(0,0)+(2cm,2cm)$)}, legend columns=3},
 		legend to name=leg1]
 		\coordinate (c2) at (rel axis cs:1,1);
 		% 
 		% \kls{data/kl/kl_sprinkler_all.csv}
 		\addplot table [x index=0, y index=1, col sep=comma] {data/kl/rejection_sprinkler.csv};
-		\addlegendentry{rejection}
+		\addlegendentry{rejection sampling}
 		\addplot table [x index=0, y index=1, col sep=comma] {data/kl/importance_sprinkler.csv};
-		\addlegendentry{importance}
+		\addlegendentry{importance sampling}
 		\addplot table [x index=0, y index=1, col sep=comma] {data/kl/mh_sprinkler.csv};
-		\addlegendentry{mh}
+		\addlegendentry{metropolis hastings}
 		\addplot table [x index=0, y index=1, col sep=comma] {data/kl/smc_sprinkler.csv};
-		\addlegendentry{smc}
+		\addlegendentry{particle filter}
+		\addplot table [x index=0, y index=1, col sep=comma] {data/kl/pc_sprinkler.csv};
+		\addlegendentry{particle cascade}
+		\addplot table [x index=0, y index=1, col sep=comma] {data/kl/pimh_sprinkler.csv};
+		\addlegendentry{particle-independent mh}
+						
 	\end{groupplot}
 	\coordinate (c3) at ($(c1)!.5!(c2)$);
 	\node[below] at (c3 |- current bounding box.south)
 	{\pgfplotslegendfromname{leg1}};
-																																																																																														
+																																																																																																						
 \end{tikzpicture}

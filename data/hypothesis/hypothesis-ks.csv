@@ -1,2 +1,2 @@
 ,Rejection Sampling,Importance Sampling,Metropolis Hastings,Particle Filter,Particle Cascade,Particle-Independent Metropolis-Hastings
-coin,0.0619,0.666,0.26,0.666,0.946,0.977
+Biased Coin,0.0619,0.666,0.26,0.666,0.946,0.977
