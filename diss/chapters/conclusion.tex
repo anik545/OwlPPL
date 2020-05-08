@@ -1,20 +1,24 @@
 % !TeX root = ../diss.tex
+\vspace{-10mm}
 \chapter{Conclusion}
-\vspace{-5mm}
+\vspace{-7mm}
 \section{Work Completed}
 In this project, I have designed, developed and tested a probabilistic programming language embedding in OCaml. It has achieved all the core requirements as well as some of the extensions. My PPL can represent a wide variety of models, including infinite models with unbounded recursion, fulfilling the definition of a universal PPL. Standard OCaml features, such as pattern matching or higher order functions, and well as existing deterministic functions can be used in my PPL. Models can then be combined in complex ways, and existing OCaml libraries can be used within models.
 
 I have also performed extensive evaluation of my PPL, showing that the performance is competitive with other universal PPLs. In particular, the memory usage of OwlPPL proved to be significantly lower than other languages, which could make it appropriate for edge computing. In addition, performing hypothesis tests shows that my PPL produces correct results, and my implementations of inference procedures are very unlikely to be faulty, which is the best guarantee that can be given. Programs written in my PPL are also not overly verbose when compared to these languages.
+\vspace{-3mm}
 
 \section{Further Work}
 
-Future work would mainly focus on how to improve inference. For example, there are several algorithms I have implemented that would benefit from the use of multiple cores - which may be possible with the ongoing development of multi-core OCaml. In particular, the use of the Independent variant could benefit from parallelisation. 
+Future work would mainly focus on how to improve inference. For example, there are several algorithms I have implemented that would benefit from the use of multiple cores - which may be possible with the ongoing development of multi-core OCaml. In particular, the Independent variant could benefit greatly from parallelisation. 
 
 I could also use more efficient inference algorithm implementations. This may require changing the core data structure or adding more variants to give more information, for example adding variable names in order to keep track of the primitives being used, or allowing a user to specify guide distributions for models to create more specific proposal distributions for MCMC (a technique used by several PPLs, including Pyro and WebPPL).
 
 One of my initial goals was for my PPL to be able to represent as many types of model as possible. This prompted the use of a trace based approach (inspired by Church) rather than using a computation graph. However, there are recent universal PPLs which use dynamic computation graphs to make inference more efficient (e.g. Pyro). Since \texttt{Owl} contains a powerful computational graph implementation, this could be a further extension.
+\vspace{-3mm}
 
 \section{Lessons Learnt}
 While there are many possible extensions to this project, it successfully achieved all the initial goals, and I have learnt a great deal about OCaml and probabilistic programming, including the mathematics behind tractable Bayesian inference, the difficulties in testing statistical code as well as language design.
 
 [ {\small \textbf{Word count}: \input{wordcount.txt}}]
+

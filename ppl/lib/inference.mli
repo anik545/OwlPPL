@@ -1,6 +1,6 @@
 (** Implementation of inference algorithms 
 
-    Inference algorithms to be called on probabilistic models defined using {!module-Dist}. The {infer} method can be used to call all the inference algorithms listed, but the underlying method is also exposed for convenience. The 
+    Inference algorithms to be called on probabilistic models defined using {!module-Dist}. The [infer] method can be used to call all the inference algorithms listed, but the underlying method is also exposed for convenience. The 
 *)
 
 open Dist

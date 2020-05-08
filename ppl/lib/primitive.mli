@@ -15,7 +15,7 @@ type 'a support =
 (* This allows users to define distributions with more functionality
    which they can use in their programs, but isn't needed here *)
 
-(** The signature for new primitives distributions *)
+(** The signature for new primitive distributions *)
 module type PRIM_DIST = sig
   type t
 

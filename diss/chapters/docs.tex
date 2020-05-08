@@ -150,22 +150,22 @@ Operators}{Condition Operators}}\label{distux5fmonad}}
 
 \begin{description}
 \item[{\protect\hyperlink{val-conditionux27}{}\texttt{val\ condition\textquotesingle{}\ :\ (\textquotesingle{}a\ -\textgreater{}\ float)\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}}]
-most general condition operator
+The most general condition operator
 \end{description}
 
 \begin{description}
 \item[{\protect\hyperlink{val-condition}{}\texttt{val\ condition\ :\ bool\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}}]
-hard conditioning
+Hard conditioning
 \end{description}
 
 \begin{description}
 \item[{\protect\hyperlink{val-score}{}\texttt{val\ score\ :\ float\ -\textgreater{}\ \textquotesingle{}a\ dist\ -\textgreater{}\ \textquotesingle{}a\ dist}}]
-soft conditioning
+Soft conditioning, add a constant score to a trace
 \end{description}
 
 \begin{description}
 \item[{\protect\hyperlink{val-observe}{}\texttt{val\ observe\ :\ \textquotesingle{}a\ -\textgreater{}\ \textquotesingle{}a\ Primitive.t\ -\textgreater{}\ \textquotesingle{}b\ dist\ -\textgreater{}\ \textquotesingle{}b\ dist}}]
-soft conditioning for observations from a known distribution
+Soft conditioning for observations from a known distribution
 \end{description}
 
 \hypertarget{distux5fmonad}{\subsubsection{\texorpdfstring{\protect\hyperlink{distux5fmonad}{}Monad
@@ -203,11 +203,7 @@ used in models.
 
 \protect\hyperlink{type-primitive}{}\texttt{type\ \textquotesingle{}a\ primitive}
 
-\begin{description}
-\item[{\protect\hyperlink{val-binomial}{}\texttt{val\ binomial\ :\ int\ -\textgreater{}\ float\ -\textgreater{}\ int\ primitive}}]
-Create a binomial distribution, the output is the number of successes
-from n independent trials with probability of success p
-\end{description}
+\protect\hyperlink{val-binomial}{}\texttt{val\ binomial\ :\ int\ -\textgreater{}\ float\ -\textgreater{}\ int\ primitive}
 
 \protect\hyperlink{val-normal}{}\texttt{val\ normal\ :\ float\ -\textgreater{}\ float\ -\textgreater{}\ float\ primitive}
 
@@ -254,7 +250,9 @@ Common operators for combining distributions
 Implementation of inference algorithms
 
 Inference algorithms to be called on probabilistic models defined using
-\href{../Dist/index.html}{\texttt{Dist}}
+\href{../Dist/index.html}{\texttt{Dist}}. The \texttt{infer} method can
+be used to call all the inference algorithms listed, but the underlying
+method is also exposed for convenience. The
 
 \begin{itemize}
 \tightlist
@@ -451,7 +449,7 @@ PRIM\_DIST
 \section{\texorpdfstring{Module type
 \texttt{Primitive.PRIM\_DIST}}{Module type Primitive.PRIM\_DIST}}\label{module-type-primitive.primux5fdist}
 
-The signature for new primitives distributions
+The signature for new primitive distributions
 
 \protect\hyperlink{type-t}{}\texttt{type\ t}
 
@@ -470,6 +468,12 @@ The signature for new primitives distributions
 
 \section{\texorpdfstring{Module type
 \texttt{Ppl\_\_Sigs.Prob}}{Module type Ppl\_\_Sigs.Prob}}\label{module-type-pplux5fux5fsigs.prob}
+
+This is an signature for types representing probabilities - it overloads
+mathematical operators which are commonly used in probability
+calculations. At the moment, there are two implementations - ordinary
+float probabilities and log probabilities. Both are backed by floats,
+but use of the LogProb module can lead to a reduced risk of underflow.
 
 \protect\hyperlink{type-t}{}\texttt{type\ t}
 

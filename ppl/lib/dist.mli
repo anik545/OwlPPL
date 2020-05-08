@@ -38,16 +38,16 @@ val from_primitive : 'a Primitive.t -> 'a dist
 (** {2:dist_monad Condition Operators} *)
 
 val condition' : ('a -> float) -> 'a dist -> 'a dist
-(** most general condition operator *)
+(** The most general condition operator *)
 
 val condition : bool -> 'a dist -> 'a dist
-(** hard conditioning *)
+(** Hard conditioning *)
 
 val score : float -> 'a dist -> 'a dist
-(** soft conditioning *)
+(** Soft conditioning, add a constant score to a trace *)
 
 val observe : 'a -> 'a Primitive.t -> 'b dist -> 'b dist
-(** soft conditioning for observations from a known distribution *)
+(** Soft conditioning for observations from a known distribution *)
 
 (** {2:dist_monad Monad Functions} 
     Monad functions

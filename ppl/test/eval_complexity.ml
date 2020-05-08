@@ -121,6 +121,37 @@ let by_data_length_linreg_single_inf ?(num_times = 3) ?(num_x = 20) inf :
   let data = Array.(transpose_exn @@ append [| ns |] @@ transpose_exn d) in
   Array.append [| header |] (map_2d data ~f:string_of_float)
 
+let by_data_length_dpmm_single_inf ?(num_times = 3) ?(num_x = 20) inf :
+    string array array =
+  (* lengths of data *)
+  let ns = Owl.Arr.to_array @@ Owl.Arr.linspace 1. 10000. num_x in
+
+  let header = [| "n"; print_infer_strat_short inf; "err" |] in
+
+  (* generate data to condition on, memoise to ensure same lists are used *)
+  let list_gen =
+    memo (fun n -> List.init n ~f:(fun _ -> Owl_stats.uniform_rvs ~a:0. ~b:10.))
+  in
+
+  let model : float list -> (float * float) list dist =
+    Models.cluster_parameters
+  in
+
+  let mean_std_of_times n f =
+    let arr = Array.init n ~f:(fun _ -> snd @@ time f) in
+    let mean = Owl_stats.mean arr in
+    [| mean; 1.96 *. Owl_stats.std ~mean arr |]
+  in
+  let d =
+    Array.map ns ~f:(fun n ->
+        printf "inf: %s, datasize: %f\n" (print_infer_strat_short inf) n;
+        let f = use_model (model (list_gen (int_of_float n))) inf in
+        mean_std_of_times num_times f)
+  in
+  (print_2d @@ Array.(transpose_exn @@ append [| ns |] @@ transpose_exn d));
+  let data = Array.(transpose_exn @@ append [| ns |] @@ transpose_exn d) in
+  Array.append [| header |] (map_2d data ~f:string_of_float)
+
 let mh, imp, rej, smc, pc, pimh =
   (MH 500, Importance 50, Rejection (100, Soft), SMC 50, PC 10, PIMH 10)
 
@@ -139,9 +170,15 @@ let infs =
     |> Array.map ~f:str_to_inf
   else [| mh; rej; imp; smc |]
 
-let _ =
+(* let _ =
   Array.map infs ~f:(fun inf ->
       by_data_length_linreg_single_inf inf ~num_times:10
       |> write_to_csv
            ~fname:
-             ("linreg_by_data_length_" ^ print_infer_strat_short inf ^ ".csv"))
+             ("linreg_by_data_length_" ^ print_infer_strat_short inf ^ ".csv")) *)
+
+let _ =
+  Array.map infs ~f:(fun inf ->
+      by_data_length_dpmm_single_inf inf ~num_times:2
+      |> write_to_csv
+           ~fname:("dpmm_by_data_length_" ^ print_infer_strat_short inf ^ ".csv"))

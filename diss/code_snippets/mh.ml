@@ -7,11 +7,9 @@ let mh_transform ~burn d =
     let next = if accept then (y, r) else (x, s) in
     Yield (return next, next) in
   let seq = Sequence.unfold_step ~init:(sample proposal) ~f:iterate in
-  let seq = Sequence.drop_eagerly seq burn in
-  (* burn initial *)
+  let seq = Sequence.drop_eagerly seq burn in   (* burn initial *)
   let r = ref seq in
-  let* _ = return () in
-  (* to close over the sequence ref *)
+  let* _ = return () in  (* to close over the sequence ref *)
   match Sequence.next !r with
   | Some (hd, tl) ->
       let* x, _ = hd in

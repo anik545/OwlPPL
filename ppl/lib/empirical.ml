@@ -43,6 +43,8 @@ end
 
 (* TODO: stop using map.poly, slow - take a first class module in the creater functions *)
 module Discrete : S = struct
+  (** Module to represent discrete empirical distributions, backed by a map *)
+
   type 'a t = ('a, int) Map.Poly.t [@@deriving sexp]
 
   let update_elt x =
@@ -105,6 +107,8 @@ module Discrete : S = struct
 end
 
 module ContinuousArr = struct
+  (** Module to represent continuous empirical distributions, backed by a dynamic array *)
+
   type 'a t = { samples : float array; n : int; max_length : int }
 
   (* open Owl_stats *)

@@ -7,34 +7,12 @@
 \begin{document}
 \begin{figure}[]
 	\centering
-	% \input{tikz/kl_plot.tex}
+	\input{tikz/kl_plot.tex}
 	% \input{tikz/linreg_by_datasize.tex}
 	% \includegraphics[width=\textwidth]{tikz/kl_plot.tex}																									
 	\caption{}
 	\label{}
 \end{figure}
 
-\begin{table}[!ht]
-	\centering
-	% \csvautotabular{data/hypothesis/hypothesis-ks.csv}
-	\pgfplotstableread[col sep=comma,]{data/hypothesis/hypothesis-ks.csv}\normal
-	\pgfplotstabletranspose[colnames from = 0]\transpose\normal
-	\pgfplotstabletypeset[
-		% string type,
-		% every col no 1/.style={precision=1}
-		% every row/.style={/pgf/number format/sci},
-		every head row/.style={before row=\toprule, after row=\midrule},
-		every last row/.style={after row=\bottomrule},
-		every col no 0/.style={
-			string type,
-			column name={Inference Method},
-			column type={@{}l}},
-		column type={c@{}},
-		precision=4,
-		fixed zerofill=true
-	]\transpose
-	\caption{p-values of K-S test on different models using different inference procedures}
-	\label{tab:ks-pvals}
-\end{table}
 
 \end{document}

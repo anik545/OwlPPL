@@ -27,65 +27,16 @@ preparation -
 requirements + starting point?
 tools -> ocaml + owl (same level)
 
-bayesian inference under ppl
-
-2.8+2.7+2.9 -
-
-whole section on probabilistic programming
- -> two approaches
- -> im using trace driven, therefore these equations for inference
- -> explain why these inference algorithms
 
 lead reader down path, explain why this path
 
-signposting in sections
-
-first/last para of each chapter. 
-
-proffesional practice -> end
-
-put repo overview into proff. practice
-
-3.2 -> give examples of combining primitives - talk more about language design - why is it a dsl
-    -> what are the components of the dsl - what is the dsl, can i specify the dsl (sample/observe)
 
 inference alg in prep -> 
 
 change section heading in 3.6 to implenting inferencing
 clearly mention which class each algorithm belongs to
 
-profesional practice testing -> make clear got unit tests 
-in prep, say i will talk in more detail about the challenges of testing (forward reference)
-In the implementation testing section, give concrete example of a unit test that wont work. How to deal wiht this failure? (use fixed seed) - doesnt always work. (find some good reference papers)
-
-evaluation -> subsectioin for each example -> with the problem
-
-graphical representation of each model with code
-sprinkler model as a 
-
-put code coverage stuff in an appendix
-
-some of the code listing could be wrapped
-
-consider doing a \paragraph instead to just do a bold word instead of a section heading
-
-chapter 1 get rid of section heading 
-
-say more in related works (maybe table of different ppl)
-
-could get 4 plots into a single line
-
-personal reflection in conclusion
-
-dont talk about things as if they were easy
-
 talk about some real world applications 
 -> https://www.cs.cmu.edu/~fp/papers/toplas08.pdf pg1 has references
 
 talk about the name, owlppl
-
-add a pie chart of gprof output??
-add a line chart of memory usage over time from spacetime.
-on that line chart, add lines for the other languages as well
-
-ppl -> PPL

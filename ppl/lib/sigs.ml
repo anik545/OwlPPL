@@ -33,7 +33,6 @@ module type Primitive_Distributions = sig
   type 'a primitive
 
   val binomial : int -> float -> int primitive
-  (** Create a binomial distribution, the output is the number of successes from n independent trials with probability of success p  *)
 
   val normal : float -> float -> float primitive
 
@@ -101,6 +100,8 @@ module type Ops = sig
 end
 
 module type Prob = sig
+  (** This is an signature for types representing probabilities - it overloads mathematical operators which are commonly used in probability calculations. At the moment, there are two implementations - ordinary float probabilities and log probabilities. Both are backed by floats, but use of the LogProb module can lead to a reduced risk of underflow.  *)
+
   type t
 
   (* type t =  float *)

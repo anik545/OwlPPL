@@ -81,10 +81,10 @@ let () =
   match args.(1) with
   | "chi" ->
       print_test_to_file chi_sq models_with_soln_discrete infs_chi
-        "hypothesis-chi.csv"
+        "hypothesis-chi1.csv"
   | "ks" ->
       print_test_to_file kolmogorov_smirnov models_with_soln_continuous infs_ks
-        "hypothesis-ks.csv"
+        "hypothesis-ks1.csv"
   | _ -> printf "invalid test type"
 
 (* chi () *)
