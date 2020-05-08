@@ -9,7 +9,6 @@ maintainer: "Anik Roy"
 authors: "ar899@cam.ac.uk"
 license: "MIT"
 homepage: "https://github.com/anik545/OwlPPL"
-bug-reports: ""
 dev-repo: "git@github.com:anik545/OwlPPL.git"
 
 depends: [ 

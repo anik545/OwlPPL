@@ -9,12 +9,12 @@ type param = float * float
 let obs =
   List.init 10 ~f:(fun x ->
       let x = float_of_int x in
-      (x, (x *. 2.) +. 4.))
+      (x, (x *. 2.) +. 3.))
 
 let linreg =
   let linear =
     let* a = normal 0. 2. in
-    let* b = normal 0. 2. in
+    let* b = normal 0. 1. in
     let* c = gamma 1. 1. in
     return (a, b, c)
   in
@@ -30,7 +30,7 @@ let linreg =
 let linreg' =
   let open Float in
   let* m = normal 0. 2. in
-  let* c = normal 0. 2. in
+  let* c = normal 0. 1. in
   List.fold obs
     ~init:(return (m, c))
     ~f:(fun d (x, y) -> observe y Primitive.(normal ((m * x) + c) 1.) d)
@@ -38,7 +38,7 @@ let linreg' =
 let linreg'' =
   let linear =
     let* a = normal 0. 2. in
-    let* b = normal 0. 2. in
+    let* b = normal 0. 1. in
     return (a, b)
   in
   let open Float in
@@ -64,5 +64,4 @@ let d'' = infer (fmap snd3 linreg) (MH 10)
 
 (* let d'' = mh' 10000 c' *)
 
-let () =
-  Printf.printf "y=%f*x+%f\n" (sample_mean ~n:1000 d') (sample_mean ~n:100 d'')
+let () = Printf.printf "slope = %f\n" (sample_mean ~n:1000 d')
