@@ -22,7 +22,7 @@ To show how my PPL would be used on real problems, I now outline a set of exampl
 
 \subsection{Sprinkler}
 % to show exact inference on discrete model
-The sprinkler model is a commonly used example in Bayesian inference due to it's simplicity. It is an example of a \textit{Bayesian network}, and can be visualised as in figure \ref{fig:sprinkler-network}. The code in listing \ref{lst:sprinkler} shows the model in the diagram encoded as a program. This particular program models the probability of rain given that the grass is wet.
+The sprinkler model is a commonly used example in Bayesian inference due to it's simplicity. It is an example of a \textit{Bayesian network}, and can be visualised as in Figure \ref{fig:sprinkler-network}. The code in Listing \ref{lst:sprinkler} shows the model in the diagram encoded as a program. This particular program models the probability of rain given that the grass is wet.
 
 % \begin{noindent}
 \begin{figure*}[!htb]
@@ -54,7 +54,7 @@ let () =
 \subsection{Biased Coin} \label{sec:coin} 
 Modelling a biased coin shows an example of a very simple model with a continuous posterior that can be calculated analytically \cite{datasci}. The problem is that given a coin, we flip it 10 times and observe 9 heads. We not want to find out whether or not the coin is biased and with what weight (how likely is it to flip a heads). This model uses an uninformative prior, and the posterior over the weight of the coin is $\text{Beta}(10,2)$ (derivation given in \ref{app:coin})
 
-The program in my PPL is shown in listing \ref{lst:coin}, and demonstrates setting up the model, performing inference as well as finding the mean of the posterior. The application is to find the chance of the next coin flip landing heads.
+The program in my PPL is shown in Listing \ref{lst:coin}, and demonstrates setting up the model, performing inference as well as finding the mean of the posterior. The application is to find the chance of the next coin flip landing heads.
 
 \begin{listing}[!ht]
 	\ocamlcode{code_snippets/coin.ml}	
@@ -101,11 +101,11 @@ This example shows how to use multiple data points to infer a continuous distrib
 \subsection{Infinite Mixture Model - Dirichlet Process}
 This example demonstrates the common task of clustering a set of data points without knowledge of the number of clusters. This is a model which cannot be expressed in PPLs such as STAN or Infer.Net, since it is a non-parametric Bayesian model - we do not know the number of clusters beforehand. The infinite nature of this model requires the use of unbounded recursion and demonstrates the power of universal PPLs.
 
-The prior for this model is a Dirichlet process \cite{teh2010dirichlet}, which defines a distribution over distributions. This model is then known as a Dirichlet Process mixture model with an infinite number of Gaussians components \cite{dpmm}, and the number of clusters is allowed to grow with the dataset size. I use a mixture of Gaussians, meaning the likelihood of a point belonging to each cluster is given by different normal distributions.
+The prior for this model is a Dirichlet process \cite{teh2010dirichlet}, which defines a distribution over distributions. This model is a Dirichlet Process mixture model with an infinite number of Gaussians components \cite{dpmm}, and the number of clusters is allowed to grow with the dataset size. I use a mixture of Gaussians, meaning the likelihood of a point belonging to each cluster is given by different normal distributions.
 
 \begin{listing}[H]
 	\ocamlcode{code_snippets/dpmm.ml}
-	\captionof{listing}{OwlPPL}
+	\captionof{listing}{Infinite mixture model in OwlPPL, gets the cluster assigned to each data point}
 \end{listing}
 
 

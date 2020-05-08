@@ -72,7 +72,7 @@ Monads are a design pattern commonly used in functional programming languages.
 	
 The key data structure I use to model probability distributions is a monad. A data type is a monad if it defines two operations, \texttt{return} and \texttt{bind}, and can be thought of as a type which `wrap' values. The return function takes a value and returns a monad wrapping that value. The bind function takes a monad and a function, and applies the function to the value wrapped inside the monad, and then re-wraps this value. The type must also satisfy a set of laws, which I omit here \cite{wadler1990comprehending}. Monads can be used to structure programs in a general way, and allow side effects to be described in types.
 	
-\paragraph{Probability Monad} \ref{sec:monad}
+\paragraph{Probability Monad} \label{sec:prep-monad}
 It has been shown that probability distributions form a monad, \cite{giry1982categorical, jones1989probabilistic}, and that they can be used to create distributions composed from other distributions \cite{ramsey2002stochastic}. In this case, \texttt{return x} represents a distribution with only one value (x) - known as a Dirac distribution. So \texttt{bind d f} is the main operator for composing distributions. Binding distributions together represents taking the output of one distribution (d) and using it in the body of the function (f). This can be thought of as taking a sample from d. However, it is important to note that calling bind will not directly produce a sample, but expose that structure to an interpreter (the inference engine) which can then decide what to do at that point.
 	
 \paragraph{Custom let operators}

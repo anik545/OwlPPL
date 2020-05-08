@@ -75,10 +75,9 @@ An extension goal achieved here is to allow users to define their own primitive 
 	
 The type of a primitive distribution is 
 \begin{center}
-																																																																																																																							
 	\mintinline{ocaml}| type 'a prim_dist = (module PRIM_DIST with type t='a)|
 \end{center}
-with the \texttt{PRIM\_DIST} signature defined as in listing \ref{lst:prim-sig}.
+with the \texttt{PRIM\_DIST} signature defined as in Listing \ref{lst:prim-sig}.
 
 % TODO: put these side by side instead
 \begin{figure}[!htb]
@@ -100,7 +99,7 @@ with the \texttt{PRIM\_DIST} signature defined as in listing \ref{lst:prim-sig}.
 % 	\label{lst:prim-sig}
 % \end{listing}
 	
-An example of this being used to add a new primitive distribution is given in listing \ref{lst:new-dist}, for the specific case of the Poisson distribution. The \texttt{Poisson} distribution can now be used as other primitives are, e.g. in \texttt{observe} statements.
+An example of this being used to add a new primitive distribution is given in Listing \ref{lst:new-dist}, for the specific case of the Poisson distribution. The \texttt{Poisson} distribution can now be used as other primitives are, e.g. in \texttt{observe} statements.
 	
 % \begin{listing}[!ht]
 % 	\ocamlcode{code_snippets/new_dist.ml}	
@@ -113,7 +112,7 @@ Statistical models are designed by the user to model a process they are interest
 
 \subsubsection{Probability Monad}
 	
-As mentioned in section \ref{sec:prep-monapd}, monads are a natural way to represent composable probability distributions. They allow the output from one distribution (essentially a sample), to be used as if it was of the type that the distribution is defined over. Essentially, the \texttt{bind} operation allows us to 'unwrap' the 'a dist type to allow us to manipulate a value of type 'a. We must then use \texttt{return} to `wrap' the value back into a value of type 'a dist. The type signatures of these functions are below, with \texttt{m} being the monad type.
+As mentioned in section \ref{sec:prep-monad}, monads are a natural way to represent composable probability distributions. They allow the output from one distribution (essentially a sample), to be used as if it was of the type that the distribution is defined over. Essentially, the \texttt{bind} operation allows us to 'unwrap' the 'a dist type to allow us to manipulate a value of type 'a. We must then use \texttt{return} to `wrap' the value back into a value of type 'a dist. The type signatures of these functions are below, with \texttt{m} being the monad type.
 % \begin{noindent}
 \begin{figure}[!htb]
 \centering
@@ -153,7 +152,7 @@ let d = (normal 0. 1.) +~ (normal 0. 1.)
 \end{listing}
 % \end{noindent}
 
-However, there are many different underlying data structures which can be used to represent distributions which conform to the definition of a monad. The simplest is a list of pairs representing a set of values and corresponding probabilities, \texttt{('a * float) list}. This is a natural way to represent discrete distributions, with return and bind defined as in listing \ref{lst:monad_plist}. Here, \texttt{return} gives us the distribution with just one value, and bind combines a distribution with a function that takes every element from the initial distribution and applies a function that creates a set of new distributions. The new distributions are then flattened into a single list and normalised. This approach has been used to create functional probabilistic languages \cite{erwig}, but has several drawbacks, primarily the fact that it cannot be used to represent continuous distributions, and that inference is not efficient - there is no information from the model encoded in this representation, such as how random variables are combined or from what distributions they came from.
+However, there are many different underlying data structures which can be used to represent distributions which conform to the definition of a monad. The simplest is a list of pairs representing a set of values and corresponding probabilities, \texttt{('a * float) list}. This is a natural way to represent discrete distributions, with return and bind defined as in Listing \ref{lst:monad_plist}. Here, \texttt{return} gives us the distribution with just one value, and bind combines a distribution with a function that takes every element from the initial distribution and applies a function that creates a set of new distributions. The new distributions are then flattened into a single list and normalised. This approach has been used to create functional probabilistic languages \cite{erwig}, but has several drawbacks, primarily the fact that it cannot be used to represent continuous distributions, and that inference is not efficient - there is no information from the model encoded in this representation, such as how random variables are combined or from what distributions they came from.
 
 \begin{listing}[!ht]
 	\ocamlcode{code_snippets/probmonad_list.ml}	
@@ -206,7 +205,7 @@ For discrete distributions, I use a \texttt{Core.Map}\footnote{\url{https://ocam
 	\label{lst:empirical}
 \end{listing}
 	
-The signature in listing \ref{lst:empirical} is implemented for both continuous and discrete distributions. For the continuous case, I perform binning to approximate the continuous distribution by a discrete one in order to approximate the pdf. The number of bins used is calculated automatically from the number of samples taken.
+The signature in Listing \ref{lst:empirical} is implemented for both continuous and discrete distributions. For the continuous case, I perform binning to approximate the continuous distribution by a discrete one in order to approximate the pdf. The number of bins used is calculated automatically from the number of samples taken.
 		
 \section{Conditioning} \label{sec:condition}
 	
@@ -217,9 +216,9 @@ The condition variant in my GADT is used to assign scores to traces, and takes a
 		
 I have also implemented a few helpers to make it easier to condition models. The three main helpers are \texttt{condition}, \texttt{score} and \texttt{observe}, which are all specific cases of the general \texttt{Condition} variant. 
 		
-The \texttt{condition} operator is used for hard conditioning, which conditions the model on an observation being true. If true is passed in, then the score assigned is 1, and if false, the score assigned is 0. This score represents how likely it is for the current trace to occur, and different inference algorithms will use this information to produce a distribution over all possible traces. We can use this operator to constrain certain variables or outcomes in a model. For example in listing \ref{lst:dice}, we roll two dice and observe that the sum is 4 - we can then find the distribution over the first die (which won't include 4,5 or 6 since they are >=4).
+The \texttt{condition} operator is used for hard conditioning, which conditions the model on an observation being true. If true is passed in, then the score assigned is 1, and if false, the score assigned is 0. This score represents how likely it is for the current trace to occur, and different inference algorithms will use this information to produce a distribution over all possible traces. We can use this operator to constrain certain variables or outcomes in a model. For example in Listing \ref{lst:dice}, we roll two dice and observe that the sum is 4 - we can then find the distribution over the first die (which won't include 4,5 or 6 since they are >=4).
 						
-This function is mostly useful for discrete models when using equality in this manner, since the probability of observing any given value in a continuous distribution is zero. However, if we are dealing with ranges, then we can use hard conditioning as in listing \ref{lst:half_normal}, which constrains the standard normal distribution to be positive.
+This function is mostly useful for discrete models when using equality in this manner, since the probability of observing any given value in a continuous distribution is zero. However, if we are dealing with ranges, then we can use hard conditioning as in Listing \ref{lst:half_normal}, which constrains the standard normal distribution to be positive.
 
 \begin{figure*}[!htb]
 	\begin{minipage}{0.5\textwidth}
@@ -257,7 +256,7 @@ The simplest operation to define on models is to sample from them. Sampling from
 					
 In PPLs, a complete program is a posterior distribution of a parameter given some observed data, $P(\theta\mid x)$. The generative model, i.e. the program without condition statements, is the prior distribution, $P(\theta)$. The condition statements then define the likelihood model, $P(x\mid \theta)$, the probability of the observations in the current model. So sampling from the prior is the same as sampling normally, but ignoring the conditionals (essentially ignoring the data).
 				
-We can also take into account the conditionals, and produce weighted samples, with the weight being the score assigned by each conditional branch, accumulated by multiplying all the scores. This gives us a set of values with corresponding weights which represent how likely those values are. An important property of these weights is that they are not normalised, so we cannot use them to find the posterior directly. I have implemented several variants of functions for finding the prior and sampling, all with the same concept as listing ref{lst:sampling}.
+We can also take into account the conditionals, and produce weighted samples, with the weight being the score assigned by each conditional branch, accumulated by multiplying all the scores. This gives us a set of values with corresponding weights which represent how likely those values are. An important property of these weights is that they are not normalised, so we cannot use them to find the posterior directly. I have implemented several variants of functions for finding the prior and sampling, all with the same concept as Listing ref{lst:sampling}.
 				
 \begin{listing}[!htb]
 	\centering
@@ -301,7 +300,7 @@ This method is very naive, and therefore inefficient. Since we essentially take 
 % Why rejection doesn't work for continuous, so must use importance instead -->
 % http://www.cs.tut.fi/~elomaa/teach/AI-2013-9.pdf
 % Hard rejection
-In my implementation of rejection sampling, I take samples from the prior, with accumulated scores. If the score is above some constant threshold, then the sample is accepted, and rejected otherwise. The specific case of the general rejection sampling algorithm used here sets the proposal distribution as the prior, and we use the scores to approximate the density function of the posterior (listing \ref{lst:rej}).
+In my implementation of rejection sampling, I take samples from the prior, with accumulated scores. If the score is above some constant threshold, then the sample is accepted, and rejected otherwise. The specific case of the general rejection sampling algorithm used here sets the proposal distribution as the prior, and we use the scores to approximate the density function of the posterior (Listing \ref{lst:rej}).
 % todo: code of rejection sampling
 				
 \begin{listing}[!htb]
@@ -315,7 +314,7 @@ This method is naive, since it runs an entire trace even if the first condition 
 				
 This particular function is hard rejection, since samples with a lower score are always rejected. I have also implemented functionality to perform `soft' rejection. This method instead sets the probability of acceptance being the score attached to the sample.
 				
-A problem with rejection sampling is if conditions make most execution traces very unlikely, it will take a very large number of samples to have enough (or any) accepted samples. An example is given in listing \ref{lst:bad-reject}, where the condition only has a 1\% chance of being true. This means that, on average, for every 1000 samples, we will only accept one.
+A problem with rejection sampling is if conditions make most execution traces very unlikely, it will take a very large number of samples to have enough (or any) accepted samples. An example is given in Listing \ref{lst:bad-reject}, where the condition only has a 1\% chance of being true. This means that, on average, for every 1000 samples, we will only accept one.
 				
 % \begin{noindent}
 \begin{listing}[!htb]
@@ -381,23 +380,22 @@ It is known as `independent' metropolis hastings (IMH) since subsequent candidat
 % MCMC section
 I have implemented IMH as a function transforming distributions (\texttt{'a dist -> 'a dist}). This allows it to be composed with other inference algorithms, as well as allowing the standard sample function to be used on the output. To model a Markov chain, I use a \texttt{Core.Sequence.t} - which is a data structure for a lazy list. The constructor takes a function that takes a previous state to produce a new state and output a value - analogous to the transition function. In this case, the output is the same as the state.
 				
-One important property of the return distribution is that consecutive sample statements will need to return different values (to simulate running the chain). In order to achieve this, I create some mutable state - the sequence, which will take a step every time sample is called on the output distribution. In order to make sure this sequence is persistent, I use a reference and put it after a bind (let*) statement, incrementing the chain every time the function is called (which is only on sampling). Since the bind statement contains a function, the reference is closed over and is persistent to the output distribution.
-				
 \begin{listing}[H]
 	\centering
 	\ocamlcode{code_snippets/mh.ml}
 	\caption{Metropolis hastings}
 	\label{lst:mh}
 \end{listing}
+
+One important property of the return distribution is that consecutive sample statements will need to return different values (to simulate running the chain). In order to achieve this, I create some mutable state - the sequence, which will take a step every time sample is called on the output distribution. In order to make sure this sequence is persistent, I use a reference and put it after a bind (let*) statement, incrementing the chain every time the function is called (which is only on sampling). Since the bind statement contains a function, the reference is closed over and is persistent to the output distribution.
 				
-\FloatBarrier
 			
 \subsection{Bootstrap Particle Filter (SMC)} \label{sec:pf}
 % https://probmods.org/chapters/inference-algorithms.html
 % particle filter section
 Particle Filters are a class of algorithms which use particles to approximate a posterior. This is similar to the technique I used in importance sampling (\ref{sec:likelihood-wighting}), but the difference here is that the particles are sequentially updated as we observe condition statements (i.e. as we observe data). In fact, an example of an smc algorithm is sequential importance sampling, but here I use an algorithm called the bootstrap filter \cite{particlefilter}.
 				
-The code given in listing \ref{lst:smc} transforms a conditional distribution to a new conditional distribution. In order to find the posterior, we simply ignore the conditional by finding the prior after using the smc method.
+The code given in Listing \ref{lst:smc} transforms a conditional distribution to a new conditional distribution. In order to find the posterior, we simply ignore the conditional by finding the prior after using the smc method.
 				
 \begin{listing}[!htb]
 	\centering
@@ -467,7 +465,7 @@ Other important visualisations for continuous distributions are the Q-Q and P-P 
 	\label{fig:vis-qq}
 \end{figure}
 				
-For primitive continuous distributions, a smooth line can also be drawn since we have a function that can calculate the exact pdf or cdf. This can also be overlaid onto a histogram, to compare two distributions as in figure \ref{fig:vis-samples}.
+For primitive continuous distributions, a smooth line can also be drawn since we have a function that can calculate the exact pdf or cdf. This can also be overlaid onto a histogram, to compare two distributions as in Figure \ref{fig:vis-samples}.
 				
 \begin{figure}[!htb]
 	\centering														
@@ -505,7 +503,7 @@ I decided to use hypothesis testing to evaluate my PPL's inference implementatio
 			
 I wrote comprehensive unit tests for the deterministic functionality. The test framework I used, \texttt{Alcotest}, checks that outputs of functions match expected values. All the helper functions (e.g. normalise), the types which could be reliably created with the same values (e.g. empirical distributions), and simple distribution properties (e.g. sampling from a Dirac distribution always produces the same value) were tested.
 			
-I also used an additional library \texttt{Quickcheck}, to test that a specified invariant holds for a function - it uses randomly generated inputs to check a wide range of values. As an example (listing \ref{lst:test}), for the normalise function, we expect that the output probabilities always sum to one, no matter the input array - listing \ref{lst:test}.
+I also used an additional library \texttt{Quickcheck}, to test that a specified invariant holds for a function - it uses randomly generated inputs to check a wide range of values. As an example (Listing \ref{lst:test}), for the normalise function, we expect that the output probabilities always sum to one, no matter the input array - Listing \ref{lst:test}.
 				
 % \begin{noindent}
 			\begin{listing}[!htb]
@@ -521,12 +519,12 @@ I also used an additional library \texttt{Quickcheck}, to test that a specified 
 			\end{listing}
 % \end{noindent}
 				
-A subset of the test output and code coverage are given in figure \ref{fig:test-out}.
+A subset of the test output and code coverage are given in Figure \ref{fig:test-out}.
 			
 \begin{figure}[!htb]
 	\centering
 	\subfloat[Test report, abbreviated]{{\includegraphics[width=0.6\textwidth]{figs/tests.png} }}%
-	\qquad
+	\hfill
 	\subfloat[Code coverage report]{{\includegraphics[width=0.35\textwidth]{figs/coverage.png} }}%
 	\caption{Output from running unit tests}
 	\label{fig:test-out}
