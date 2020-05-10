@@ -306,3 +306,4 @@ TSWLatexianTemp*
 # Makeindex log files
 *.lpz
 node_modules
+ppl/doc/htmldoc_docs.pdf

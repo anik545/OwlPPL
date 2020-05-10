@@ -30,11 +30,14 @@
     (bash "pandoc $(cat doc/include_docs) -o %{target}"))
    (bash "cp %{target} /home/anik/Files/work/project/diss/chapters/docs.tex"))))
 
-(alias
- (name alldocs)
+(rule
+ (alias alldocs)
  (deps
   (alias texdoc)
-  (alias pdfdoc)))
+  (alias pdfdoc))
+  
+  (action (bash "cp -r /home/anik/Files/work/project/ppl/_build/default/_doc/_html/ /home/anik/Files/work/project/docs/"))
+)
 
 (alias
  (name doc)
