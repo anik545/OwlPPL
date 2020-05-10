@@ -26,8 +26,6 @@ let coin_model =
   let* coinweight = continuous_uniform 0. 1. in
   observe 9 Primitive.(binomial 10 coinweight)
   (return coinweight)
-
-
 ```
 
 ## Documentation
