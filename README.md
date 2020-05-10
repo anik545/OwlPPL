@@ -5,14 +5,13 @@ A universal probabilistic programming language and accompanying dissertation wri
 ## Requirements
 
  - Ocaml 4.08
- - Dune 2.0
- - 
+ - Opam
 
 ## Build + Install
 
 ```
 git clone https://github.com/anik545/OwlPPL
-opam install ppl
+opam install OwlPPL/ppl
 ```
 
 ## Usage
@@ -26,6 +25,8 @@ let coin_model =
   let* coinweight = continuous_uniform 0. 1. in
   observe 9 Primitive.(binomial 10 coinweight)
   (return coinweight)
+  
+let mean = sample_mean ~n:10000 (infer coin_model (MH(1000))) (*0.833*)
 ```
 
 ## Documentation
@@ -33,4 +34,3 @@ let coin_model =
 Build locally using `dune build @doc` in ppl
 
 https://anik545.github.io/OwlPPL/
-
